@@ -1,0 +1,39 @@
+.coconut-catch-game {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  padding: 25px;
+  border-radius: 18px;
+  background: linear-gradient(#8ae0ec 0 64%, #f6d088 64%);
+  text-align: center;
+  font-weight: 800;
+}
+.coconut-catch-game__palm {
+  position: absolute;
+  top: 25px;
+  left: 20px;
+  font-size: 6rem;
+  transform: rotate(-12deg);
+}
+.coconut-catch-game__coconut {
+  position: absolute;
+  top: 100px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 4.5rem;
+  transition: left 0.18s ease;
+}
+.coconut-catch-game__basket {
+  position: absolute;
+  bottom: 42px;
+  left: calc(50% - 32px);
+  font-size: 4rem;
+}
+.coconut-catch-game small {
+  position: absolute;
+  bottom: 19px;
+  left: 0;
+  width: 100%;
+  color: #316378;
+}

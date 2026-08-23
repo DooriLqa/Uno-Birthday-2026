@@ -1,0 +1,33 @@
+.treasure-map-game {
+  min-height: 360px;
+  padding: 25px;
+  border-radius: 18px;
+  background: #ded1aa;
+  background-image:
+    linear-gradient(45deg, rgba(128, 88, 35, 0.07) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(128, 88, 35, 0.07) 25%, transparent 25%);
+  background-size: 20px 20px;
+  text-align: center;
+  font-weight: 800;
+}
+.treasure-map-game__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  justify-content: center;
+  gap: 9px;
+  margin-top: 35px;
+}
+.treasure-map-game__grid button {
+  height: 72px;
+  border: 2px dashed #9a753d;
+  border-radius: 12px;
+  background: #f7e9bf;
+  color: #805f30;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+.treasure-map-game small {
+  display: block;
+  margin-top: 28px;
+  color: #6d512b;
+}
