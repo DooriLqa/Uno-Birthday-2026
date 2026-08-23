@@ -8,6 +8,7 @@ import { WaveRiderGame } from '@/features/wave-rider'
 import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
 import { Button } from '@/shared/ui/Button'
+import { TimeAttackGame } from '@/features/time-attack'
 
 const gameScreens = {
   'shell-hunt': ShellHuntGame,
@@ -15,6 +16,7 @@ const gameScreens = {
   'wave-rider': WaveRiderGame,
   'ice-cream': IceCreamGame,
   'treasure-map': TreasureMapGame,
+  'time-attack': TimeAttackGame,
 }
 
 export function GamePage() {

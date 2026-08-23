@@ -48,6 +48,14 @@ export const games: Game[] = [
     color: '#ded1aa',
     target: 'сокровище',
   },
+  {
+    id: 'time-attack',
+    title: 'Время атакует',
+    description: 'Оно близко.',
+    emoji: '⏱️',
+    color: '#bdbcbc',
+    target: 'часы',
+  },
 ]
 
 export const getGame = (id: string | undefined) => games.find((game) => game.id === id)
