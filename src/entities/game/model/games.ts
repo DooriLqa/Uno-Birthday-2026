@@ -50,8 +50,8 @@ export const games: Game[] = [
   },
   {
     id: 'time-attack',
-    title: 'Время атакует',
-    description: 'Оно близко.',
+    title: 'На лугу пасутся...',
+    description: '¿Qué horas son, mi corazón?',
     emoji: '⏱️',
     color: '#bdbcbc',
     target: 'часы',

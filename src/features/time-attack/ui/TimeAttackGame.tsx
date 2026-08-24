@@ -14,6 +14,11 @@ import bark2 from "../../../assets/TimeAttackGame/bark2.mp3";
 import bark3 from "../../../assets/TimeAttackGame/bark3.mp3";
 import bark4 from "../../../assets/TimeAttackGame/bark4.mp3";
 
+type TimeAttackGameProps = {
+  isFinished?: boolean;
+  finishedBackground?: string;
+};
+
 type Direction = -1 | 0 | 1;
 
 type Dog = {
@@ -28,23 +33,15 @@ type Dog = {
 
 const GAME_WIDTH = 720;
 const GAME_HEIGHT = 480;
-
 const HALF_WIDTH = GAME_WIDTH / 2;
 
-// Нижние 200 пикселей игрового поля
+// Собаки могут находиться только в нижних 200 px.
 const PLAY_TOP = GAME_HEIGHT - 200;
 
 const DOG_SIZE = 72;
 
+// Левая группа — 5 собак.
 const LEFT_DOGS = [
-  dog12,
-  dog3,
-  dog2,
-  dog1,
-  dog1,
-];
-
-const RIGHT_DOGS = [
   dog12,
   dog11,
   dog6,
@@ -53,6 +50,15 @@ const RIGHT_DOGS = [
   dog3,
   dog2,
   dog2,
+  dog1,
+];
+
+// Правая группа — 9 собак.
+const RIGHT_DOGS = [
+  dog12,
+  dog3,
+  dog2,
+  dog1,
   dog1,
 ];
 
@@ -82,8 +88,6 @@ const getRandomSpeed = (): number => {
 };
 
 const getRandomY = (): number => {
-  // Собака всегда находится только в нижних 200px.
-  // Учитываем размер самой картинки.
   return (
     PLAY_TOP +
     Math.random() * (200 - DOG_SIZE)
@@ -96,25 +100,24 @@ const getRandomChangeDelay = (): number => {
 
 const playRandomBark = () => {
   const randomIndex = Math.floor(
-    Math.random() * BARK_SOUNDS.length
+    Math.random() * BARK_SOUNDS.length,
   );
 
-  const audio = new Audio(
-    BARK_SOUNDS[randomIndex]
-  );
+  const audio = new Audio(BARK_SOUNDS[randomIndex]);
 
   audio.currentTime = 0;
+
   audio.play().catch((error) => {
     console.error(
       "Не удалось воспроизвести звук:",
-      error
+      error,
     );
   });
 };
 
 const createDogs = (
   sources: string[],
-  side: "left" | "right"
+  side: "left" | "right",
 ): Dog[] => {
   const minX =
     side === "left"
@@ -129,18 +132,12 @@ const createDogs = (
   return sources.map((src, index) => ({
     id: `${side}-${index}-${src}`,
     src,
-
     x:
       minX +
-      Math.random() *
-      (maxX - minX),
-
+      Math.random() * (maxX - minX),
     y: getRandomY(),
-
     direction: getRandomDirection(),
-
     speed: getRandomSpeed(),
-
     nextChange:
       performance.now() +
       getRandomChangeDelay(),
@@ -151,7 +148,7 @@ const updateDogs = (
   dogs: Dog[],
   side: "left" | "right",
   now: number,
-  deltaSeconds: number
+  deltaSeconds: number,
 ): Dog[] => {
   const minX =
     side === "left"
@@ -168,13 +165,9 @@ const updateDogs = (
     let speed = dog.speed;
     let nextChange = dog.nextChange;
 
-    // Через случайный промежуток времени
-    // собака выбирает новое состояние:
-    // влево / вправо / стоять.
     if (now >= nextChange) {
       direction = getRandomDirection();
       speed = getRandomSpeed();
-
       nextChange =
         now + getRandomChangeDelay();
     }
@@ -185,20 +178,16 @@ const updateDogs = (
       speed *
       deltaSeconds;
 
-    // Левая граница своей области
     if (x <= minX) {
       x = minX;
       direction = getRandomDirection();
-
       nextChange =
         now + getRandomChangeDelay();
     }
 
-    // Правая граница своей области
     if (x >= maxX) {
       x = maxX;
       direction = getRandomDirection();
-
       nextChange =
         now + getRandomChangeDelay();
     }
@@ -213,22 +202,17 @@ const updateDogs = (
   });
 };
 
-const TimeAttackGame: React.FC = () => {
-  const [leftDogs, setLeftDogs] =
-    useState<Dog[]>(() =>
-      createDogs(
-        LEFT_DOGS,
-        "left"
-      )
-    );
+const TimeAttackGame: React.FC<TimeAttackGameProps> = ({
+  isFinished = false,
+  finishedBackground,
+}) => {
+  const [leftDogs, setLeftDogs] = useState<Dog[]>(() =>
+    createDogs(LEFT_DOGS, "left"),
+  );
 
-  const [rightDogs, setRightDogs] =
-    useState<Dog[]>(() =>
-      createDogs(
-        RIGHT_DOGS,
-        "right"
-      )
-    );
+  const [rightDogs, setRightDogs] = useState<Dog[]>(() =>
+    createDogs(RIGHT_DOGS, "right"),
+  );
 
   const animationFrameRef =
     useRef<number | null>(null);
@@ -237,18 +221,19 @@ const TimeAttackGame: React.FC = () => {
     useRef<number | null>(null);
 
   useEffect(() => {
+    // После правильного ответа останавливаем движение.
+    if (isFinished) {
+      return;
+    }
+
     const animate = (now: number) => {
-      if (
-        lastTimeRef.current === null
-      ) {
+      if (lastTimeRef.current === null) {
         lastTimeRef.current = now;
       }
 
       const deltaSeconds = Math.min(
-        (now -
-          lastTimeRef.current) /
-        1000,
-        0.05
+        (now - lastTimeRef.current) / 1000,
+        0.05,
       );
 
       lastTimeRef.current = now;
@@ -258,8 +243,8 @@ const TimeAttackGame: React.FC = () => {
           dogs,
           "left",
           now,
-          deltaSeconds
-        )
+          deltaSeconds,
+        ),
       );
 
       setRightDogs((dogs) =>
@@ -267,75 +252,91 @@ const TimeAttackGame: React.FC = () => {
           dogs,
           "right",
           now,
-          deltaSeconds
-        )
+          deltaSeconds,
+        ),
       );
 
       animationFrameRef.current =
-        requestAnimationFrame(
-          animate
-        );
+        requestAnimationFrame(animate);
     };
 
     animationFrameRef.current =
-      requestAnimationFrame(
-        animate
-      );
+      requestAnimationFrame(animate);
 
     return () => {
       if (
-        animationFrameRef.current !==
-        null
+        animationFrameRef.current !== null
       ) {
         cancelAnimationFrame(
-          animationFrameRef.current
+          animationFrameRef.current,
         );
       }
 
+      animationFrameRef.current = null;
       lastTimeRef.current = null;
     };
-  }, []);
+  }, [isFinished]);
 
   return (
-    <div className="time-attack-game">
-      {/* Левая группа */}
-      <div className="time-attack-game__group time-attack-game__group--left">
-        {leftDogs.map((dog) => (
-          <img
-            key={dog.id}
-            className="time-attack-game__dog"
-            src={dog.src}
-            alt=""
-            draggable={false}
-            onClick={playRandomBark}
-            style={{
-              transform: `
-                translate3d(${dog.x}px, ${dog.y}px, 0)
-                scaleX(${dog.direction === -1 ? -1 : 1})
-              `,
-            }}
-          />
-        ))}
-      </div>
+    <div
+      className="time-attack-game"
+      style={
+        isFinished && finishedBackground
+          ? {
+            backgroundImage: `url(${finishedBackground})`,
+          }
+          : undefined
+      }
+    >
+      {/* После завершения обе группы собак
+          полностью удаляются из DOM. */}
+      {!isFinished && (
+        <>
+          {/* Левая группа */}
+          <div className="time-attack-game__group time-attack-game__group--left">
+            {leftDogs.map((dog) => (
+              <img
+                key={dog.id}
+                className="time-attack-game__dog"
+                src={dog.src}
+                alt=""
+                draggable={false}
+                onClick={playRandomBark}
+                style={{
+                  left: `${dog.x}px`,
+                  top: `${dog.y}px`,
+                  transform: `scaleX(${dog.direction === -1
+                      ? -1
+                      : 1
+                    })`,
+                }}
+              />
+            ))}
+          </div>
 
-      {/* Правая группа */}
-      <div className="time-attack-game__group time-attack-game__group--right">
-        {rightDogs.map((dog) => (
-          <img
-            key={dog.id}
-            className="time-attack-game__dog"
-            src={dog.src}
-            alt=""
-            draggable={false}
-            onClick={playRandomBark}
-            style={{
-              left: `${dog.x}px`,
-              top: `${dog.y}px`,
-              transform: `scaleX(${dog.direction === -1 ? -1 : 1})`,
-            }}
-          />
-        ))}
-      </div>
+          {/* Правая группа */}
+          <div className="time-attack-game__group time-attack-game__group--right">
+            {rightDogs.map((dog) => (
+              <img
+                key={dog.id}
+                className="time-attack-game__dog"
+                src={dog.src}
+                alt=""
+                draggable={false}
+                onClick={playRandomBark}
+                style={{
+                  left: `${dog.x}px`,
+                  top: `${dog.y}px`,
+                  transform: `scaleX(${dog.direction === -1
+                      ? -1
+                      : 1
+                    })`,
+                }}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -1,0 +1,24 @@
+.time-attack-hint {
+    margin-top: 32px;
+}
+
+.time-attack-hint summary {
+    cursor: pointer;
+    user-select: none;
+}
+
+.time-attack-hint__levels {
+    margin-top: 12px;
+}
+
+.time-attack-hint__levels details {
+    margin-top: 8px;
+}
+
+.time-attack-hint__levels summary {
+    cursor: pointer;
+}
+
+.time-attack-hint p {
+    margin-top: 8px;
+}
