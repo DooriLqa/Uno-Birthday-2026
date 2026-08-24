@@ -1,1 +1,1 @@
-export { TimeAttackGame } from './ui/TimeAttackGame'
+export { default as TimeAttackGame } from './ui/TimeAttackGame';

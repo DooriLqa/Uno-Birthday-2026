@@ -1,48 +1,66 @@
-.shell-hunt-game {
-  min-height: 360px;
-  overflow: hidden;
-  padding: 25px;
-  border-radius: 18px;
-  background: linear-gradient(#75d8ed 0 35%, #f9da9b 35%);
-  text-align: center;
-  font-weight: 800;
-}
-
-.shell-hunt-game__shore {
+.time-attack-game {
   position: relative;
-  height: 215px;
-  margin-top: 25px;
+
+  width: 720px;
+  height: 480px;
+
+  overflow: hidden;
+
+  background-image: url("../../../assets/TimeAttackGame/background.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 720px 480px;
 }
 
-.shell-hunt-game__shore>span {
-  display: block;
-  font-size: 3rem;
-  letter-spacing: 12px;
+/*
+ * Обе группы занимают всё игровое поле.
+ * clip-path ограничивает каждую группу
+ * своей половиной.
+ */
+.time-attack-game__group {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 720px;
+  height: 480px;
+
+  overflow: hidden;
+
+  pointer-events: auto;
 }
 
-.shell-hunt-game__shells {
-  display: flex;
-  justify-content: center;
-  gap: 22px;
-  margin-top: 75px;
+/* Только левая половина */
+.time-attack-game__group--left {
+  clip-path: inset(0 360px 0 0);
 }
 
-.shell-hunt-game__shells button {
-  width: 88px;
-  height: 88px;
-  border: 0;
-  border-radius: 50%;
-  background: #fff8e9;
-  box-shadow: 0 5px 0 #d7b879;
+/* Только правая половина */
+.time-attack-game__group--right {
+  clip-path: inset(0 0 0 360px);
+}
+
+/*
+ * Размер изображения собаки.
+ * При необходимости можно изменить
+ * только это значение.
+ */
+.time-attack-game__dog {
+  position: absolute;
+
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  user-select: none;
+
+  pointer-events: auto;
+
   cursor: pointer;
-  font-size: 3.4rem;
-}
 
-.shell-hunt-game__shells button:disabled {
-  cursor: default;
-  opacity: 0.72;
-}
+  transform-origin: center center;
 
-.shell-hunt-game small {
-  color: #316378;
+  will-change: left, top, transform;
 }
