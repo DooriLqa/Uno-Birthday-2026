@@ -1,0 +1,89 @@
+.lock-picking-game {
+  position: relative;
+  min-height: 390px;
+  padding: 25px 25px 22px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 25%, #3b4850 0, #1c252b 42%, #11171b 100%);
+  color: #f2d59b;
+  text-align: center;
+  font-weight: 800;
+}
+.lock-picking-game__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #c6d0d0;
+  font-size: 0.9rem;
+}
+.lock-picking-game__header p {
+  margin: 0;
+}
+.lock-picking-game__lock {
+  position: relative;
+  width: 132px;
+  height: 145px;
+  margin: 20px auto 15px;
+  border: 7px solid #9b743a;
+  border-radius: 12px 12px 18px 18px;
+  background: linear-gradient(135deg, #d6ad62, #725026 46%, #b38a46);
+  box-shadow: inset 0 0 0 4px #e4c681, 0 12px 25px #0008;
+}
+.lock-picking-game__shackle {
+  position: absolute;
+  top: -58px;
+  left: 25px;
+  width: 68px;
+  height: 72px;
+  border: 12px solid #b8904e;
+  border-bottom: 0;
+  border-radius: 42px 42px 0 0;
+  box-shadow: inset 4px 2px 0 #e4c681;
+}
+.lock-picking-game__plate {
+  margin-top: 34px;
+  color: #f5d48a;
+  font-size: 2.4rem;
+  text-shadow: 0 2px 2px #684719;
+}
+.lock-picking-game__keyhole {
+  width: 17px;
+  height: 29px;
+  margin: 8px auto;
+  border-radius: 50% 50% 45% 45%;
+  background: #25201a;
+  box-shadow: 0 1px 0 #e6c477;
+}
+.lock-picking-game__sequence {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.lock-picking-game__sequence span {
+  display: grid;
+  place-items: center;
+  width: 37px;
+  height: 37px;
+  border: 1px solid #56656a;
+  border-radius: 6px;
+  background: #263238;
+  color: #738187;
+  font-size: 1.55rem;
+}
+.lock-picking-game__sequence span.is-done {
+  border-color: #b8904e;
+  background: #725026;
+  color: #f5d48a;
+}
+.lock-picking-game__sequence span.is-current {
+  border-color: #f5d48a;
+  background: #f5d48a;
+  color: #29231a;
+  box-shadow: 0 0 0 3px #f5d48a33, 0 0 17px #f5d48a99;
+}
+.lock-picking-game__message {
+  margin: 17px 0 0;
+  color: #c6d0d0;
+  font-size: 0.9rem;
+}
