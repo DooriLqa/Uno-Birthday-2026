@@ -48,6 +48,14 @@ export const games: Game[] = [
     color: '#ded1aa',
     target: 'сокровище',
   },
+  {
+    id: 'Japonsk',
+    title: 'Кроссворд от патапоныча',
+    description: 'Мы в пизде Taa.',
+    emoji: '🗺️',
+    color: '#ded1aa',
+    target: 'Патапон',
+  },
 ]
 
 export const getGame = (id: string | undefined) => games.find((game) => game.id === id)

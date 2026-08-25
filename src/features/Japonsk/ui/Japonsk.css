@@ -1,0 +1,86 @@
+.Japonsk {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.Japonsk__grid {
+  display: grid;
+  gap: 0;
+  margin-top: 10px;
+}
+
+/* Подсказки сверху */
+.Japonsk__column-hint {
+  height: 45px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 4px;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+/* Подсказки слева */
+.Japonsk__row-hint {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding-right: 7px;
+  font-size: 14px;
+}
+
+/* Клетки */
+.Japonsk__cell {
+  width: 45px;
+  height: 45px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #777;
+  border-radius: 0;
+  background: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.Japonsk__cell:hover {
+  background: #e8e8e8;
+}
+
+.Japonsk__cell--filled {
+  background: #222;
+}
+
+.Japonsk__cell--filled:hover {
+  background: #222;
+}
+
+.Japonsk__cell--cross {
+  background: #fff;
+  color: #222;
+}
+
+.Japonsk__check {
+  margin-top: 20px;
+  padding: 7px 14px;
+  border: 1px solid #777;
+  border-radius: 3px;
+  background: #eee;
+  cursor: pointer;
+}
+
+.Japonsk__check:hover {
+  background: #ddd;
+}
+
+.Japonsk__cell--right-border {
+  border-right: 3px solid #222;
+}
+
+.Japonsk__cell--bottom-border {
+  border-bottom: 3px solid #222;
+}

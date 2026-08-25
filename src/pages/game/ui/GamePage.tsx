@@ -8,13 +8,14 @@ import { WaveRiderGame } from '@/features/wave-rider'
 import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
 import { Button } from '@/shared/ui/Button'
-
+import { Japonsk } from '@/features/Japonsk'
 const gameScreens = {
   'shell-hunt': ShellHuntGame,
   'coconut-catch': CoconutCatchGame,
   'wave-rider': WaveRiderGame,
   'ice-cream': IceCreamGame,
   'treasure-map': TreasureMapGame,
+  Japonsk: Japonsk,
 }
 
 export function GamePage() {
