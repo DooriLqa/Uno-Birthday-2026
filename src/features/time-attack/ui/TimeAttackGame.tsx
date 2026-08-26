@@ -29,6 +29,11 @@ type Dog = {
   direction: Direction;
   speed: number;
   nextChange: number;
+  zIndex: number;
+
+  // Параметры плавного движения по оси Y
+  yDirection: -1 | 1;
+  ySpeed: number;
 };
 
 const GAME_WIDTH = 720;
@@ -39,8 +44,7 @@ const HALF_WIDTH = GAME_WIDTH / 2;
 const PLAY_TOP = GAME_HEIGHT - 200;
 
 const DOG_SIZE = 72;
-
-// Левая группа — 5 собак.
+// Собаки группы минуты, гуляют слева. Большое дерево.
 const LEFT_DOGS = [
   dog12,
   dog11,
@@ -53,7 +57,7 @@ const LEFT_DOGS = [
   dog1,
 ];
 
-// Правая группа — 9 собак.
+// Собаки группы часы, гуляют справа. Маленькое дерево.
 const RIGHT_DOGS = [
   dog12,
   dog3,
@@ -96,6 +100,10 @@ const getRandomY = (): number => {
 
 const getRandomChangeDelay = (): number => {
   return 700 + Math.random() * 2200;
+};
+
+const getRandomZIndex = (): number => {
+  return Math.random() < 0.5 ? 1 : 2;
 };
 
 const playRandomBark = () => {
@@ -141,6 +149,11 @@ const createDogs = (
     nextChange:
       performance.now() +
       getRandomChangeDelay(),
+    zIndex: getRandomZIndex(),
+
+    // У каждой собаки своё направление и скорость по Y.
+    yDirection: Math.random() < 0.5 ? -1 : 1,
+    ySpeed: 5 + Math.random() * 12,
   }));
 };
 
@@ -164,9 +177,40 @@ const updateDogs = (
     let direction = dog.direction;
     let speed = dog.speed;
     let nextChange = dog.nextChange;
+    let zIndex = dog.zIndex;
+
+    // Вертикальное движение
+    let y = dog.y;
+    let yDirection = dog.yDirection;
+
+    y +=
+      yDirection *
+      dog.ySpeed *
+      deltaSeconds;
+
+    const minY = PLAY_TOP;
+    const maxY = GAME_HEIGHT - DOG_SIZE;
+
+    if (y <= minY) {
+      y = minY;
+      yDirection = 1;
+    }
+
+    if (y >= maxY) {
+      y = maxY;
+      yDirection = -1;
+    }
 
     if (now >= nextChange) {
-      direction = getRandomDirection();
+      const newDirection =
+        getRandomDirection();
+
+      // Меняем слой только при фактической смене направления.
+      if (newDirection !== direction) {
+        zIndex = getRandomZIndex();
+      }
+
+      direction = newDirection;
       speed = getRandomSpeed();
       nextChange =
         now + getRandomChangeDelay();
@@ -180,14 +224,32 @@ const updateDogs = (
 
     if (x <= minX) {
       x = minX;
-      direction = getRandomDirection();
+
+      const newDirection =
+        getRandomDirection();
+
+      // Разворот на границе также меняет слой.
+      if (newDirection !== direction) {
+        zIndex = getRandomZIndex();
+      }
+
+      direction = newDirection;
       nextChange =
         now + getRandomChangeDelay();
     }
 
     if (x >= maxX) {
       x = maxX;
-      direction = getRandomDirection();
+
+      const newDirection =
+        getRandomDirection();
+
+      // Разворот на границе также меняет слой.
+      if (newDirection !== direction) {
+        zIndex = getRandomZIndex();
+      }
+
+      direction = newDirection;
       nextChange =
         now + getRandomChangeDelay();
     }
@@ -195,9 +257,12 @@ const updateDogs = (
     return {
       ...dog,
       x,
+      y,
       direction,
       speed,
       nextChange,
+      zIndex,
+      yDirection,
     };
   });
 };
@@ -305,9 +370,10 @@ const TimeAttackGame: React.FC<TimeAttackGameProps> = ({
                 style={{
                   left: `${dog.x}px`,
                   top: `${dog.y}px`,
+                  zIndex: dog.zIndex,
                   transform: `scaleX(${dog.direction === -1
-                      ? -1
-                      : 1
+                    ? -1
+                    : 1
                     })`,
                 }}
               />
@@ -327,9 +393,10 @@ const TimeAttackGame: React.FC<TimeAttackGameProps> = ({
                 style={{
                   left: `${dog.x}px`,
                   top: `${dog.y}px`,
+                  zIndex: dog.zIndex,
                   transform: `scaleX(${dog.direction === -1
-                      ? -1
-                      : 1
+                    ? -1
+                    : 1
                     })`,
                 }}
               />

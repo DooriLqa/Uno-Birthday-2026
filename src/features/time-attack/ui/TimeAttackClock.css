@@ -1,0 +1,234 @@
+.time-attack-clock-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Белая область с инструкцией */
+.time-attack-clock__hint {
+    margin-bottom: 14px;
+    padding: 8px 16px;
+
+    background: #ffffff;
+
+    border-radius: 6px;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    text-align: center;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.time-attack-clock {
+    position: relative;
+
+    box-sizing: border-box;
+
+    border: 8px solid #222;
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.25);
+
+    user-select: none;
+
+    /*
+     * Очень важно для перетаскивания
+     * стрелки на сенсорном экране.
+     */
+    touch-action: none;
+}
+
+.time-attack-clock--correct {
+    box-shadow:
+        0 0 0 4px rgba(0, 160, 70, 0.35),
+        0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Цифры */
+
+.time-attack-clock__number {
+    position: absolute;
+
+    transform:
+        translate(-50%, -50%);
+
+    font-size: 20px;
+    font-weight: 700;
+
+    pointer-events: none;
+
+    z-index: 2;
+}
+
+/* Деления */
+
+.time-attack-clock__ticks {
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+}
+
+.time-attack-clock__tick {
+    position: absolute;
+
+    top: 6px;
+    left: 50%;
+
+    width: 2px;
+    height: 7px;
+
+    transform-origin:
+        50% 126px;
+
+    background: #777;
+}
+
+.time-attack-clock__tick--hour {
+    width: 3px;
+    height: 12px;
+
+    background: #222;
+}
+
+/* Общий стиль стрелок */
+
+.time-attack-clock__hand {
+    position: absolute;
+
+    left: 50%;
+    bottom: 50%;
+
+    transform-origin:
+        50% 100%;
+
+    border-radius: 5px;
+
+    z-index: 5;
+}
+
+/* Часовая стрелка */
+
+.time-attack-clock__hour-hand {
+    width: 10px;
+    height: 70px;
+
+    margin-left: -5px;
+
+    background: #222;
+
+    pointer-events: none;
+}
+
+/* Минутная стрелка */
+
+.time-attack-clock__minute-hand {
+    width: 6px;
+    height: 105px;
+
+    margin-left: -11px;
+
+    background: #444;
+
+    cursor: grab;
+
+    pointer-events: auto;
+
+    padding-left: 8px;
+    padding-right: 8px;
+
+    box-sizing: content-box;
+}
+
+.time-attack-clock__minute-hand:active {
+    cursor: grabbing;
+}
+
+.time-attack-clock__hand--dragging {
+    filter: brightness(1.35);
+}
+
+/* Центр */
+
+.time-attack-clock__center {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 18px;
+    height: 18px;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background: #222;
+
+    z-index: 10;
+
+    pointer-events: none;
+}
+
+/*
+ * Результат:
+ * находится внутри часов,
+ * немного ниже центра.
+ */
+
+.time-attack-clock__result {
+    position: absolute;
+
+    left: 50%;
+    top: calc(50% + 30px);
+
+    transform:
+        translateX(-50%);
+
+    z-index: 11;
+
+    font-size: 22px;
+    font-weight: 800;
+
+    pointer-events: none;
+}
+
+.time-attack-clock__result--correct {
+    color: #16803c;
+}
+
+.time-attack-clock__result--wrong {
+    color: #b42318;
+}
+
+/* Кнопка Готово */
+
+.time-attack-clock__button {
+    margin-top: 18px;
+
+    padding: 10px 28px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #222;
+    color: #ffffff;
+
+    font-size: 17px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.time-attack-clock__button:hover {
+    opacity: 0.9;
+}

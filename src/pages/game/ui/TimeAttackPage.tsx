@@ -8,10 +8,15 @@ import { TimeAttackGame } from "@/features/time-attack";
 import background1 from "@/assets/TimeAttackGame/background1.jpg";
 
 import { useProgressStore } from "@/features/game-progress/model/store";
+import "./TimeAttackPage.css";
+import { TimeAttackClock } from "@/features/time-attack/ui/TimeAttackClock";
 
 export function TimeAttackPage() {
     const [answer, setAnswer] = useState("");
     const [isFinished, setIsFinished] = useState(false);
+    const [showCodeButton, setShowCodeButton] = useState(false);
+    const [isGameCompleted, setIsGameCompleted] = useState(false);
+    const [showClock, setShowClock] = useState(false);
 
     // Количество неверных попыток
     const [wrongAttempts, setWrongAttempts] = useState(0);
@@ -53,12 +58,11 @@ export function TimeAttackPage() {
 
         // Проверяем только после нажатия Enter
         // или кнопки "Ввести время".
-        if (answer === "23:45") {
+        if (answer === "23:40") {
             setIsFinished(true);
             setShowWrongMessage(false);
+            setShowCodeButton(true);
 
-            // Засчитываем Time Attack как пройденную игру
-            completeGame("time-attack");
             return;
         }
 
@@ -73,6 +77,20 @@ export function TimeAttackPage() {
         );
 
         setShowWrongMessage(true);
+    };
+
+    const handleGetCode = () => {
+        if (isGameCompleted) {
+            return;
+        }
+
+        setShowCodeButton(false);
+        setShowClock(true);
+    };
+
+    const handleClockCorrectTime = () => {
+        completeGame("time-attack");
+        setIsGameCompleted(true);
     };
 
     return (
@@ -98,10 +116,34 @@ export function TimeAttackPage() {
                         Тик-так! Тик-так! Часы пробили ... пора домой!
                     </p>
 
-                    <TimeAttackGame
-                        isFinished={isFinished}
-                        finishedBackground={background1}
-                    />
+                    <div className="time-attack-game-wrapper">
+                        <TimeAttackGame
+                            isFinished={isFinished}
+                            finishedBackground={background1}
+                        />
+
+                        {showCodeButton && (
+                            <button
+                                type="button"
+                                className="time-attack-code-button"
+                                onClick={handleGetCode}
+                            >
+                                Получить код
+                            </button>
+                        )}
+
+                        {showClock && (
+                            <div className="time-attack-clock-overlay">
+                                <TimeAttackClock
+                                    targetHour={23}
+                                    targetMinute={40}
+                                    onCorrectTime={
+                                        handleClockCorrectTime
+                                    }
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <aside className="info-panel">
@@ -139,15 +181,24 @@ export function TimeAttackPage() {
 
                             {showWrongMessage && (
                                 <p>
-                                    Время не конь!🐎
+                                    Давай без брут форса!🐎
                                 </p>
                             )}
                         </>
                     ) : (
-                        <p>
-                            Все собачки вернулись домой и легли спать.
-                        </p>
+                        <>
+                            <p>
+                                Все собачки вернулись домой и легли спать.
+                            </p>
+
+                            {isGameCompleted && (
+                                <p className="time-attack-completed">
+                                    Игра пройдена!
+                                </p>
+                            )}
+                        </>
                     )}
+
                     <details className="time-attack-hint">
                         <summary>Если совсем нет идей...</summary>
 
@@ -170,7 +221,7 @@ export function TimeAttackPage() {
                                     <summary>Почти ответ</summary>
 
                                     <p>
-                                        Деревья что то значят!
+                                        Деревья что-то значят!
                                         А собаки тем более!
                                     </p>
                                 </details>

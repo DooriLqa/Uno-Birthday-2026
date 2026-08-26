@@ -22,3 +22,40 @@
 .time-attack-hint p {
     margin-top: 8px;
 }
+
+.time-attack-game-wrapper {
+    position: relative;
+}
+
+.time-attack-code-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    padding: 14px 28px;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+}
+
+.time-attack-completed {
+    font-weight: 600;
+    margin-top: 12px;
+}
+
+.time-attack-clock-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 20;
+}
