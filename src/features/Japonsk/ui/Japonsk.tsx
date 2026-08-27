@@ -97,57 +97,75 @@ export function Japonsk({ onComplete }: Props) {
 
   return (
     <div className="Japonsk">
-      <p>Японский кроссворд</p>
+      <div className="Japonsk__scene">
+        <div className="Japonsk__crossword">
+          {/* Подсказки сверху */}
+          <div className="Japonsk__top-hints">
+            <div className="Japonsk__hint-corner" />
 
-      <div
-        className="Japonsk__grid"
-        style={{
-          gridTemplateColumns: `70px repeat(${solution[0].length}, 45px)`,
-        }}
-      >
-        {/* Пустой угол */}
-        <div />
-
-        {/* Подсказки сверху */}
-        {columnHints.map((hint, column) => (
-          <div className="Japonsk__column-hint" key={column}>
-            {hint.map((number, index) => (
-              <span key={index}>{number}</span>
+            {columnHints.map((hint, column) => (
+              <div
+                className={`
+                  Japonsk__column-hint
+                  ${column === 4 || column === 9 ? 'Japonsk__column-hint--divider' : ''}
+                `}
+                key={column}
+              >
+                {hint.map((number, index) => (
+                  <span key={index}>{number}</span>
+                ))}
+              </div>
             ))}
           </div>
-        ))}
 
-        {/* Подсказки слева + клетки */}
-        {board.map((row, rowIndex) => (
-          <>
-            <div className="Japonsk__row-hint" key={`hint-${rowIndex}`}>
-              {rowHints[rowIndex].map((number, index) => (
-                <span key={index}>{number}</span>
+          {/* Подсказки слева + поле */}
+          <div className="Japonsk__board-wrapper">
+            <div className="Japonsk__left-hints">
+              {rowHints.map((hint, rowIndex) => (
+                <div
+                  className={`
+                    Japonsk__row-hint
+                    ${rowIndex === 4 || rowIndex === 9 ? 'Japonsk__row-hint--divider' : ''}
+                  `}
+                  key={rowIndex}
+                >
+                  {hint.map((number, index) => (
+                    <span key={index}>{number}</span>
+                  ))}
+                </div>
               ))}
             </div>
 
-            {row.map((cell, columnIndex) => (
-              <button
-                key={`${rowIndex}-${columnIndex}`}
-                type="button"
-                className={`
-                Japonsk__cell
-                Japonsk__cell--${cell}
-                ${columnIndex === 4 || columnIndex === 9 ? 'Japonsk__cell--right-border' : ''}
-                ${rowIndex === 4 || rowIndex === 9 ? 'Japonsk__cell--bottom-border' : ''}
-              `}
-                onClick={() => clickCell(rowIndex, columnIndex)}
-              >
-                {cell === 'cross' && '×'}
-              </button>
-            ))}
-          </>
-        ))}
-      </div>
+            <div className="Japonsk__board">
+              {board.map((row, rowIndex) =>
+                row.map((cell, columnIndex) => (
+                  <button
+                    key={`${rowIndex}-${columnIndex}`}
+                    type="button"
+                    className={`
+                      Japonsk__cell
+                      Japonsk__cell--${cell}
+                      ${
+                        columnIndex === 4 || columnIndex === 9 ? 'Japonsk__cell--right-divider' : ''
+                      }
+                      ${rowIndex === 4 || rowIndex === 9 ? 'Japonsk__cell--bottom-divider' : ''}
+                    `}
+                    onClick={() => clickCell(rowIndex, columnIndex)}
+                    aria-label={`Строка ${rowIndex + 1}, столбец ${columnIndex + 1}`}
+                  >
+                    {cell === 'cross' && '×'}
+                  </button>
+                )),
+              )}
+            </div>
+          </div>
+        </div>
 
-      <button type="button" className="Japonsk__check" onClick={checkSolution}>
-        Проверить
-      </button>
+        {/* Кнопка справа */}
+        <button type="button" className="Japonsk__check" onClick={checkSolution}>
+          ПРОВЕРИТЬ
+        </button>
+      </div>
     </div>
   )
 }
