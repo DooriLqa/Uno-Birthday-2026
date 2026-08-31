@@ -1,0 +1,115 @@
+.game-island-map {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #0b9ed1;
+}
+.game-island-map__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(3px) saturate(1.1);
+  scale: 1.05;
+}
+.game-island-map__active-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(100vw, 177.7778dvh);
+  height: min(100dvh, 56.25vw);
+  translate: -50% -50%;
+}
+.game-island-map__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+.game-island-map__marker {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: clamp(42px, 5vw, 72px);
+  height: clamp(42px, 5vw, 72px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  translate: -50% -50%;
+  transition:
+    scale 0.16s ease,
+    filter 0.16s ease,
+    background 0.16s ease;
+}
+.game-island-map__marker:hover,
+.game-island-map__marker:focus-visible {
+  z-index: 2;
+  scale: 1.18;
+  filter: drop-shadow(0 0 12px #fff4a5);
+  outline: none;
+}
+.game-island-map__marker.is-completed {
+  filter: saturate(1.25) brightness(1.08);
+}
+.game-island-map__icon {
+  font-size: clamp(1.35rem, 3vw, 2.6rem);
+  line-height: 1;
+  filter: drop-shadow(0 3px 3px rgba(23, 63, 78, 0.45));
+}
+.game-island-map__tooltip {
+  position: absolute;
+  bottom: calc(100% + 13px);
+  left: 50%;
+  width: max-content;
+  max-width: 180px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: #12324a;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 5px);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+.game-island-map__tooltip::after {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  border: 6px solid transparent;
+  border-top-color: #12324a;
+  content: '';
+  translate: -50% 0;
+}
+.game-island-map__marker:hover .game-island-map__tooltip,
+.game-island-map__marker:focus-visible .game-island-map__tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+@media (min-aspect-ratio: 16 / 9) {
+  .game-island-map__active-area {
+    width: 100vw;
+    height: 56.25vw;
+  }
+}
+@media (max-aspect-ratio: 16 / 9) {
+  .game-island-map__active-area {
+    width: 177.7778dvh;
+    height: 100dvh;
+  }
+}
+@media (max-width: 600px) {
+  .game-island-map__tooltip {
+    display: none;
+  }
+}

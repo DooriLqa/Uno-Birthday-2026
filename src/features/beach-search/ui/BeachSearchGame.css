@@ -1,0 +1,121 @@
+.beach-search-game {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(19, 85, 116, 0.18);
+  background: #f8f1d7;
+}
+.beach-search-field {
+  flex: 1;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: #b9e8ee;
+  cursor: grab;
+  overscroll-behavior: contain;
+  touch-action: pan-x;
+}
+.beach-search-field:focus {
+  outline: 3px solid #ff9b6d;
+  outline-offset: -3px;
+}
+.beach-search-field__scene {
+  position: relative;
+  width: 1680px;
+  height: 100%;
+  min-height: 420px;
+  background-position: center;
+  background-size: cover;
+}
+.beach-search-field__item {
+  position: absolute;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  filter: drop-shadow(0 3px 2px rgba(51, 54, 30, 0.32));
+  transition:
+    scale 0.16s ease,
+    filter 0.16s ease;
+}
+.beach-search-field__item:hover,
+.beach-search-field__item:focus-visible {
+  scale: 1.12;
+  filter: drop-shadow(0 0 8px #fff) drop-shadow(0 3px 2px rgba(51, 54, 30, 0.4));
+  outline: none;
+}
+.beach-search-field__item img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.beach-search-checklist {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -6px 18px rgba(23, 91, 117, 0.1);
+}
+.beach-search-checklist__title {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  color: #135574;
+  font-weight: 900;
+}
+.beach-search-checklist ul {
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+}
+.beach-search-checklist li {
+  display: grid;
+  grid-template-columns: 28px max-content 18px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 4px 6px;
+  border-radius: 9px;
+  color: #25495c;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.beach-search-checklist li.is-found {
+  background: #e0f4df;
+  color: #478144;
+  text-decoration: line-through;
+}
+.beach-search-checklist img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+@media (max-width: 700px) {
+  .beach-search-checklist {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .beach-search-checklist ul {
+    width: 100%;
+  }
+  .beach-search-checklist li {
+    font-size: 0.76rem;
+  }
+  .beach-search-field__scene {
+    min-height: 360px;
+  }
+}
