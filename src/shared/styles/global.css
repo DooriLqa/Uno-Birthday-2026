@@ -515,3 +515,43 @@ h1 {
   background: transparent;
   box-shadow: none;
 }
+
+.game-overlay.beach-radio-page {
+  padding: 16px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #67cde9 0 54%, #f6d18b 54% 100%);
+}
+.beach-radio-page .page-top {
+  position: absolute;
+  z-index: 12;
+  top: 16px;
+  left: 16px;
+  margin: 0;
+}
+.beach-radio-page .page-top > span {
+  display: none;
+}
+.beach-radio-page .game-layout {
+  display: block;
+  height: 100%;
+}
+.beach-radio-page .game-panel {
+  height: 100%;
+  padding: 0;
+  border-radius: 30px;
+  background: transparent;
+  box-shadow: none;
+}
+.beach-radio-page .game-panel > h1,
+.beach-radio-page .game-panel > p {
+  display: none;
+}
+@media (max-width: 620px) {
+  .game-overlay.beach-radio-page {
+    padding: 0;
+  }
+  .beach-radio-page .page-top {
+    top: 10px;
+    left: 10px;
+  }
+}
