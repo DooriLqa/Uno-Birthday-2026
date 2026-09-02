@@ -515,3 +515,46 @@ h1 {
   background: transparent;
   box-shadow: none;
 }
+.game-overlay.book-shelf-page {
+  padding: 84px 16px 24px;
+  background-position: center;
+}
+.book-shelf-page .page-top {
+  position: relative;
+  z-index: 2;
+  width: min(1120px, 100%);
+  margin: 0 auto 14px;
+}
+.book-shelf-page .game-layout {
+  display: block;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+.book-shelf-page .game-panel {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.book-shelf-page .library-game {
+  min-height: min(650px, calc(100dvh - 245px));
+  border-color: rgba(255, 245, 215, 0.42);
+  background:
+    linear-gradient(135deg, rgba(255, 250, 231, 0.94), rgba(226, 192, 135, 0.88));
+  box-shadow:
+    0 22px 48px rgba(52, 35, 16, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+@media (max-width: 760px) {
+  .game-overlay.book-shelf-page {
+    padding: 72px 10px 14px;
+  }
+  .book-shelf-page .page-top {
+    margin-bottom: 10px;
+  }
+  .book-shelf-page .library-game {
+    min-height: calc(100dvh - 205px);
+    padding: 14px 12px 16px;
+    border-radius: 22px;
+  }
+}

@@ -7,6 +7,7 @@ import { WaveRiderGame } from '@/features/wave-rider'
 import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
 import { BeachSearchGame } from '@/features/beach-search'
+import { BookShelfGame } from '@/features/book-shelf'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-v3.png'
 import { Button } from '@/shared/ui/Button'
@@ -15,6 +16,7 @@ type Props = { gameId: string; onBack: () => void }
 
 const gameScreens = {
   'shell-hunt': ShellHuntGame,
+  'book-shelf': BookShelfGame,
   'coconut-catch': CoconutCatchGame,
   'wave-rider': WaveRiderGame,
   'ice-cream': IceCreamGame,
@@ -36,14 +38,15 @@ export function GamePage({ gameId, onBack }: Props) {
   const GameScreen = gameScreens[game.id as keyof typeof gameScreens]
   const isBeachSearch = game.id === 'beach-search'
   const isTotemCode = game.id === 'shell-hunt'
-  const isImmersiveGame = isBeachSearch || isTotemCode
+  const isBookShelf = game.id === 'book-shelf'
+  const isImmersiveGame = isBeachSearch || isTotemCode || isBookShelf
   const sceneImage = specialSceneImages[game.id] ?? islandMapImage
 
   return (
     <main
       className={`beach-shell game-overlay ${isBeachSearch ? 'beach-search-page' : ''} ${
         isTotemCode ? 'totem-code-page' : ''
-      }`}
+      } ${isBookShelf ? 'book-shelf-page' : ''}`}
       style={{ backgroundImage: `url(${sceneImage})` }}
     >
       <div className="page-top">
@@ -52,7 +55,7 @@ export function GamePage({ gameId, onBack }: Props) {
         </button>
         <span>{game.emoji}</span>
       </div>
-      <section className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''}`}>
+      <section className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''} ${isBookShelf ? 'book-shelf-layout' : ''}`}>
         <div className={`game-panel ${isBeachSearch ? 'beach-search-panel' : ''}`}>
           {!isImmersiveGame && (
             <>

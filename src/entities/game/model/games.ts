@@ -17,6 +17,14 @@ const gameList: Game[] = [
     target: 'все предметы',
   },
   {
+    id: 'book-shelf',
+    title: 'Книжная полка',
+    description: 'Разложи книги по цветам в правильный порядок.',
+    emoji: '📚',
+    color: '#e7d5ff',
+    target: 'все книги',
+  },
+  {
     id: 'shell-hunt',
     title: 'Охота за ракушками',
     description: 'Найди сокровище у кромки воды.',

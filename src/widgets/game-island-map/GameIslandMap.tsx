@@ -6,6 +6,7 @@ type Props = { games: Game[]; completedIds: string[]; onPlay: (gameId: string) =
 
 const markerPositions: Record<string, { left: string; top: string }> = {
   'shell-hunt': { left: '27%', top: '38%' },
+  'book-shelf': { left: '42%', top: '32%' },
   'coconut-catch': { left: '47%', top: '51%' },
   'wave-rider': { left: '72%', top: '37%' },
   'ice-cream': { left: '28%', top: '65%' },
