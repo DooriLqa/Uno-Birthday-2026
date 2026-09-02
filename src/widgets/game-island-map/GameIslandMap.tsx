@@ -5,6 +5,7 @@ import './GameIslandMap.css'
 type Props = { games: Game[]; completedIds: string[]; onPlay: (gameId: string) => void }
 
 const markerPositions: Record<string, { left: string; top: string }> = {
+  'beach-radio': { left: '84%', top: '72%' },
   'shell-hunt': { left: '27%', top: '38%' },
   'book-shelf': { left: '42%', top: '32%' },
   'coconut-catch': { left: '47%', top: '51%' },
