@@ -56,6 +56,14 @@ export const games: Game[] = [
     color: '#ded1aa',
     target: 'Патапон',
   },
+  {
+    id: 'robot-maze',
+    title: 'Лабиринт робота',
+    description: 'Помоги роботу найти выход из лабиринта.',
+    emoji: '🤖',
+    color: '#a9d8f2',
+    target: 'выход',
+  },
 ]
 
 export const getGame = (id: string | undefined) => games.find((game) => game.id === id)

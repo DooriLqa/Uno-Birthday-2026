@@ -1,0 +1,585 @@
+.RobotMaze {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 25px 30px;
+
+  background: linear-gradient(180deg, #73c9df 0%, #a9e3e7 38%, #e8d29a 38%, #d9b978 100%);
+
+  color: #3d2a1c;
+  font-family: Arial, sans-serif;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.RobotMaze__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  max-width: 1400px;
+
+  margin: 0 auto 20px;
+}
+
+.RobotMaze__title {
+  margin: 0;
+
+  font-size: 32px;
+  font-weight: 800;
+
+  color: #fff;
+
+  text-shadow:
+    2px 2px 0 #3f8fa3,
+    3px 3px 0 rgba(0, 0, 0, 0.15);
+}
+
+.RobotMaze__level {
+  padding: 9px 17px;
+
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.88);
+
+  color: #386c77;
+
+  font-weight: 700;
+
+  box-shadow: 0 4px 10px rgba(55, 100, 110, 0.15);
+}
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.RobotMaze__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 1400px;
+
+  margin: 0 auto;
+}
+
+/* =========================================================
+   MAZE
+   ========================================================= */
+
+.RobotMaze__maze {
+  display: grid;
+
+  gap: 0;
+
+  padding: 8px;
+
+  border-radius: 16px;
+
+  background: linear-gradient(135deg, #f2d697, #d6ae65);
+
+  box-shadow:
+    0 10px 0 rgba(117, 78, 38, 0.18),
+    0 18px 30px rgba(53, 87, 80, 0.2);
+
+  overflow: hidden;
+}
+
+/* =========================================================
+   CELLS
+   ========================================================= */
+
+.RobotMaze__cell {
+  position: relative;
+
+  width: 40px;
+  height: 40px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================================================
+   FLOOR — ПЕСОК
+   ========================================================= */
+
+.RobotMaze__cell--1,
+.RobotMaze__cell--2,
+.RobotMaze__cell--3,
+.RobotMaze__cell--4 {
+  background:
+    radial-gradient(circle at 20% 25%, rgba(255, 255, 255, 0.35) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 70%, rgba(125, 87, 42, 0.18) 0 1px, transparent 2px), #e8c77d;
+
+  border: 1px solid rgba(160, 119, 58, 0.25);
+}
+
+/* =========================================================
+   WALL — ПЕСОК / КАМНИ
+   ========================================================= */
+
+.RobotMaze__cell--0 {
+  background:
+    radial-gradient(circle at 30% 25%, #d9a95d 0 4px, transparent 5px),
+    radial-gradient(circle at 70% 65%, #b98546 0 5px, transparent 6px),
+    linear-gradient(135deg, #c89550, #a9753c);
+
+  border: 2px solid #8e6031;
+
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 224, 153, 0.25),
+    inset -2px -2px 0 rgba(92, 54, 25, 0.2);
+}
+
+/* =========================================================
+   START
+   ========================================================= */
+
+.RobotMaze__cell--2 {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent 60%), #edcf85;
+
+  box-shadow: inset 0 0 0 3px rgba(72, 164, 173, 0.25);
+}
+
+/* =========================================================
+   EXIT — МОРЕ
+   ========================================================= */
+
+.RobotMaze__cell--3 {
+  background: linear-gradient(180deg, #68c6d4 0%, #3ca8bd 100%);
+
+  border: 2px solid #25899e;
+}
+
+.RobotMaze__exit {
+  font-size: 27px;
+
+  filter: drop-shadow(2px 3px 0 rgba(49, 88, 76, 0.25));
+
+  animation: exitFloat 1.8s ease-in-out infinite;
+}
+
+@keyframes exitFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* =========================================================
+   CHEST
+   ========================================================= */
+
+.RobotMaze__cell--4 {
+  background: radial-gradient(circle at center, #f2d894, #e0bd6d);
+
+  border: 2px solid #bd914c;
+}
+
+.RobotMaze__chest {
+  position: relative;
+
+  font-size: 27px;
+
+  filter: drop-shadow(2px 3px 0 rgba(79, 51, 24, 0.3));
+
+  animation: chestBounce 1.5s ease-in-out infinite;
+}
+
+.RobotMaze__chest::after {
+  content: '';
+
+  position: absolute;
+
+  left: 50%;
+  bottom: -5px;
+
+  width: 25px;
+  height: 5px;
+
+  transform: translateX(-50%);
+
+  background: rgba(76, 52, 29, 0.2);
+
+  border-radius: 50%;
+
+  filter: blur(2px);
+}
+
+.RobotMaze__chest--opened {
+  animation: none;
+
+  filter: drop-shadow(0 0 8px rgba(255, 220, 80, 0.9));
+}
+
+@keyframes chestBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* =========================================================
+   ROBOT
+   ========================================================= */
+
+.RobotMaze__robot {
+  position: absolute;
+
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  font-size: 28px;
+
+  transition: transform 0.25s ease;
+
+  filter: drop-shadow(2px 3px 0 rgba(50, 60, 60, 0.25));
+}
+
+/* =========================================================
+   PANEL — ТЕПЕРЬ СНИЗУ
+   ========================================================= */
+
+.RobotMaze__panel {
+  width: min(100%, 900px);
+
+  margin-top: 24px;
+  padding: 18px;
+
+  box-sizing: border-box;
+
+  border-radius: 18px;
+
+  background: linear-gradient(180deg, #fff4d5, #f3d99d);
+
+  border: 3px solid #c49350;
+
+  box-shadow:
+    0 8px 0 rgba(117, 78, 38, 0.2),
+    0 15px 30px rgba(53, 87, 80, 0.18);
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.RobotMaze__status {
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+  padding: 8px 12px;
+
+  box-sizing: border-box;
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.65);
+
+  color: #634326;
+
+  text-align: center;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   PROGRAM
+   ========================================================= */
+
+.RobotMaze__program-title {
+  margin-bottom: 8px;
+
+  color: #79532d;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+}
+
+.RobotMaze__program {
+  display: grid;
+
+  grid-template-columns: repeat(10, 1fr);
+
+  gap: 5px;
+
+  margin-bottom: 16px;
+}
+
+.RobotMaze__slot {
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+
+  background: rgba(255, 255, 255, 0.5);
+
+  border: 2px solid rgba(174, 132, 73, 0.4);
+
+  color: #654523;
+
+  font-size: 21px;
+  font-weight: 700;
+
+  box-sizing: border-box;
+}
+
+.RobotMaze__slot--active {
+  background: #fff0a8;
+
+  border-color: #e5ad32;
+
+  box-shadow: 0 0 0 3px rgba(229, 173, 50, 0.25);
+
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   COMMAND BUTTONS
+   ========================================================= */
+
+.RobotMaze__command-buttons {
+  display: flex;
+  justify-content: center;
+
+  gap: 10px;
+
+  margin-bottom: 12px;
+}
+
+.RobotMaze__command {
+  width: 130px;
+  min-height: 64px;
+
+  border: 2px solid #b9894a;
+
+  border-radius: 11px;
+
+  background: linear-gradient(180deg, #fff1c7, #e7c17b);
+
+  color: #674521;
+
+  cursor: pointer;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.RobotMaze__command:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow: 0 4px 0 rgba(116, 76, 35, 0.2);
+}
+
+.RobotMaze__command:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.RobotMaze__command:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+.RobotMaze__command-icon {
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 25px;
+}
+
+/* =========================================================
+   MAIN BUTTONS
+   ========================================================= */
+
+.RobotMaze__buttons {
+  display: flex;
+  justify-content: center;
+
+  gap: 8px;
+}
+
+.RobotMaze__button {
+  min-width: 120px;
+  min-height: 40px;
+
+  border: none;
+
+  border-radius: 9px;
+
+  background: #b98545;
+
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow: 0 4px 0 #8e6031;
+
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.RobotMaze__button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.RobotMaze__button:active:not(:disabled) {
+  transform: translateY(2px);
+
+  box-shadow: 0 2px 0 #8e6031;
+}
+
+.RobotMaze__button--run {
+  background: linear-gradient(180deg, #49b8c5, #258d9e);
+
+  box-shadow: 0 4px 0 #1e6d79;
+}
+
+.RobotMaze__button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+.RobotMaze__stats {
+  display: flex;
+  justify-content: center;
+
+  gap: 40px;
+
+  margin-top: 15px;
+  padding-top: 12px;
+
+  border-top: 2px dashed rgba(139, 96, 47, 0.3);
+
+  color: #76512e;
+
+  font-size: 13px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .RobotMaze {
+    padding: 20px;
+  }
+
+  .RobotMaze__panel {
+    width: min(100%, 700px);
+  }
+
+  .RobotMaze__program {
+    grid-template-columns: repeat(10, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .RobotMaze {
+    padding: 12px;
+  }
+
+  .RobotMaze__header {
+    margin-bottom: 15px;
+  }
+
+  .RobotMaze__title {
+    font-size: 23px;
+  }
+
+  .RobotMaze__level {
+    padding: 7px 11px;
+
+    font-size: 12px;
+  }
+
+  .RobotMaze__maze {
+    padding: 5px;
+  }
+
+  .RobotMaze__cell {
+    width: 32px;
+    height: 32px;
+  }
+
+  .RobotMaze__robot {
+    font-size: 22px;
+  }
+
+  .RobotMaze__chest {
+    font-size: 21px;
+  }
+
+  .RobotMaze__exit {
+    font-size: 21px;
+  }
+
+  .RobotMaze__panel {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .RobotMaze__program {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .RobotMaze__command {
+    width: 100px;
+    min-height: 58px;
+  }
+
+  .RobotMaze__buttons {
+    flex-wrap: wrap;
+  }
+
+  .RobotMaze__button {
+    min-width: 100px;
+  }
+
+  .RobotMaze__stats {
+    gap: 20px;
+  }
+}

@@ -8,14 +8,17 @@ import { WaveRiderGame } from '@/features/wave-rider'
 import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
 import { Button } from '@/shared/ui/Button'
-import { Japonsk } from '@/features/Japonsk'
+import { Japonsk } from '@/features/cropp/Japonsk'
+import { RobotMazeGame } from '@/features/cropp/RobotMazeGame'
+
 const gameScreens = {
   'shell-hunt': ShellHuntGame,
   'coconut-catch': CoconutCatchGame,
   'wave-rider': WaveRiderGame,
   'ice-cream': IceCreamGame,
   'treasure-map': TreasureMapGame,
-  Japonsk: Japonsk,
+  japonsk: Japonsk,
+  'robot-maze': RobotMazeGame,
 }
 
 export function GamePage() {
