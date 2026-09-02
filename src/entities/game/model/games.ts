@@ -9,6 +9,14 @@ export type Game = {
 
 const gameList: Game[] = [
   {
+    id: 'beach-radio',
+    title: 'Радио Бони',
+    description: 'Выиграй радиоприёмник и найди тайные частоты.',
+    emoji: '📻',
+    color: '#f2c98c',
+    target: 'радиоприёмник',
+  },
+  {
     id: 'beach-search',
     title: 'Поиск на пляже',
     description: 'Найди предметы на большом пляже.',
