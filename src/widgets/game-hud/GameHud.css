@@ -1,7 +1,7 @@
 .game-hud {
   position: fixed;
   z-index: 55;
-  top: 92px;
+  top: 76px;
   left: 16px;
   right: 16px;
   display: flex;
@@ -11,19 +11,22 @@
   pointer-events: none;
 }
 .game-hud__coins,
-.game-hud__inventory {
+.game-hud__inventory,
+.game-hud__radio-widget {
+  border: 2px solid rgba(112, 66, 29, 0.25);
+  background: rgba(255, 250, 228, 0.94);
+  box-shadow: 0 6px 16px rgba(23, 91, 117, 0.18);
+  color: #70421d;
+  backdrop-filter: blur(7px);
+  pointer-events: auto;
+}
+.game-hud__coins {
   display: flex;
   align-items: center;
   gap: 9px;
   padding: 8px 11px;
-  border: 2px solid rgba(112, 66, 29, 0.25);
   border-radius: 15px;
-  background: rgba(255, 250, 228, 0.94);
-  box-shadow: 0 6px 16px rgba(23, 91, 117, 0.18);
-  color: #70421d;
   font-weight: 900;
-  backdrop-filter: blur(7px);
-  pointer-events: auto;
 }
 .game-hud__coin-icon {
   display: grid;
@@ -40,13 +43,22 @@
 .game-hud__coins strong {
   font-size: 1.05rem;
 }
+.game-hud__right {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
 .game-hud__inventory {
+  display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 5px;
+  padding: 7px 9px;
+  border-radius: 15px;
+  font-weight: 900;
 }
 .game-hud__inventory-label {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   opacity: 0.72;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -72,11 +84,55 @@
   background: rgba(255, 255, 255, 0.28);
   box-shadow: none;
 }
-.game-hud__slot--button {
+.game-hud__slot--button,
+.game-hud__radio-power,
+.game-hud__radio-open {
   cursor: pointer;
 }
-.game-hud__slot--button:hover {
-  transform: translateY(-2px);
+.game-hud__slot--button:hover,
+.game-hud__radio-power:hover,
+.game-hud__radio-open:hover {
+  transform: translateY(-1px);
+}
+.game-hud__radio-widget {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  border-radius: 13px;
+}
+.game-hud__radio-power {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 2px solid #684128;
+  border-radius: 50%;
+  background: #efd18e;
+  color: #684128;
+}
+.game-hud__radio-power.is-on {
+  background: #8dcf8d;
+  color: #255f35;
+}
+.game-hud__radio-volume {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.game-hud__radio-volume input {
+  width: 105px;
+  accent-color: #6b4128;
+}
+.game-hud__radio-open {
+  padding: 6px 8px;
+  border: 1px solid #d8b979;
+  border-radius: 8px;
+  background: #fffdf4;
+  color: #70421d;
+  font-size: 0.7rem;
+  font-weight: 900;
 }
 @media (max-width: 620px) {
   .game-hud {
@@ -89,11 +145,21 @@
     display: none;
   }
   .game-hud__coins,
-  .game-hud__inventory {
+  .game-hud__inventory,
+  .game-hud__radio-widget {
     padding: 6px 8px;
   }
   .game-hud__slot {
     width: 37px;
     height: 37px;
+  }
+  .game-hud__radio-widget {
+    max-width: calc(100vw - 20px);
+  }
+  .game-hud__radio-volume input {
+    width: 80px;
+  }
+  .game-hud__radio-open {
+    display: none;
   }
 }

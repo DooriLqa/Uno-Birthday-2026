@@ -1,7 +1,8 @@
-import { Minus, PackagePlus, Plus, Wrench } from 'lucide-react'
+import { Minus, PackagePlus, Plus, RotateCcw, Wrench } from 'lucide-react'
 import { useState } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
+import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
 import './DevCoinControls.css'
 
 const DEV_ITEMS: InventoryItem[] = [{ id: 'beach-radio', name: 'Радиоприёмник', icon: '📻' }]
@@ -75,6 +76,15 @@ export function DevCoinControls() {
               })}
             </div>
           )}
+
+          <button
+            type="button"
+            className="dev-coin-controls__quiz-reset"
+            onClick={() => useQuizProgressStore.getState().resetQuizMemory()}
+            title="Сбросить веса всех вопросов квиза"
+          >
+            <RotateCcw size={15} /> Стереть память квиза
+          </button>
         </div>
       )}
       <button

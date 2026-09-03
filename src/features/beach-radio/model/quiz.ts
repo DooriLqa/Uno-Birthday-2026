@@ -80,26 +80,13 @@ export const questions: QuizQuestion[] = [
 ]
 
 export function pickQuestion(excludedIds: string[] = []): QuizQuestion {
-  const state = useQuizProgressStore.getState()
-  const available = (pool: QuizQuestion[]) => {
-    const filtered = pool.filter((question) => !excludedIds.includes(question.id))
-    return filtered.length > 0 ? filtered : pool
-  }
-  const unasked = available(
-    questions.filter((question) => !state.seenQuestionIds.includes(question.id)),
-  )
-  const notSolved = available(
-    questions.filter(
-      (question) =>
-        state.seenQuestionIds.includes(question.id) &&
-        !state.correctQuestionIds.includes(question.id),
-    ),
-  )
-  const correct = available(
-    questions.filter((question) => state.correctQuestionIds.includes(question.id)),
-  )
-  const pool = unasked.length > 0 ? unasked : notSolved.length > 0 ? notSolved : correct
-  const question = pool[Math.floor(Math.random() * pool.length)] ?? questions[0]
-  state.markSeen(question.id)
-  return question
+  const { questionWeights } = useQuizProgressStore.getState()
+  const excluded = new Set(excludedIds)
+  const available = questions.filter((question) => !excluded.has(question.id))
+  const pool = available.length > 0 ? available : questions
+
+  const minWeight = Math.min(...pool.map((question) => questionWeights[question.id] ?? 0))
+  const candidates = pool.filter((question) => (questionWeights[question.id] ?? 0) === minWeight)
+
+  return candidates[Math.floor(Math.random() * candidates.length)] ?? questions[0]
 }

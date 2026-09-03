@@ -1020,3 +1020,26 @@
     width: 90px;
   }
 }
+
+/* The dialog should hug its content instead of reserving a large empty block. */
+.beach-radio-dialog,
+.beach-radio-dialog--quiz {
+  min-height: 0;
+  height: auto;
+  padding: 18px 22px;
+}
+.quiz-panel {
+  min-height: 0;
+  height: auto;
+  display: block;
+}
+.quiz-panel__question {
+  margin: 0 auto 12px;
+  padding: 12px 18px;
+}
+.quiz-panel h2 {
+  margin: 0;
+}
+.quiz-panel__answers {
+  margin-top: 0;
+}
