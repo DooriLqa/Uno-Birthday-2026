@@ -518,6 +518,7 @@ h1 {
 .game-overlay.book-shelf-page {
   padding: 84px 16px 24px;
   background-position: center;
+  overflow-y: auto;
 }
 .book-shelf-page .page-top {
   position: relative;
@@ -537,7 +538,7 @@ h1 {
   box-shadow: none;
 }
 .book-shelf-page .library-game {
-  min-height: min(650px, calc(100dvh - 245px));
+  min-height: 0;
   border-color: rgba(255, 245, 215, 0.42);
   background:
     linear-gradient(135deg, rgba(255, 250, 231, 0.94), rgba(226, 192, 135, 0.88));

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { CSSProperties, PointerEvent } from 'react'
+import type { CSSProperties, DragEvent, PointerEvent } from 'react'
 import './BookShelfGame.css'
 import pageArtwork from '@/shared/assets/totem-code/segments/letter-o.png'
 
@@ -29,6 +29,7 @@ type FlyingPage = {
 
 const BOOK_COUNT = 12
 const SHELF_ROW_CAP = 3
+const randomLetters = 'Агата рассеянным взглядом проводила лиловое облачко табачного дыма. Она любила курить, но на людях старалась воздерживаться. Закурив вторую сигарету и преодолевая вялость во всем теле, медленно оторвалась от постели. Надела поверх черной блузы бежевый джемпер и встала перед зеркалом. Убедившись, что с одеждой все в порядке, взяла сумочку с туалетными принадлежностями и косметикой и вышла из комнаты. Несмотря на дневное время, в пустом десятиугольном холле было, как обычно, темновато. Лишь стоявший посередине белый стол расплывался в сумраке белым пятном. Десятиугольный осколок неба в потолке был таким же голубовато-серым, как накануне. Первым делом Агата направилась в ванную комнату, быстро умылась и накрасилась. Вернувшись в холл, стала убирать чашки, стаканы и пепельницы, полные окурков, которыми был заставлен стол. И тут…'
 
 const bookColors: Record<BookColorId, { hex: string; glow: string }> = {
   rose: { hex: '#dd6b6b', glow: 'rgba(221, 107, 107, 0.45)' },
@@ -65,6 +66,7 @@ const getPilePosition = (bookId: number) => {
 }
 
 type PilePosition = ReturnType<typeof getPilePosition>
+type PagePosition = { left: number; top: number }
 
 const initialPilePositions = Object.fromEntries(
   initialBooks.map((book) => [book.id, getPilePosition(book.id)]),
@@ -81,13 +83,76 @@ export function BookShelfGame({ onComplete }: Props) {
   const [dragPoint, setDragPoint] = useState<{ x: number; y: number } | null>(null)
   const [inventoryPages, setInventoryPages] = useState<Book[]>([])
   const [flyingPage, setFlyingPage] = useState<FlyingPage | null>(null)
-  const [isMessageOpen, setIsMessageOpen] = useState(false)
+  const [placedPages, setPlacedPages] = useState<Book[]>([])
+  const [placedPagePositions, setPlacedPagePositions] = useState<Record<number, PagePosition>>({})
+  const [draggedPageId, setDraggedPageId] = useState<number | null>(null)
+  const [draggedPagePoint, setDraggedPagePoint] = useState<{ x: number; y: number } | null>(null)
   const pileRef = useRef<HTMLDivElement>(null)
+  const letterAreaRef = useRef<HTMLDivElement>(null)
   const inventoryRef = useRef<HTMLDivElement>(null)
   const completedDropBookId = useRef<number | null>(null)
 
   const shelfColumns = Math.max(1, Math.min(BOOK_COUNT, SHELF_ROW_CAP))
   const draggedBook = books.find((book) => book.id === draggedBookId) ?? null
+  const draggedPage = [...inventoryPages, ...placedPages].find((page) => page.id === draggedPageId) ?? null
+
+  const handlePagePointerDown = (pageId: number, event: PointerEvent<HTMLElement>) => {
+    event.preventDefault()
+    event.currentTarget.setPointerCapture(event.pointerId)
+    setDraggedPageId(pageId)
+    setDraggedPagePoint({ x: event.clientX, y: event.clientY })
+  }
+
+  const handlePageDropAt = (pageId: number, clientX: number, clientY: number) => {
+    const page = inventoryPages.find((candidate) => candidate.id === pageId)
+    const letterAreaBounds = letterAreaRef.current?.getBoundingClientRect()
+    if (!letterAreaBounds) return
+
+    const left = Math.max(8, Math.min(letterAreaBounds.width - 96, clientX - letterAreaBounds.left - 44))
+    const top = Math.max(8, Math.min(letterAreaBounds.height - 120, clientY - letterAreaBounds.top - 56))
+
+    if (!page) {
+      if (placedPages.some((candidate) => candidate.id === pageId)) {
+        setPlacedPagePositions((previousPositions) => ({
+          ...previousPositions,
+          [pageId]: { left, top },
+        }))
+      }
+      return
+    }
+
+    if (placedPages.some((candidate) => candidate.id === page.id)) return
+
+    setPlacedPages((previousPages) => [...previousPages, page])
+    setInventoryPages((previousPages) => previousPages.filter((candidate) => candidate.id !== page.id))
+    setPlacedPagePositions((previousPositions) => ({
+      ...previousPositions,
+      [page.id]: { left, top },
+    }))
+  }
+
+  const handlePageDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    handlePageDropAt(Number(event.dataTransfer.getData('application/x-library-page')), event.clientX, event.clientY)
+  }
+
+  const handleInventoryDropById = (pageId: number) => {
+    const page = placedPages.find((candidate) => candidate.id === pageId)
+    if (!page || inventoryPages.some((candidate) => candidate.id === page.id)) return
+
+    setInventoryPages((previousPages) => [...previousPages, page])
+    setPlacedPages((previousPages) => previousPages.filter((candidate) => candidate.id !== page.id))
+    setPlacedPagePositions((previousPositions) => {
+      const nextPositions = { ...previousPositions }
+      delete nextPositions[page.id]
+      return nextPositions
+    })
+  }
+
+  const handleInventoryDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    handleInventoryDropById(Number(event.dataTransfer.getData('application/x-library-page')))
+  }
 
   const handleDrop = (slotId: number, slotColor: BookColorId) => {
     if (draggedBookId === null) return false
@@ -204,6 +269,33 @@ export function BookShelfGame({ onComplete }: Props) {
     }
   }, [draggedBookId])
 
+  useEffect(() => {
+    if (draggedPageId === null) return
+
+    const handlePointerMove = (event: globalThis.PointerEvent) => {
+      setDraggedPagePoint({ x: event.clientX, y: event.clientY })
+    }
+
+    const handlePointerUp = (event: globalThis.PointerEvent) => {
+      const dropTarget = document.elementFromPoint(event.clientX, event.clientY)
+      if (dropTarget?.closest('.library-game__letter-area')) {
+        handlePageDropAt(draggedPageId, event.clientX, event.clientY)
+      } else if (dropTarget?.closest('.library-game__inventory')) {
+        handleInventoryDropById(draggedPageId)
+      }
+      setDraggedPageId(null)
+      setDraggedPagePoint(null)
+    }
+
+    window.addEventListener('pointermove', handlePointerMove)
+    window.addEventListener('pointerup', handlePointerUp, { once: true })
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerup', handlePointerUp)
+    }
+  }, [draggedPageId])
+
   return (
     <div className="library-game__stage">
       <section className="library-game" aria-label="Игра с расстановкой книг по цветам">
@@ -227,6 +319,7 @@ export function BookShelfGame({ onComplete }: Props) {
         <p className="library-game__instruction">Поставь каждый том в своё место на полке.</p>
       </div>
 
+        <div className="library-game__workspace">
         <div className="library-game__layout">
           <div
             ref={pileRef}
@@ -328,25 +421,43 @@ export function BookShelfGame({ onComplete }: Props) {
           </div>
         </div>
         </div>
+        </div>
       </section>
-      <div ref={inventoryRef} className="library-game__inventory" aria-label="Инвентарь найденных страниц">
+      {draggedPage && draggedPagePoint ? (
+        <span
+          className="library-game__page-drag-preview"
+          style={{
+            left: draggedPagePoint.x - 44,
+            top: draggedPagePoint.y - 56,
+            '--page-color': draggedPage.hex,
+            '--page-artwork': `url(${pageArtwork})`,
+          } as CSSProperties}
+          aria-hidden="true"
+        >
+          <span />
+        </span>
+      ) : null}
+      <div
+        ref={inventoryRef}
+        className="library-game__inventory"
+        aria-label="Инвентарь найденных страниц"
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={handleInventoryDrop}
+      >
         <div className="library-game__inventory-heading">
           <span className="library-game__inventory-icon" aria-hidden="true">✦</span>
           <span>Инвентарь</span>
           <strong>{inventoryPages.length}</strong>
         </div>
         <div className="library-game__inventory-pages">
-          {inventoryPages.map((book, index) => (
+          {inventoryPages.map((book) => (
             <button
               key={book.id}
               type="button"
               className="library-game__inventory-page"
+              draggable={false}
               style={{ '--page-color': book.hex, '--page-artwork': `url(${pageArtwork})` } as CSSProperties}
-              onClick={() => {
-                if (inventoryPages.length === BOOK_COUNT && index === inventoryPages.length - 1) {
-                  setIsMessageOpen(true)
-                }
-              }}
+              onPointerDown={(event) => handlePagePointerDown(book.id, event)}
               aria-label={`Страница из книги цвета ${book.color}`}
             >
               <span aria-hidden="true" />
@@ -354,29 +465,36 @@ export function BookShelfGame({ onComplete }: Props) {
           ))}
         </div>
       </div>
-      {isMessageOpen ? (
-        <div className="library-game__message-backdrop" role="presentation" onClick={() => setIsMessageOpen(false)}>
-          <section
-            className="library-game__message"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="library-message-title"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              type="button"
-              className="library-game__message-close"
-              onClick={() => setIsMessageOpen(false)}
-              aria-label="Закрыть сообщение"
-            >
-              ×
-            </button>
-            <span className="library-game__message-art" style={{ backgroundImage: `url(${pageArtwork})` }} aria-hidden="true" />
-            <h2 id="library-message-title">Секретная страница</h2>
-            <p>Ты собрал все страницы. Здесь скоро появится твой особенный текст.</p>
-          </section>
+      <div
+        ref={letterAreaRef}
+        className="library-game__letter-area"
+        aria-label="Область для страниц"
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={handlePageDrop}
+      >
+        <div className="library-game__letter-noise" aria-hidden="true">
+          {randomLetters}
         </div>
-      ) : null}
+        <div className="library-game__placed-pages">
+          {placedPages.map((page, index) => (
+            <span
+              key={page.id}
+              className="library-game__placed-page"
+              draggable={false}
+              style={{
+                '--page-color': page.hex,
+                '--page-artwork': `url(${pageArtwork})`,
+                '--page-left': `${placedPagePositions[page.id]?.left ?? 18 + (index % 3) * 76}px`,
+                '--page-top': `${placedPagePositions[page.id]?.top ?? 22 + (index % 4) * 42}px`,
+              } as CSSProperties}
+              onPointerDown={(event) => handlePagePointerDown(page.id, event)}
+              aria-label={`Размещённая страница ${index + 1}`}
+            >
+              <span aria-hidden="true" />
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
