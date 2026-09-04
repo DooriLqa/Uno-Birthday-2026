@@ -8,6 +8,7 @@ const markerPositions: Record<string, { left: string; top: string }> = {
   'beach-radio': { left: '84%', top: '72%' },
   'shell-hunt': { left: '27%', top: '38%' },
   'book-shelf': { left: '42%', top: '32%' },
+  'flappy-bird': { left: '60%', top: '23%' },
   'coconut-catch': { left: '47%', top: '51%' },
   'wave-rider': { left: '72%', top: '37%' },
   'ice-cream': { left: '28%', top: '65%' },

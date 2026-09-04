@@ -546,6 +546,23 @@ h1 {
     0 22px 48px rgba(52, 35, 16, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
+.game-overlay.flappy-bird-page {
+  padding: 84px 16px 24px;
+  background: linear-gradient(160deg, #84d9df 0%, #d9f2c1 58%, #f8df9a 100%);
+  overflow-y: auto;
+}
+.flappy-bird-page .page-top,
+.flappy-bird-page .game-layout {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+.flappy-bird-page .page-top { margin-bottom: 14px; }
+.flappy-bird-page .game-layout { display: block; }
+.flappy-bird-page .game-panel { padding: 0; background: transparent; box-shadow: none; }
+@media (max-width: 760px) {
+  .game-overlay.flappy-bird-page { padding: 72px 10px 14px; }
+  .flappy-bird-page .page-top { margin-bottom: 10px; }
+}
 @media (max-width: 760px) {
   .game-overlay.book-shelf-page {
     padding: 72px 10px 14px;

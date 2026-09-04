@@ -10,6 +10,7 @@ import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
 import { BeachSearchGame } from '@/features/beach-search'
 import { BookShelfGame } from '@/features/book-shelf'
+import { FlappyBirdGame } from '@/features/flappy-bird'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-v3.png'
 import { Button } from '@/shared/ui/Button'
@@ -25,6 +26,7 @@ type Props = { gameId: string; onBack: () => void }
 const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
   'shell-hunt': ShellHuntGame,
   'book-shelf': BookShelfGame,
+  'flappy-bird': FlappyBirdGame,
   'coconut-catch': CoconutCatchGame,
   'wave-rider': WaveRiderGame,
   'ice-cream': IceCreamGame,
@@ -49,8 +51,9 @@ export function GamePage({ gameId, onBack }: Props) {
   const isBeachSearch = game.id === 'beach-search'
   const isTotemCode = game.id === 'shell-hunt'
   const isBookShelf = game.id === 'book-shelf'
+  const isFlappyBird = game.id === 'flappy-bird'
   const isBeachRadio = game.id === 'beach-radio'
-  const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio || isBookShelf
+  const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio || isBookShelf || isFlappyBird
   const sceneImage = specialSceneImages[game.id] ?? islandMapImage
   const openRadio = () => setRadioOpen(true)
 
@@ -59,6 +62,7 @@ export function GamePage({ gameId, onBack }: Props) {
       className={`beach-shell game-overlay ${isBeachSearch ? 'beach-search-page' : ''} ${
         isTotemCode ? 'totem-code-page' : ''
       } ${isBookShelf ? 'book-shelf-page' : ''
+      } ${isFlappyBird ? 'flappy-bird-page' : ''
       } ${isBeachRadio ? 'beach-radio-page' : ''}`}
       style={isBeachRadio ? undefined : { backgroundImage: `url(${sceneImage})` }}
     >
@@ -68,7 +72,7 @@ export function GamePage({ gameId, onBack }: Props) {
         </button>
         <span>{game.emoji}</span>
       </div>
-      <section className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''} ${isBookShelf ? 'book-shelf-layout' : ''}`}>
+      <section className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''} ${isBookShelf ? 'book-shelf-layout' : ''} ${isFlappyBird ? 'flappy-bird-layout' : ''}`}>
 
       <GameHud onOpenRadio={openRadio} />
 

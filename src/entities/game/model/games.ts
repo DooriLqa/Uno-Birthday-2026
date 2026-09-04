@@ -33,6 +33,14 @@ const gameList: Game[] = [
     target: 'все книги',
   },
   {
+    id: 'flappy-bird',
+    title: 'Полёт над лагуной',
+    description: 'Пролетай между трубами и собирай монетки.',
+    emoji: '🐦',
+    color: '#f8df9a',
+    target: '10 труб',
+  },
+  {
     id: 'shell-hunt',
     title: 'Охота за ракушками',
     description: 'Найди сокровище у кромки воды.',
