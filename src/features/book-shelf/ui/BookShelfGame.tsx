@@ -29,6 +29,7 @@ type FlyingPage = {
 
 const BOOK_COUNT = 12
 const SHELF_ROW_CAP = 3
+const MESSAGE_PAGE_TEXT = 'С днём рождения! Пусть каждый день будет солнечным, а этот остров хранит самые тёплые воспоминания.'
 const randomLetters = 'Агата рассеянным взглядом проводила лиловое облачко табачного дыма. Она любила курить, но на людях старалась воздерживаться. Закурив вторую сигарету и преодолевая вялость во всем теле, медленно оторвалась от постели. Надела поверх черной блузы бежевый джемпер и встала перед зеркалом. Убедившись, что с одеждой все в порядке, взяла сумочку с туалетными принадлежностями и косметикой и вышла из комнаты. Несмотря на дневное время, в пустом десятиугольном холле было, как обычно, темновато. Лишь стоявший посередине белый стол расплывался в сумраке белым пятном. Десятиугольный осколок неба в потолке был таким же голубовато-серым, как накануне. Первым делом Агата направилась в ванную комнату, быстро умылась и накрасилась. Вернувшись в холл, стала убирать чашки, стаканы и пепельницы, полные окурков, которыми был заставлен стол. И тут…'
 
 const bookColors: Record<BookColorId, { hex: string; glow: string }> = {
@@ -85,6 +86,7 @@ export function BookShelfGame({ onComplete }: Props) {
   const [flyingPage, setFlyingPage] = useState<FlyingPage | null>(null)
   const [placedPages, setPlacedPages] = useState<Book[]>([])
   const [placedPagePositions, setPlacedPagePositions] = useState<Record<number, PagePosition>>({})
+  const [specialPageId, setSpecialPageId] = useState<number | null>(null)
   const [draggedPageId, setDraggedPageId] = useState<number | null>(null)
   const [draggedPagePoint, setDraggedPagePoint] = useState<{ x: number; y: number } | null>(null)
   const pileRef = useRef<HTMLDivElement>(null)
@@ -107,9 +109,11 @@ export function BookShelfGame({ onComplete }: Props) {
     const page = inventoryPages.find((candidate) => candidate.id === pageId)
     const letterAreaBounds = letterAreaRef.current?.getBoundingClientRect()
     if (!letterAreaBounds) return
+    const pageWidth = pageId === specialPageId ? 190 : 88
+    const pageHeight = pageId === specialPageId ? 150 : 112
 
-    const left = Math.max(8, Math.min(letterAreaBounds.width - 96, clientX - letterAreaBounds.left - 44))
-    const top = Math.max(8, Math.min(letterAreaBounds.height - 120, clientY - letterAreaBounds.top - 56))
+    const left = Math.max(8, Math.min(letterAreaBounds.width - pageWidth - 8, clientX - letterAreaBounds.left - pageWidth / 2))
+    const top = Math.max(8, Math.min(letterAreaBounds.height - pageHeight - 8, clientY - letterAreaBounds.top - pageHeight / 2))
 
     if (!page) {
       if (placedPages.some((candidate) => candidate.id === pageId)) {
@@ -161,9 +165,24 @@ export function BookShelfGame({ onComplete }: Props) {
     const currentBook = books.find((book) => book.id === draggedBookId)
     if (!currentBook || currentBook.color !== slotColor) return false
 
+    const nextPlacedBooks = { ...placedBooksBySlot, [slotId]: currentBook }
+    const isFinalPage = Object.keys(nextPlacedBooks).length === BOOK_COUNT
     const slotElement = document.querySelector<HTMLElement>(`.library-game__slot[data-slot-id="${slotId}"]`)
     const inventoryBounds = inventoryRef.current?.getBoundingClientRect()
-    if (slotElement && inventoryBounds) {
+    if (isFinalPage) {
+      setSpecialPageId(currentBook.id)
+      const letterAreaBounds = letterAreaRef.current?.getBoundingClientRect()
+      setPlacedPages((previousPages) => [...previousPages, currentBook])
+      if (letterAreaBounds) {
+        setPlacedPagePositions((previousPositions) => ({
+          ...previousPositions,
+          [currentBook.id]: {
+            left: Math.max(8, letterAreaBounds.width / 2 - 95),
+            top: Math.max(8, letterAreaBounds.height / 2 - 75),
+          },
+        }))
+      }
+    } else if (slotElement && inventoryBounds) {
       const slotBounds = slotElement.getBoundingClientRect()
       setFlyingPage({
         book: currentBook,
@@ -178,7 +197,6 @@ export function BookShelfGame({ onComplete }: Props) {
       }, 720)
     }
 
-    const nextPlacedBooks = { ...placedBooksBySlot, [slotId]: currentBook }
     setPlacedBooksBySlot(nextPlacedBooks)
     setBooks((previousBooks) => previousBooks.filter((book) => book.id !== currentBook.id))
     completedDropBookId.current = currentBook.id
@@ -427,14 +445,15 @@ export function BookShelfGame({ onComplete }: Props) {
         <span
           className="library-game__page-drag-preview"
           style={{
-            left: draggedPagePoint.x - 44,
-            top: draggedPagePoint.y - 56,
+            left: draggedPagePoint.x - (draggedPage.id === specialPageId ? 95 : 44),
+            top: draggedPagePoint.y - (draggedPage.id === specialPageId ? 75 : 56),
             '--page-color': draggedPage.hex,
             '--page-artwork': `url(${pageArtwork})`,
           } as CSSProperties}
           aria-hidden="true"
         >
           <span />
+          {draggedPage.id === specialPageId ? <strong>{MESSAGE_PAGE_TEXT}</strong> : null}
         </span>
       ) : null}
       <div
@@ -454,13 +473,14 @@ export function BookShelfGame({ onComplete }: Props) {
             <button
               key={book.id}
               type="button"
-              className="library-game__inventory-page"
+              className={`library-game__inventory-page ${book.id === specialPageId ? 'library-game__inventory-page--message' : ''} ${draggedPageId === book.id ? 'is-page-dragging' : ''}`}
               draggable={false}
               style={{ '--page-color': book.hex, '--page-artwork': `url(${pageArtwork})` } as CSSProperties}
               onPointerDown={(event) => handlePagePointerDown(book.id, event)}
               aria-label={`Страница из книги цвета ${book.color}`}
             >
               <span aria-hidden="true" />
+              {book.id === specialPageId ? <strong>{MESSAGE_PAGE_TEXT}</strong> : null}
             </button>
           ))}
         </div>
@@ -479,7 +499,7 @@ export function BookShelfGame({ onComplete }: Props) {
           {placedPages.map((page, index) => (
             <span
               key={page.id}
-              className="library-game__placed-page"
+              className={`library-game__placed-page ${page.id === specialPageId ? 'library-game__placed-page--message' : ''} ${draggedPageId === page.id ? 'is-page-dragging' : ''}`}
               draggable={false}
               style={{
                 '--page-color': page.hex,
@@ -491,6 +511,7 @@ export function BookShelfGame({ onComplete }: Props) {
               aria-label={`Размещённая страница ${index + 1}`}
             >
               <span aria-hidden="true" />
+              {page.id === specialPageId ? <strong>{MESSAGE_PAGE_TEXT}</strong> : null}
             </span>
           ))}
         </div>

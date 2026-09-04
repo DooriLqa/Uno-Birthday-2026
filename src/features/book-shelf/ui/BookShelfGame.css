@@ -113,6 +113,11 @@
   pointer-events: none;
 }
 
+.library-game__inventory-page--message {
+  width: 150px;
+  height: 72px;
+}
+
 .library-game__page-drag-preview {
   position: fixed;
   z-index: 60;
@@ -126,7 +131,12 @@
     linear-gradient(135deg, #fff9e9 0 68%, var(--page-color) 69% 100%);
   box-shadow: 4px 8px 12px rgba(83, 48, 22, 0.28);
   pointer-events: none;
-  transform: rotate(-3deg);
+  transform: none;
+}
+
+.library-game__page-drag-preview:has(strong) {
+  width: 190px;
+  height: 150px;
 }
 
 .library-game__page-drag-preview span {
@@ -137,6 +147,31 @@
   height: 3px;
   background: var(--page-color);
   box-shadow: 0 -8px rgba(105, 68, 29, 0.18), 0 -16px rgba(105, 68, 29, 0.18);
+}
+
+.library-game__page-drag-preview strong,
+.library-game__placed-page--message strong,
+.library-game__inventory-page--message strong {
+  position: absolute;
+  inset: 18px 14px 36px;
+  display: grid;
+  place-items: center;
+  color: #68421f;
+  font-family: Georgia, serif;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.library-game__inventory-page--message strong {
+  inset: 8px 6px 18px;
+  font-size: 0.58rem;
+}
+
+.library-game__inventory-page.is-page-dragging,
+.library-game__placed-page.is-page-dragging {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .library-game__message-backdrop {
@@ -350,6 +385,11 @@
   height: 3px;
   background: var(--page-color);
   box-shadow: 0 -8px rgba(105, 68, 29, 0.18), 0 -16px rgba(105, 68, 29, 0.18);
+}
+
+.library-game__placed-page--message {
+  width: 190px;
+  height: 150px;
 }
 
 .library-game__pile,
