@@ -22,6 +22,7 @@ import { SeaBattle } from '@/features/sea-battle'
 import { ShellGamePage } from '@/pages/games/ui/ShellGame/ShellGamePage'
 import { WackAMole } from '@/features/wack-a-mole'
 import { Arkanoid } from '@/features/arkanoid'
+import { LockPickingGame } from '@/features/lock-picking'
 
 type GameScreenProps = {
   onComplete: () => void
@@ -46,7 +47,8 @@ const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
   'sea-battle': SeaBattle,
   'shell-game': ShellGamePage,
   'wack-a-mole': WackAMole,
-  arkanoid: Arkanoid,
+  'arkanoid': Arkanoid,
+  'lock-picking': LockPickingGame,
 }
 
 const specialSceneImages: Record<string, string> = {

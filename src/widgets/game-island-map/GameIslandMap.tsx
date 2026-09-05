@@ -20,7 +20,8 @@ const markerPositions: Record<string, { left: string; top: string }> = {
   'sea-battle': { left: '44%', top: '39%' },
   'shell-game': { left: '46%', top: '30%' },
   'wack-a-mole': { left: '48%', top: '38%' },
-  arkanoid: { left: '50%', top: '30%' },
+  'arkanoid': { left: '50%', top: '30%' },
+  'lock-picking': { left: '54%', top: '47%' },
 }
 
 export function GameIslandMap({ games, completedIds, onPlay }: Props) {
