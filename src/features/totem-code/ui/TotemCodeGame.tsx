@@ -14,18 +14,8 @@ type Drum = 'shape' | 'letter'
 type GlyphStyle = 'natural' | 'ornamented'
 type TotemValue = Record<Drum, number>
 
-const shapes = [
-  { name: 'Круг' },
-  { name: 'Квадрат' },
-  { name: 'Треугольник' },
-  { name: 'Ромб' },
-]
-const letters = [
-  { name: 'В' },
-  { name: 'О' },
-  { name: 'Д' },
-  { name: 'А' },
-]
+const shapes = [{ name: 'Круг' }, { name: 'Квадрат' }, { name: 'Треугольник' }, { name: 'Ромб' }]
+const letters = [{ name: 'В' }, { name: 'О' }, { name: 'Д' }, { name: 'А' }]
 const totems = [
   { name: 'Хаски', image: totemHusky },
   { name: 'Корги', image: totemCorgi },
