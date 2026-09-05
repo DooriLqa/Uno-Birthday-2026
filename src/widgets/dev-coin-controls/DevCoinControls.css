@@ -75,3 +75,14 @@
   height: 30px;
   padding: 0;
 }
+.dev-coin-controls__dialogues {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+.dev-coin-controls__dialogues strong {
+  grid-column: 1 / -1;
+}
+.dev-coin-controls__dialogues button {
+  min-width: 0;
+}

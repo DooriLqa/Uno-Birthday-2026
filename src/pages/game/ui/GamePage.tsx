@@ -31,9 +31,9 @@ type GameScreenProps = {
 type Props = { gameId: string; onBack: () => void }
 
 const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
-  'shell-hunt': TotemCodeGame,
   'book-shelf': BookShelfGame,
   'flappy-bird': FlappyBirdGame,
+  'totem-code': TotemCodeGame,
   'coconut-catch': CoconutCatchGame,
   'fruit-basket': FruitBasketGame,
   'wave-rider': WaveRiderGame,
@@ -50,7 +50,7 @@ const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
 }
 
 const specialSceneImages: Record<string, string> = {
-  'shell-hunt': totemBeachScene,
+  'totem-code': totemBeachScene,
 }
 
 export function GamePage({ gameId, onBack }: Props) {
@@ -63,9 +63,9 @@ export function GamePage({ gameId, onBack }: Props) {
 
   const GameScreen = gameScreens[game.id]
   const isBeachSearch = game.id === 'beach-search'
-  const isTotemCode = game.id === 'shell-hunt'
   const isBookShelf = game.id === 'book-shelf'
   const isFlappyBird = game.id === 'flappy-bird'
+  const isTotemCode = game.id === 'totem-code'
   const isBeachRadio = game.id === 'beach-radio'
   const isFruitBasket = game.id === 'fruit-basket'
   const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio || isBookShelf || isFlappyBird || isFruitBasket
