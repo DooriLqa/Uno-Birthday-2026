@@ -1,0 +1,106 @@
+.black-jack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 24px 0 10px;
+}
+.black-jack__table {
+  width: min(900px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 28px;
+  box-sizing: border-box;
+  border-radius: 22px;
+  background: #f4efe8;
+}
+.black-jack__hand {
+  min-height: 170px;
+}
+.black-jack__hand-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.black-jack__hand-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.black-jack__hand-header span {
+  font-weight: 700;
+}
+.black-jack__cards {
+  display: flex;
+  align-items: flex-start;
+  min-height: 135px;
+}
+.black-jack__card {
+  width: 92px;
+  height: 132px;
+  margin-right: -18px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.14);
+}
+.black-jack__card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.black-jack__card-back {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border: 6px solid #d9d1c9;
+  color: #9d9187;
+  font-size: 34px;
+}
+.black-jack__result {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+}
+.black-jack__result--win {
+  color: #2e9b55;
+}
+.black-jack__result--lose {
+  color: #d9534f;
+}
+.black-jack__controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.black-jack__controls button {
+  min-width: 145px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 10px;
+  background: #eb6c9a;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 150ms ease;
+}
+.black-jack__controls button:hover {
+  transform: translateY(-2px);
+}
+@media (max-width: 600px) {
+  .black-jack__table {
+    padding: 18px;
+  }
+  .black-jack__card {
+    width: 70px;
+    height: 101px;
+    margin-right: -14px;
+  }
+}

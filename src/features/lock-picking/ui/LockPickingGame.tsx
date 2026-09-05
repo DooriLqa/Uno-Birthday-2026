@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { usePawCoinStore } from '@/features/currency/model/store'
 import './LockPickingGame.css'
 
 type Props = { onComplete: () => void }
@@ -14,9 +15,11 @@ const arrowSymbols: Record<ArrowKey, string> = {
 }
 
 const createSequence = () =>
-  Array.from({ length: 3 }, () => arrowKeys[Math.floor(Math.random() * arrowKeys.length)])
+  Array.from({ length: 8 }, () => arrowKeys[Math.floor(Math.random() * arrowKeys.length)])
 
 export function LockPickingGame({ onComplete }: Props) {
+  const addPawCoins = usePawCoinStore((state) => state.addPawCoins)
+  const rewardGrantedRef = useRef(false)
   const [sequence, setSequence] = useState(createSequence)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [attempts, setAttempts] = useState(0)
@@ -32,7 +35,11 @@ export function LockPickingGame({ onComplete }: Props) {
         if (nextIndex === sequence.length) {
           setCurrentIndex(nextIndex)
           setIsComplete(true)
-          onComplete()
+          if (!rewardGrantedRef.current) {
+            rewardGrantedRef.current = true
+            addPawCoins(1)
+            onComplete()
+          }
         } else {
           setCurrentIndex(nextIndex)
         }
@@ -52,7 +59,7 @@ export function LockPickingGame({ onComplete }: Props) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentIndex, isComplete, onComplete, sequence])
+  }, [addPawCoins, currentIndex, isComplete, onComplete, sequence])
 
   return (
     <div className="lock-picking-game">
