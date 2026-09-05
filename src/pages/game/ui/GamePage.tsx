@@ -5,10 +5,13 @@ import { useProgressStore } from '@/features/game-progress/model/store'
 import { BeachRadioGame, RadioModal } from '@/features/beach-radio'
 import { TotemCodeGame } from '@/features/totem-code'
 import { CoconutCatchGame } from '@/features/coconut-catch'
+import { FruitBasketGame } from '@/features/fruit-basket'
 import { WaveRiderGame } from '@/features/wave-rider'
 import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
 import { BeachSearchGame } from '@/features/beach-search'
+import { BookShelfGame } from '@/features/book-shelf'
+import { FlappyBirdGame } from '@/features/flappy-bird'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 import { Button } from '@/shared/ui/Button'
@@ -23,7 +26,10 @@ type Props = { gameId: string; onBack: () => void }
 
 const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
   'shell-hunt': TotemCodeGame,
+  'book-shelf': BookShelfGame,
+  'flappy-bird': FlappyBirdGame,
   'coconut-catch': CoconutCatchGame,
+  'fruit-basket': FruitBasketGame,
   'wave-rider': WaveRiderGame,
   'ice-cream': IceCreamGame,
   'treasure-map': TreasureMapGame,
@@ -46,8 +52,11 @@ export function GamePage({ gameId, onBack }: Props) {
   const GameScreen = gameScreens[game.id]
   const isBeachSearch = game.id === 'beach-search'
   const isTotemCode = game.id === 'shell-hunt'
+  const isBookShelf = game.id === 'book-shelf'
+  const isFlappyBird = game.id === 'flappy-bird'
   const isBeachRadio = game.id === 'beach-radio'
-  const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio
+  const isFruitBasket = game.id === 'fruit-basket'
+  const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio || isBookShelf || isFlappyBird || isFruitBasket
   const sceneImage = specialSceneImages[game.id] ?? islandMapImage
   const openRadio = () => setRadioOpen(true)
 
@@ -55,8 +64,11 @@ export function GamePage({ gameId, onBack }: Props) {
     <main
       className={`beach-shell game-overlay ${isBeachSearch ? 'beach-search-page' : ''} ${
         isTotemCode ? 'totem-code-page' : ''
-      } ${isBeachRadio ? 'beach-radio-page' : ''}`}
-      style={isBeachRadio ? undefined : { backgroundImage: `url(${sceneImage})` }}
+      } ${isBookShelf ? 'book-shelf-page' : ''
+      } ${isFlappyBird ? 'flappy-bird-page' : ''
+      } ${isBeachRadio ? 'beach-radio-page' : ''
+      } ${isFruitBasket ? 'fruit-basket-page' : ''}`}
+      style={isBeachRadio || isFruitBasket ? undefined : { backgroundImage: `url(${sceneImage})` }}
     >
       <div className="page-top">
         <button type="button" className="back" onClick={onBack}>
@@ -64,10 +76,10 @@ export function GamePage({ gameId, onBack }: Props) {
         </button>
         <span>{game.emoji}</span>
       </div>
+      <section className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''} ${isBookShelf ? 'book-shelf-layout' : ''} ${isFlappyBird ? 'flappy-bird-layout' : ''}`}>
 
       <GameHud onOpenRadio={openRadio} />
 
-      <section className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''}`}>
         <div className={`game-panel ${isBeachSearch ? 'beach-search-panel' : ''}`}>
           {!isImmersiveGame && (
             <>
