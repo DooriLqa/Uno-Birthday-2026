@@ -13,6 +13,64 @@ body {
   margin: 0;
   background: linear-gradient(180deg, #68cbe8 0 31%, #e8f9f8 31% 40%, #fff0c7 40%);
 }
+.island-map-page {
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+}
+.island-map-page .site-header {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: 50%;
+  width: min(760px, calc(100% - 24px));
+  min-height: 64px;
+  margin: 0;
+  padding: 12px 22px 16px;
+  border: 2px solid #a66b35;
+  border-top: 0;
+  border-radius: 0 0 20px 20px;
+  background: #f7dfa2;
+  box-shadow: 0 8px 18px rgba(15, 70, 90, 0.28);
+  color: #70421d;
+  translate: -50% 0;
+}
+.island-map-page .site-header::before,
+.island-map-page .site-header::after {
+  position: absolute;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #7b4d25;
+  box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.3);
+  content: '';
+}
+.island-map-page .site-header::before {
+  left: 24px;
+}
+.island-map-page .site-header::after {
+  right: 24px;
+}
+.island-map-page .brand {
+  color: #70421d;
+  text-shadow: none;
+}
+.island-map-page .brand__sun {
+  background: #ffbd45;
+}
+.island-map-page .progress {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: none;
+}
+.island-map-page .reset-button {
+  border-color: rgba(112, 66, 29, 0.45);
+  background: rgba(255, 255, 255, 0.35);
+  color: #70421d;
+}
+.island-map-page .reset-button:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
 button,
 a {
   font: inherit;
@@ -57,6 +115,28 @@ a {
   background: rgba(255, 255, 255, 0.86);
   font-weight: 800;
   box-shadow: 0 4px 12px rgba(23, 91, 117, 0.15);
+}
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.reset-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.reset-button:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 .hero {
   max-width: 660px;
@@ -166,6 +246,45 @@ h1 {
   color: #12324a;
   font-size: 2.2rem;
   text-shadow: none;
+}
+.has-beach-search,
+.has-beach-search #root {
+  height: 100dvh;
+  overflow: hidden;
+}
+.beach-search-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  padding: 16px 0 0;
+  overflow: hidden;
+}
+.beach-search-page .page-top {
+  flex: 0 0 auto;
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto 12px;
+}
+.beach-search-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.beach-search-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.beach-search-panel > h1,
+.beach-search-panel > p {
+  display: none;
 }
 .pixi-stage {
   width: 100%;
@@ -353,5 +472,86 @@ h1 {
   }
   .pixi-stage {
     height: 340px;
+  }
+}
+
+.game-overlay {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 96px max(16px, calc((100vw - 1120px) / 2)) 32px;
+  overflow: auto;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.game-overlay.beach-search-page {
+  padding: 88px 0 0;
+}
+.game-overlay.totem-code-page {
+  padding: 84px 16px 16px;
+  overflow: hidden;
+}
+.totem-code-page .page-top {
+  position: relative;
+  z-index: 2;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+.totem-code-page .game-layout {
+  display: block;
+  width: min(1280px, 100%);
+  height: calc(100dvh - 140px);
+  margin: 0 auto;
+}
+.totem-code-page .game-panel {
+  height: 100%;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.game-overlay.beach-radio-page {
+  padding: 16px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #67cde9 0 54%, #f6d18b 54% 100%);
+}
+.beach-radio-page .page-top {
+  position: absolute;
+  z-index: 12;
+  top: 16px;
+  left: 16px;
+  margin: 0;
+}
+.beach-radio-page .page-top > span {
+  display: none;
+}
+.beach-radio-page .game-layout {
+  display: block;
+  height: 100%;
+}
+.beach-radio-page .game-panel {
+  height: 100%;
+  padding: 0;
+  border-radius: 30px;
+  background: transparent;
+  box-shadow: none;
+}
+.beach-radio-page .game-panel > h1,
+.beach-radio-page .game-panel > p {
+  display: none;
+}
+@media (max-width: 620px) {
+  .game-overlay.beach-radio-page {
+    padding: 0;
+  }
+  .beach-radio-page .page-top {
+    top: 10px;
+    left: 10px;
   }
 }
