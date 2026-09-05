@@ -33,6 +33,26 @@ export const useProgressStore = create<ProgressState>()(
         }),
       resetProgress: () => set({ completedGameIds: [], foundItemsByGame: {} }),
     }),
-    { name: 'beach-party-progress' },
+    {
+      name: 'beach-party-progress',
+      version: 1,
+      migrate: (persistedState) => {
+        const state = persistedState as Pick<ProgressState, 'completedGameIds' | 'foundItemsByGame'>
+        const legacyId = 'shell-hunt'
+        const currentId = 'totem-code'
+        const completedGameIds = state.completedGameIds?.map((id) => (id === legacyId ? currentId : id)) ?? []
+        const legacyItems = state.foundItemsByGame?.[legacyId]
+        const foundItemsByGame = { ...(state.foundItemsByGame ?? {}) }
+        delete foundItemsByGame[legacyId]
+
+        return {
+          ...state,
+          completedGameIds: [...new Set(completedGameIds)],
+          foundItemsByGame: legacyItems
+            ? { ...foundItemsByGame, [currentId]: [...(foundItemsByGame[currentId] ?? []), ...legacyItems] }
+            : foundItemsByGame,
+        }
+      },
+    },
   ),
 )
