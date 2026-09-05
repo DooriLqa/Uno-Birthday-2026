@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, DragEvent, PointerEvent } from 'react'
 import './BookShelfGame.css'
 import pageArtwork from '@/shared/assets/totem-code/segments/letter-o.png'
@@ -81,6 +81,7 @@ export function BookShelfGame({ onComplete }: Props) {
   const [fallingBookId, setFallingBookId] = useState<number | null>(null)
   const [dropMotionByBook, setDropMotionByBook] = useState<Record<number, CSSProperties>>({})
   const [pilePositions, setPilePositions] = useState<Record<number, PilePosition>>(initialPilePositions)
+  const [pileBounds, setPileBounds] = useState<DOMRect | null>(null)
   const [dragPoint, setDragPoint] = useState<{ x: number; y: number } | null>(null)
   const [inventoryPages, setInventoryPages] = useState<Book[]>([])
   const [flyingPage, setFlyingPage] = useState<FlyingPage | null>(null)
@@ -105,7 +106,7 @@ export function BookShelfGame({ onComplete }: Props) {
     setDraggedPagePoint({ x: event.clientX, y: event.clientY })
   }
 
-  const handlePageDropAt = (pageId: number, clientX: number, clientY: number) => {
+  const handlePageDropAt = useCallback((pageId: number, clientX: number, clientY: number) => {
     const page = inventoryPages.find((candidate) => candidate.id === pageId)
     const letterAreaBounds = letterAreaRef.current?.getBoundingClientRect()
     if (!letterAreaBounds) return
@@ -133,14 +134,14 @@ export function BookShelfGame({ onComplete }: Props) {
       ...previousPositions,
       [page.id]: { left, top },
     }))
-  }
+  }, [inventoryPages, placedPages, specialPageId])
 
   const handlePageDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     handlePageDropAt(Number(event.dataTransfer.getData('application/x-library-page')), event.clientX, event.clientY)
   }
 
-  const handleInventoryDropById = (pageId: number) => {
+  const handleInventoryDropById = useCallback((pageId: number) => {
     const page = placedPages.find((candidate) => candidate.id === pageId)
     if (!page || inventoryPages.some((candidate) => candidate.id === page.id)) return
 
@@ -151,14 +152,14 @@ export function BookShelfGame({ onComplete }: Props) {
       delete nextPositions[page.id]
       return nextPositions
     })
-  }
+  }, [inventoryPages, placedPages])
 
   const handleInventoryDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     handleInventoryDropById(Number(event.dataTransfer.getData('application/x-library-page')))
   }
 
-  const handleDrop = (slotId: number, slotColor: BookColorId) => {
+  const handleDrop = useCallback((slotId: number, slotColor: BookColorId) => {
     if (draggedBookId === null) return false
     if (placedBooksBySlot[slotId]) return false
 
@@ -205,25 +206,25 @@ export function BookShelfGame({ onComplete }: Props) {
 
     if (Object.keys(nextPlacedBooks).length === BOOK_COUNT) onComplete()
     return true
-  }
+  }, [books, draggedBookId, placedBooksBySlot, onComplete])
 
-  const handleFloorDrop = (bookId: number, clientX: number, clientY: number) => {
+  const handleFloorDrop = useCallback((bookId: number, clientX: number, clientY: number) => {
     if (completedDropBookId.current === bookId) {
       completedDropBookId.current = null
       return
     }
 
     const currentPosition = pilePositions[bookId] ?? getPilePosition(bookId)
-    const pileBounds = pileRef.current?.getBoundingClientRect()
+    const currentPileBounds = pileRef.current?.getBoundingClientRect()
     const bookWidth = 74
     const bookHeight = 110
-    const releaseX = pileBounds ? clientX - pileBounds.left - bookWidth / 2 : currentPosition.x
-    const releaseBottom = pileBounds
-      ? pileBounds.bottom - clientY - bookHeight / 2
+    const releaseX = currentPileBounds ? clientX - currentPileBounds.left - bookWidth / 2 : currentPosition.x
+    const releaseBottom = currentPileBounds
+      ? currentPileBounds.bottom - clientY - bookHeight / 2
       : currentPosition.y
     const landedPosition: PilePosition = {
       ...currentPosition,
-      x: Math.max(8, Math.min((pileBounds?.width ?? 260) - bookWidth - 8, releaseX)),
+      x: Math.max(8, Math.min((currentPileBounds?.width ?? 260) - bookWidth - 8, releaseX)),
       y: 6,
       rotate: currentPosition.rotate + (clientX % 2 === 0 ? 8 : -8),
     }
@@ -252,7 +253,7 @@ export function BookShelfGame({ onComplete }: Props) {
         return next
       })
     }, 1000)
-  }
+  }, [pilePositions])
 
   const handlePointerDown = (bookId: number, event: PointerEvent<HTMLButtonElement>) => {
     event.preventDefault()
@@ -263,6 +264,8 @@ export function BookShelfGame({ onComplete }: Props) {
 
   useEffect(() => {
     if (draggedBookId === null) return
+
+    setPileBounds(pileRef.current?.getBoundingClientRect() ?? null)
 
     const handlePointerMove = (event: globalThis.PointerEvent) => {
       setDragPoint({ x: event.clientX, y: event.clientY })
@@ -284,8 +287,9 @@ export function BookShelfGame({ onComplete }: Props) {
     return () => {
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('pointerup', handlePointerUp)
+      setPileBounds(null)
     }
-  }, [draggedBookId])
+  }, [draggedBookId, handleDrop, handleFloorDrop])
 
   useEffect(() => {
     if (draggedPageId === null) return
@@ -312,7 +316,7 @@ export function BookShelfGame({ onComplete }: Props) {
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('pointerup', handlePointerUp)
     }
-  }, [draggedPageId])
+  }, [draggedPageId, handleInventoryDropById, handlePageDropAt])
 
   return (
     <div className="library-game__stage">
@@ -347,7 +351,6 @@ export function BookShelfGame({ onComplete }: Props) {
           {books.map((book) => {
             const isFalling = fallingBookId === book.id
             const pilePosition = pilePositions[book.id] ?? getPilePosition(book.id)
-            const pileBounds = pileRef.current?.getBoundingClientRect()
             const dragX = dragPoint && draggedBookId === book.id && pileBounds
               ? dragPoint.x - pileBounds.left - 37 - pilePosition.x
               : 0
@@ -385,7 +388,7 @@ export function BookShelfGame({ onComplete }: Props) {
           <div
             className={`library-game__shelf ${draggedBook ? 'is-dragging' : ''}`}
             aria-label="Книжная полка"
-            style={{ ['--shelf-columns' as any]: shelfColumns }}
+            style={{ '--shelf-columns': shelfColumns } as CSSProperties}
           >
             {shelfSlots.map((slot, index) => {
               const isMatch = draggedBook?.color === slot.color

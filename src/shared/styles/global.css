@@ -559,9 +559,24 @@ h1 {
 .flappy-bird-page .page-top { margin-bottom: 14px; }
 .flappy-bird-page .game-layout { display: block; }
 .flappy-bird-page .game-panel { padding: 0; background: transparent; box-shadow: none; }
+.game-overlay.fruit-basket-page {
+  padding: 84px 16px 24px;
+  background: linear-gradient(145deg, #ef9b8b 0%, #f9d49b 48%, #95c894 100%);
+  overflow-y: auto;
+}
+.fruit-basket-page .page-top,
+.fruit-basket-page .game-layout {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+.fruit-basket-page .page-top { margin-bottom: 14px; }
+.fruit-basket-page .game-layout { display: block; }
+.fruit-basket-page .game-panel { padding: 0; background: transparent; box-shadow: none; }
 @media (max-width: 760px) {
   .game-overlay.flappy-bird-page { padding: 72px 10px 14px; }
   .flappy-bird-page .page-top { margin-bottom: 10px; }
+  .game-overlay.fruit-basket-page { padding: 72px 10px 14px; }
+  .fruit-basket-page .page-top { margin-bottom: 10px; }
 }
 @media (max-width: 760px) {
   .game-overlay.book-shelf-page {

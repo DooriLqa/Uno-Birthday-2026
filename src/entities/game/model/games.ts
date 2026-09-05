@@ -57,6 +57,14 @@ const gameList: Game[] = [
     target: 'кокос',
   },
   {
+    id: 'fruit-basket',
+    title: 'Корзинка удачи',
+    description: 'Собери ценности и сдай их в левую или правую зону.',
+    emoji: '🧺',
+    color: '#f6b7a8',
+    target: '20 ценностей',
+  },
+  {
     id: 'wave-rider',
     title: 'На гребне волны',
     description: 'Поймай идеальную волну.',

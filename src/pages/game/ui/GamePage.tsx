@@ -5,6 +5,7 @@ import { useProgressStore } from '@/features/game-progress/model/store'
 import { BeachRadioGame, RadioModal } from '@/features/beach-radio'
 import { TotemCodeGame } from '@/features/totem-code'
 import { CoconutCatchGame } from '@/features/coconut-catch'
+import { FruitBasketGame } from '@/features/fruit-basket'
 import { WaveRiderGame } from '@/features/wave-rider'
 import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
@@ -28,6 +29,7 @@ const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
   'book-shelf': BookShelfGame,
   'flappy-bird': FlappyBirdGame,
   'coconut-catch': CoconutCatchGame,
+  'fruit-basket': FruitBasketGame,
   'wave-rider': WaveRiderGame,
   'ice-cream': IceCreamGame,
   'treasure-map': TreasureMapGame,
@@ -53,7 +55,8 @@ export function GamePage({ gameId, onBack }: Props) {
   const isBookShelf = game.id === 'book-shelf'
   const isFlappyBird = game.id === 'flappy-bird'
   const isBeachRadio = game.id === 'beach-radio'
-  const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio || isBookShelf || isFlappyBird
+  const isFruitBasket = game.id === 'fruit-basket'
+  const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio || isBookShelf || isFlappyBird || isFruitBasket
   const sceneImage = specialSceneImages[game.id] ?? islandMapImage
   const openRadio = () => setRadioOpen(true)
 
@@ -63,8 +66,9 @@ export function GamePage({ gameId, onBack }: Props) {
         isTotemCode ? 'totem-code-page' : ''
       } ${isBookShelf ? 'book-shelf-page' : ''
       } ${isFlappyBird ? 'flappy-bird-page' : ''
-      } ${isBeachRadio ? 'beach-radio-page' : ''}`}
-      style={isBeachRadio ? undefined : { backgroundImage: `url(${sceneImage})` }}
+      } ${isBeachRadio ? 'beach-radio-page' : ''
+      } ${isFruitBasket ? 'fruit-basket-page' : ''}`}
+      style={isBeachRadio || isFruitBasket ? undefined : { backgroundImage: `url(${sceneImage})` }}
     >
       <div className="page-top">
         <button type="button" className="back" onClick={onBack}>

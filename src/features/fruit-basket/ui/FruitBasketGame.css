@@ -1,0 +1,292 @@
+.fruit-basket-game {
+  --ink: #293b31;
+  --coral: #ef765d;
+  position: relative;
+  width: min(900px, 100%);
+  min-height: min(800px, calc(100dvh - 100px));
+  margin: 0 auto;
+  overflow: hidden;
+  padding: clamp(18px, 3vw, 34px);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 30px;
+  background: #f9ead0;
+  color: var(--ink);
+  box-shadow: 0 24px 50px rgba(74, 74, 43, 0.22);
+  isolation: isolate;
+}
+.fruit-basket-game::before {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background: linear-gradient(180deg, #f6b3a4 0%, #ffe1b5 47%, #a9d9ae 47%, #74bb8d 100%);
+  content: '';
+}
+.fruit-basket-game::after {
+  position: absolute;
+  z-index: -1;
+  right: -7%;
+  bottom: 18%;
+  width: 70%;
+  height: 25%;
+  border-radius: 50% 50% 0 0;
+  background: rgba(255, 238, 183, 0.35);
+  content: '';
+  transform: rotate(-4deg);
+}
+.fruit-basket-game__skyline {
+  position: absolute;
+  top: 8%;
+  right: 8%;
+  left: 8%;
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  pointer-events: none;
+}
+.fruit-basket-game__header,
+.fruit-basket-game__status {
+  position: relative;
+  z-index: 3;
+}
+.fruit-basket-game__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.fruit-basket-game__eyebrow {
+  margin: 0 0 7px;
+  color: #a74d45;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.fruit-basket-game h1 {
+  margin: 0;
+  color: var(--ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+  text-shadow: none;
+}
+.fruit-basket-game__header p:last-child {
+  max-width: 360px;
+  margin: 13px 0 0;
+  color: #536254;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+.fruit-basket-game__score {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 10px 15px;
+  border: 2px solid rgba(41, 59, 49, 0.16);
+  border-radius: 14px;
+  background: rgba(255, 249, 231, 0.7);
+  white-space: nowrap;
+}
+.fruit-basket-game__score strong {
+  font-size: 1.7rem;
+}
+.fruit-basket-game__score span {
+  color: #748170;
+  font-weight: 800;
+}
+.fruit-basket-game__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: fit-content;
+  margin: 22px auto 10px;
+  padding: 7px 13px;
+  border-radius: 99px;
+  background: rgba(255, 249, 231, 0.68);
+  color: #667262;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.fruit-basket-game__drop-zone {
+  position: absolute;
+  z-index: 4;
+  top: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 126px;
+  overflow: hidden;
+  border: 2px dashed rgba(41, 59, 49, 0.34);
+  border-radius: 14px;
+  background: rgba(255, 249, 231, 0.34);
+  color: rgba(41, 59, 49, 0.7);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.fruit-basket-game__drop-zone--left { left: 9px; }
+.fruit-basket-game__drop-zone--right { right: 9px; }
+.fruit-basket-game__drop-zone span {
+  margin-top: 4px;
+  font-size: 1.65rem;
+  line-height: 1;
+}
+.fruit-basket-game__drop-zone i {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  display: block;
+  background: rgba(239, 118, 93, 0.38);
+  transition: height 0.1s linear;
+}
+.fruit-basket-game__drop-zone.is-ready,
+.fruit-basket-game__drop-zone.is-charging {
+  border-color: var(--coral);
+  background: rgba(255, 249, 231, 0.72);
+  color: #a74d45;
+}
+.fruit-basket-game__drop-zone.is-charging strong::after {
+  content: '...';
+}
+.fruit-basket-game__hearts {
+  color: var(--coral);
+  font-size: 1.15rem;
+  letter-spacing: 2px;
+  text-transform: none;
+}
+.fruit-basket-game__empty-hearts {
+  color: rgba(41, 59, 49, 0.22);
+}
+.fruit-basket-game__field {
+  position: relative;
+  width: min(620px, 100%);
+  height: clamp(430px, 62vh, 620px);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 2px solid rgba(41, 59, 49, 0.15);
+  border-radius: 22px;
+  background: rgba(255, 249, 231, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+.fruit-basket-game__sun {
+  position: absolute;
+  top: 8%;
+  right: 12%;
+  color: #ffd35c;
+  font-size: 3.5rem;
+  text-shadow: 0 3px 0 rgba(195, 117, 63, 0.18);
+}
+.fruit-basket-game__cloud {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 3.2rem;
+}
+.cloud-one { top: 17%; left: 12%; }
+.cloud-two { top: 30%; right: 30%; font-size: 2rem; }
+.fruit-basket-game__item {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  font-size: 2.15rem;
+  filter: drop-shadow(0 4px 2px rgba(47, 70, 47, 0.17));
+  transform: translateX(-50%);
+}
+.fruit-basket-game__item--bad {
+  filter: drop-shadow(0 4px 2px rgba(87, 45, 40, 0.28));
+}
+.fruit-basket-game__basket {
+  position: absolute;
+  z-index: 3;
+  bottom: 9%;
+  display: grid;
+  width: 15%;
+  min-width: 72px;
+  max-width: 110px;
+  justify-items: center;
+  transition: left 0.13s ease-out;
+  transform: translateX(-50%);
+}
+.fruit-basket-game__basket.is-full {
+  filter: drop-shadow(0 0 9px rgba(217, 56, 56, 0.95));
+}
+.fruit-basket-game__basket.is-full span {
+  animation: full-basket-pulse 0.8s ease-in-out infinite alternate;
+}
+.fruit-basket-game__basket span {
+  font-size: clamp(3.3rem, 7vw, 5rem);
+  line-height: 0.9;
+  filter: drop-shadow(0 7px 2px rgba(66, 99, 68, 0.25));
+}
+.fruit-basket-game__basket i {
+  width: 70%;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(52, 91, 59, 0.28);
+  font-size: 0;
+}
+@keyframes full-basket-pulse {
+  from { filter: saturate(1) drop-shadow(0 0 2px rgba(217, 56, 56, 0.55)); }
+  to { filter: saturate(1.4) drop-shadow(0 0 10px rgba(217, 56, 56, 0.95)); }
+}
+.fruit-basket-game__ground {
+  position: absolute;
+  right: -5%;
+  bottom: -9%;
+  left: -5%;
+  height: 20%;
+  border-radius: 50% 50% 0 0;
+  background: rgba(52, 131, 79, 0.32);
+}
+.fruit-basket-game__result {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  width: min(340px, calc(100% - 32px));
+  padding: 26px 24px 23px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 21px;
+  background: rgba(255, 249, 231, 0.96);
+  box-shadow: 0 16px 40px rgba(65, 70, 43, 0.22);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.fruit-basket-game__result-icon { font-size: 2.7rem; }
+.fruit-basket-game__result h2 { margin: 9px 0 6px; font-family: Georgia, 'Times New Roman', serif; font-size: 1.75rem; }
+.fruit-basket-game__result p { margin: 0; color: #667262; font-weight: 700; }
+.fruit-basket-game__result button {
+  margin-top: 18px;
+  padding: 11px 17px;
+  border: 0;
+  border-radius: 11px;
+  background: var(--coral);
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #c95449;
+}
+.fruit-basket-game__result button:active { transform: translateY(3px); box-shadow: 0 1px 0 #c95449; }
+@media (max-width: 620px) {
+  .fruit-basket-game { width: 100%; min-height: calc(100dvh - 100px); padding: 16px 12px 18px; border-radius: 22px; }
+  .fruit-basket-game__header { gap: 10px; }
+  .fruit-basket-game__header p:last-child { margin-top: 9px; font-size: 0.86rem; }
+  .fruit-basket-game__score { padding: 7px 10px; }
+  .fruit-basket-game__score strong { font-size: 1.35rem; }
+  .fruit-basket-game__status { margin-top: 15px; }
+  .fruit-basket-game__field { height: calc(100dvh - 290px); min-height: 360px; }
+  .fruit-basket-game__drop-zone { width: 54px; height: 108px; }
+  .fruit-basket-game__drop-zone--left { left: 6px; }
+  .fruit-basket-game__drop-zone--right { right: 6px; }
+}
