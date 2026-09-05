@@ -1,9 +1,7 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
-import { GamePage } from '@/pages/game'
-import { GamesPage } from '@/pages/games'
+import { createBrowserRouter } from 'react-router-dom'
+import { DesktopRoute, MobileRoute } from './DeviceRoutes'
 
 export const router = createBrowserRouter([
-  { path: '/', element: <GamesPage /> },
-  { path: '/games/:gameId', element: <GamePage /> },
-  { path: '*', element: <Navigate to="/" replace /> },
+  { path: '/', element: <DesktopRoute /> },
+  { path: '/mobile', element: <MobileRoute /> },
 ])
