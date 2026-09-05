@@ -3,14 +3,14 @@ import { ArrowLeft } from 'lucide-react'
 import { getGame } from '@/entities/game/model/games'
 import { useProgressStore } from '@/features/game-progress/model/store'
 import { BeachRadioGame, RadioModal } from '@/features/beach-radio'
-import { ShellHuntGame } from '@/features/shell-hunt'
+import { TotemCodeGame } from '@/features/totem-code'
 import { CoconutCatchGame } from '@/features/coconut-catch'
 import { WaveRiderGame } from '@/features/wave-rider'
 import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
 import { BeachSearchGame } from '@/features/beach-search'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
-import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-v3.png'
+import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 import { Button } from '@/shared/ui/Button'
 import { GameHud } from '@/widgets/game-hud/GameHud'
 
@@ -22,7 +22,7 @@ type GameScreenProps = {
 type Props = { gameId: string; onBack: () => void }
 
 const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
-  'shell-hunt': ShellHuntGame,
+  'shell-hunt': TotemCodeGame,
   'coconut-catch': CoconutCatchGame,
   'wave-rider': WaveRiderGame,
   'ice-cream': IceCreamGame,
