@@ -7,6 +7,7 @@ import { CoconutCatchGame } from '@/features/coconut-catch'
 import { WaveRiderGame } from '@/features/wave-rider'
 import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
+import { Arkanoid } from '@/features/arkanoid'
 import { Button } from '@/shared/ui/Button'
 
 const gameScreens = {
@@ -15,6 +16,7 @@ const gameScreens = {
   'wave-rider': WaveRiderGame,
   'ice-cream': IceCreamGame,
   'treasure-map': TreasureMapGame,
+  'arkanoid': Arkanoid,
 }
 
 export function GamePage() {

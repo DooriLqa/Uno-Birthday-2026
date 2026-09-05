@@ -1,0 +1,132 @@
+.wack-a-mole {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px
+}
+
+.wack-a-mole__hud {
+  width: min(720px, 100%);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between
+}
+
+.wack-a-mole__timer {
+  display: flex;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #f4efe8
+}
+
+.wack-a-mole__timer strong {
+  font-size: 22px
+}
+
+.wack-a-mole__result {
+  font-size: 22px;
+  font-weight: 800
+}
+
+.wack-a-mole__result--win {
+  color: #2e9b55
+}
+
+.wack-a-mole__result--lose {
+  color: #d9534f
+}
+
+.wack-a-mole__start {
+  padding: 11px 22px;
+  border: 0;
+  border-radius: 10px;
+  background: #eb6c9a;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer
+}
+
+.wack-a-mole__field {
+  width: 720px;
+  height: 480px;
+  max-width: 100%;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  overflow: hidden;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 720px 480px;
+  border-radius: 16px;
+  user-select: none
+}
+
+.wack-a-mole__bush {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.wack-a-mole__bush-image {
+  position: absolute;
+  width: 43%;
+  max-width: 90px;
+  height: auto;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  cursor: default;
+}
+
+.wack-a-mole__mole-hitbox {
+  position: absolute;
+  z-index: 1;
+  width: 48%;
+  max-width: 105px;
+  bottom: 23%;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  line-height: 0;
+}
+
+.wack-a-mole__mole {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  animation: wack-a-mole-rise 900ms ease-in-out forwards;
+}
+
+@keyframes wack-a-mole-rise {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@media(max-width:740px) {
+  .wack-a-mole__field {
+    height: auto;
+    aspect-ratio: 3/2;
+    background-size: cover
+  }
+}

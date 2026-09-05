@@ -1,0 +1,99 @@
+.arkanoid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.arkanoid__hud {
+    width: min(720px, 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.arkanoid__hud>div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 13px;
+    border-radius: 12px;
+    background: #f4efe8;
+}
+
+.arkanoid__hud span {
+    font-size: 14px;
+}
+
+.arkanoid__hud strong {
+    font-size: 20px;
+}
+
+.arkanoid__canvas-wrap {
+    width: 720px;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: 16px;
+    touch-action: none;
+    box-shadow: 0 8px 28px rgba(38, 59, 87, 0.12);
+}
+
+.arkanoid__canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+}
+
+.arkanoid__controls {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.arkanoid__button {
+    padding: 11px 24px;
+    border: 0;
+    border-radius: 10px;
+    background: #eb6c9a;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.arkanoid__message {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.arkanoid__message--win {
+    color: #2e9b55;
+}
+
+.arkanoid__message--lose {
+    color: #d9534f;
+}
+
+.arkanoid__hint {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+@media (max-width: 740px) {
+    .arkanoid__hud {
+        width: 100%;
+    }
+
+    .arkanoid__canvas-wrap {
+        border-radius: 12px;
+    }
+
+    .arkanoid__hud>div {
+        padding: 7px 10px;
+    }
+}

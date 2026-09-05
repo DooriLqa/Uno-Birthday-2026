@@ -1,0 +1,231 @@
+.sea-battle {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    color: #e7f4d8;
+    user-select: none;
+}
+
+.sea-battle__hud {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.sea-battle__hud>div {
+    min-width: 0;
+    padding: 9px 12px;
+    border: 1px solid rgba(167, 204, 133, 0.35);
+    border-radius: 10px;
+    background: #10180f;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.sea-battle__hud span,
+.sea-battle__hud strong {
+    display: block;
+}
+
+.sea-battle__hud span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.65;
+}
+
+.sea-battle__hud strong {
+    margin-top: 2px;
+    font-size: 18px;
+}
+
+/* Игровое окно имеет ровно пропорции visor.png — 1000x500. */
+.sea-battle__viewport {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1000 / 500;
+    overflow: hidden;
+    background: #000;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    touch-action: none;
+    cursor: crosshair;
+}
+
+/* Мир шире окна. При старте cameraX = 750, поэтому visor смотрит ровно в центр мира. */
+.sea-battle__world {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2500px;
+    height: 500px;
+    transform-origin: left top;
+    will-change: transform;
+}
+
+/* back/front каждый масштабируется именно под visor.png: 1000x500. */
+.sea-battle__back,
+.sea-battle__front {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2500px;
+    height: 500px;
+    object-fit: fill;
+    pointer-events: none;
+}
+
+.sea-battle__back {
+    z-index: 0;
+}
+
+.sea-battle__ships,
+.sea-battle__torpedoes,
+.sea-battle__explosions {
+    position: absolute;
+    inset: 0;
+}
+
+.sea-battle__ship,
+.sea-battle__torpedo,
+.sea-battle__explosion {
+    position: absolute;
+    display: block;
+    pointer-events: none;
+}
+
+.sea-battle__ship {
+    object-fit: contain;
+    z-index: 5;
+}
+
+.sea-battle__torpedo {
+    width: 36px;
+    height: 60px;
+    object-fit: contain;
+    z-index: 25;
+}
+
+.sea-battle__explosion {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    z-index: 15;
+    animation: sea-battle-explosion 1500ms ease-out both;
+}
+
+.sea-battle__front {
+    z-index: 20;
+}
+
+/* visor.png всегда неподвижен и лежит поверх мира. */
+.sea-battle__visor {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
+    z-index: 30;
+}
+
+.sea-battle__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.sea-battle__controls button {
+    min-width: 58px;
+    min-height: 46px;
+    border: 0;
+    border-radius: 10px;
+    background: #1c2918;
+    color: #e7f4d8;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #0b1009;
+}
+
+.sea-battle__controls button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.sea-battle__controls button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.sea-battle__controls .sea-battle__fire {
+    min-width: 130px;
+    background: #8b3d2f;
+    font-size: 17px;
+    letter-spacing: 0.08em;
+}
+
+.sea-battle__overlay {
+    position: absolute;
+    z-index: 40;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.62);
+    border-radius: 14px;
+}
+
+.sea-battle__message {
+    width: min(420px, calc(100% - 32px));
+    padding: 28px;
+    text-align: center;
+    border: 1px solid rgba(206, 230, 178, 0.3);
+    border-radius: 16px;
+    background: #10180f;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+}
+
+.sea-battle__message h3 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.sea-battle__message p {
+    margin: 10px 0 20px;
+    line-height: 1.5;
+    opacity: 0.8;
+}
+
+.sea-battle__message button {
+    padding: 11px 22px;
+    border: 0;
+    border-radius: 9px;
+    background: #b8d28d;
+    color: #14200f;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+@keyframes sea-battle-explosion {
+    from {
+        opacity: 1;
+        transform: scale(0.45);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(1.2);
+    }
+}
+
+@media (max-width: 760px) {
+    .sea-battle__hud {
+        grid-template-columns: 1fr;
+    }
+
+    .sea-battle__viewport {
+        border-radius: 8px;
+    }
+}
