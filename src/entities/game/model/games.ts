@@ -7,7 +7,7 @@ export type Game = {
   target: string
 }
 
-const gameList: Game[] = [
+export const gameList: Game[] = [
   {
     id: 'beach-radio',
     title: 'Радио Бони',
@@ -25,12 +25,28 @@ const gameList: Game[] = [
     target: 'все предметы',
   },
   {
-    id: 'shell-hunt',
-    title: 'Охота за ракушками',
-    description: 'Найди сокровище у кромки воды.',
-    emoji: '🐚',
-    color: '#f5c9d6',
-    target: 'ракушку',
+    id: 'book-shelf',
+    title: 'Книжная полка',
+    description: 'Разложи книги по цветам в правильный порядок.',
+    emoji: '📚',
+    color: '#e7d5ff',
+    target: 'все книги',
+  },
+  {
+    id: 'flappy-bird',
+    title: 'Полёт над лагуной',
+    description: 'Пролетай между трубами и собирай монетки.',
+    emoji: '🐦',
+    color: '#f8df9a',
+    target: '10 труб',
+  },
+  {
+    id: 'totem-code',
+    title: 'Код тотемов',
+    description: 'Собери тайную комбинацию по подсказкам.',
+    emoji: '🗿',
+    color: '#dbc09b',
+    target: 'код тотемов',
   },
   {
     id: 'coconut-catch',
@@ -39,6 +55,14 @@ const gameList: Game[] = [
     emoji: '🥥',
     color: '#c9e5ae',
     target: 'кокос',
+  },
+  {
+    id: 'fruit-basket',
+    title: 'Корзинка удачи',
+    description: 'Собери ценности и сдай их в левую или правую зону.',
+    emoji: '🧺',
+    color: '#f6b7a8',
+    target: '20 ценностей',
   },
   {
     id: 'wave-rider',
@@ -65,13 +89,68 @@ const gameList: Game[] = [
     target: 'сокровище',
   },
   {
+    id: 'shell-game',
+    title: 'Кручу-верчу',
+    description: 'Следи за ракушкой.',
+    emoji: '🥤',
+    color: '#eb6c9a',
+    target: 'наперсток',
+  },
+  {
+    id: 'black-jack',
+    title: 'Black Jack',
+    description: 'Набери 21 и обыграй раздающего.',
+    emoji: '🃏',
+    color: '#b8d8c0',
+    target: 'очко',
+  },
+  {
+    id: 'find-a-pair',
+    title: 'Find a Pair',
+    description: 'Найди все пары карт за 30 секунд.',
+    emoji: '🎴',
+    color: '#d8c5e8',
+    target: 'все пары',
+  },
+  {
+    id: 'wack-a-mole',
+    title: 'Wack a Mole',
+    description: 'Успей ударить по кроту.',
+    emoji: '🔨',
+    color: '#c9d9b4',
+    target: 'крота',
+  },
+  {
+    id: 'arkanoid',
+    title: 'Арканоид',
+    description: 'Разбей все кирпичи и не дай мячу упасть.',
+    emoji: '🧱',
+    color: '#b9d7f0',
+    target: 'все кирпичи',
+  },
+  {
+    id: 'sea-battle',
+    title: 'Морской бой',
+    description: 'Потопи все корабли.',
+    emoji: '🚢',
+    color: '#075290',
+    target: 'торпеда',
+  },
+  {
+    id: 'lock-picking',
+    title: 'Взлом замка',
+    description: 'Подбери комбинацию и открой замок.',
+    emoji: '🔐',
+    color: '#d8c28d',
+    target: 'замок',
+  },
+  {
     id: 'fishing',
     title: 'Рыбалка',
     description: 'Лови рыбок, собирай редкий улов и получай монетки.',
     emoji: '🎣',
     color: '#b7e2ea',
     target: 'рыбу',
-    repeatable: true,
   },
 ]
 

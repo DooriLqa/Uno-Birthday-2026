@@ -1,6 +1,7 @@
-import { Minus, PackagePlus, Plus, RotateCcw, Wrench } from 'lucide-react'
+import { MessageCircle, Minus, PackagePlus, Plus, Wrench, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
+import { dialogueTestSamples, openDialogue } from '@/features/dialogues'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
 import './DevCoinControls.css'
@@ -76,6 +77,15 @@ export function DevCoinControls() {
               })}
             </div>
           )}
+
+          <div className="dev-coin-controls__dialogues">
+            <strong>Тестовые диалоги</strong>
+            {dialogueTestSamples.map((dialogue, index) => (
+              <button key={dialogue.id} type="button" onClick={() => openDialogue(dialogue)}>
+                <MessageCircle size={15} /> Диалог {index + 1}
+              </button>
+            ))}
+          </div>
 
           <button
             type="button"

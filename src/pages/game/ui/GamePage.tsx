@@ -3,17 +3,27 @@ import { ArrowLeft } from 'lucide-react'
 import { getGame } from '@/entities/game/model/games'
 import { useProgressStore } from '@/features/game-progress/model/store'
 import { BeachRadioGame, RadioModal } from '@/features/beach-radio'
-import { ShellHuntGame } from '@/features/shell-hunt'
+import { TotemCodeGame } from '@/features/totem-code'
 import { CoconutCatchGame } from '@/features/coconut-catch'
+import { FruitBasketGame } from '@/features/fruit-basket'
 import { WaveRiderGame } from '@/features/wave-rider'
 import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
 import { BeachSearchGame } from '@/features/beach-search'
+import { BookShelfGame } from '@/features/book-shelf'
+import { FlappyBirdGame } from '@/features/flappy-bird'
 import { FishingGame } from '@/features/fishing'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
-import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-v3.png'
+import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 import { Button } from '@/shared/ui/Button'
 import { GameHud } from '@/widgets/game-hud/GameHud'
+import { BlackJack } from '@/features/black-jack'
+import { FindAPair } from '@/features/find-a-pair'
+import { SeaBattle } from '@/features/sea-battle'
+import { ShellGamePage } from '@/pages/games/ui/ShellGame/ShellGamePage'
+import { WackAMole } from '@/features/wack-a-mole'
+import { Arkanoid } from '@/features/arkanoid'
+import { LockPickingGame } from '@/features/lock-picking'
 
 type GameScreenProps = {
   onComplete: () => void
@@ -24,18 +34,28 @@ type GameScreenProps = {
 type Props = { gameId: string; onBack: () => void }
 
 const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
-  'shell-hunt': ShellHuntGame,
+  'book-shelf': BookShelfGame,
+  'flappy-bird': FlappyBirdGame,
+  'totem-code': TotemCodeGame,
   'coconut-catch': CoconutCatchGame,
+  'fruit-basket': FruitBasketGame,
   'wave-rider': WaveRiderGame,
   'ice-cream': IceCreamGame,
   'treasure-map': TreasureMapGame,
   'beach-search': BeachSearchGame,
   'beach-radio': BeachRadioGame,
+  'black-jack': BlackJack,
+  'find-a-pair': FindAPair,
+  'sea-battle': SeaBattle,
+  'shell-game': ShellGamePage,
+  'wack-a-mole': WackAMole,
+  arkanoid: Arkanoid,
+  'lock-picking': LockPickingGame,
   fishing: FishingGame,
 }
 
 const specialSceneImages: Record<string, string> = {
-  'shell-hunt': totemBeachScene,
+  'totem-code': totemBeachScene,
 }
 
 export function GamePage({ gameId, onBack }: Props) {
@@ -48,10 +68,14 @@ export function GamePage({ gameId, onBack }: Props) {
 
   const GameScreen = gameScreens[game.id]
   const isBeachSearch = game.id === 'beach-search'
-  const isTotemCode = game.id === 'shell-hunt'
+  const isBookShelf = game.id === 'book-shelf'
+  const isFlappyBird = game.id === 'flappy-bird'
+  const isTotemCode = game.id === 'totem-code'
   const isBeachRadio = game.id === 'beach-radio'
+  const isFruitBasket = game.id === 'fruit-basket'
+  const isImmersiveGame =
+    isBeachSearch || isTotemCode || isBeachRadio || isBookShelf || isFlappyBird || isFruitBasket
   const isFishing = game.id === 'fishing'
-  const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio || isFishing
   const sceneImage = specialSceneImages[game.id] ?? islandMapImage
   const openRadio = () => setRadioOpen(true)
 
@@ -59,11 +83,15 @@ export function GamePage({ gameId, onBack }: Props) {
     <main
       className={`beach-shell game-overlay ${isBeachSearch ? 'beach-search-page' : ''} ${
         isTotemCode ? 'totem-code-page' : ''
-      } ${isBeachRadio ? 'beach-radio-page' : ''} ${isFishing ? 'fishing-page' : ''}`}
+      } ${isBookShelf ? 'book-shelf-page' : ''} ${isTotemCode ? 'totem-code-page' : ''} ${
+        isFlappyBird ? 'flappy-bird-page' : ''
+      } ${isBeachRadio ? 'beach-radio-page' : ''} ${
+        isFishing ? 'fishing-page' : ''
+      } ${isFruitBasket ? 'fruit-basket-page' : ''}`}
       style={
         isFishing
           ? { backgroundImage: `url(${islandMapImage})` }
-          : isBeachRadio
+          : isBeachRadio || isFruitBasket
             ? undefined
             : { backgroundImage: `url(${sceneImage})` }
       }
@@ -74,10 +102,11 @@ export function GamePage({ gameId, onBack }: Props) {
         </button>
         <span>{game.emoji}</span>
       </div>
+      <section
+        className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''} ${isBookShelf ? 'book-shelf-layout' : ''} ${isFlappyBird ? 'flappy-bird-layout' : ''}`}
+      >
+        <GameHud onOpenRadio={openRadio} />
 
-      <GameHud onOpenRadio={openRadio} />
-
-      <section className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''}`}>
         <div className={`game-panel ${isBeachSearch ? 'beach-search-panel' : ''}`}>
           {!isImmersiveGame && (
             <>

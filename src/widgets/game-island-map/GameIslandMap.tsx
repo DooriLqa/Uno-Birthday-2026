@@ -6,12 +6,22 @@ type Props = { games: Game[]; completedIds: string[]; onPlay: (gameId: string) =
 
 const markerPositions: Record<string, { left: string; top: string }> = {
   'beach-radio': { left: '84%', top: '72%' },
-  'shell-hunt': { left: '27%', top: '38%' },
+  'book-shelf': { left: '42%', top: '32%' },
+  'flappy-bird': { left: '60%', top: '23%' },
+  'totem-code': { left: '27%', top: '38%' },
   'coconut-catch': { left: '47%', top: '51%' },
+  'fruit-basket': { left: '83%', top: '45%' },
   'wave-rider': { left: '72%', top: '37%' },
   'ice-cream': { left: '28%', top: '65%' },
   'treasure-map': { left: '70%', top: '65%' },
   'beach-search': { left: '49%', top: '75%' },
+  'black-jack': { left: '40%', top: '35%' },
+  'find-a-pair': { left: '42%', top: '30%' },
+  'sea-battle': { left: '44%', top: '39%' },
+  'shell-game': { left: '46%', top: '30%' },
+  'wack-a-mole': { left: '48%', top: '38%' },
+  arkanoid: { left: '50%', top: '30%' },
+  'lock-picking': { left: '54%', top: '47%' },
   fishing: { left: '58%', top: '22%' },
 }
 
