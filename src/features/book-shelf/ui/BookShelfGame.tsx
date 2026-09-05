@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, DragEvent, PointerEvent } from 'react'
 import './BookShelfGame.css'
-import pageArtwork from '@/shared/assets/totem-code/segments/letter-o.png'
+import pageArtwork from '@/shared/assets/totem-code/carved-glyph-sprite-sheet-natural-v2.png'
 
 type Props = { onComplete: () => void }
 
