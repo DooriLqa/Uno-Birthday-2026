@@ -25,6 +25,22 @@ const gameList: Game[] = [
     target: 'все предметы',
   },
   {
+    id: 'book-shelf',
+    title: 'Книжная полка',
+    description: 'Разложи книги по цветам в правильный порядок.',
+    emoji: '📚',
+    color: '#e7d5ff',
+    target: 'все книги',
+  },
+  {
+    id: 'flappy-bird',
+    title: 'Полёт над лагуной',
+    description: 'Пролетай между трубами и собирай монетки.',
+    emoji: '🐦',
+    color: '#f8df9a',
+    target: '10 труб',
+  },
+  {
     id: 'shell-hunt',
     title: 'Охота за ракушками',
     description: 'Найди сокровище у кромки воды.',
@@ -39,6 +55,14 @@ const gameList: Game[] = [
     emoji: '🥥',
     color: '#c9e5ae',
     target: 'кокос',
+  },
+  {
+    id: 'fruit-basket',
+    title: 'Корзинка удачи',
+    description: 'Собери ценности и сдай их в левую или правую зону.',
+    emoji: '🧺',
+    color: '#f6b7a8',
+    target: '20 ценностей',
   },
   {
     id: 'wave-rider',

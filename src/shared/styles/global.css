@@ -515,7 +515,105 @@ h1 {
   background: transparent;
   box-shadow: none;
 }
-
+.game-overlay.book-shelf-page {
+  padding: 84px 16px 24px;
+  background-position: center;
+  overflow-y: auto;
+}
+.book-shelf-page .page-top {
+  position: relative;
+  z-index: 2;
+  width: min(1120px, 100%);
+  margin: 0 auto 14px;
+}
+.book-shelf-page .game-layout {
+  display: block;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+.book-shelf-page .game-panel {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.book-shelf-page .library-game {
+  min-height: 0;
+  border-color: rgba(255, 245, 215, 0.42);
+  background: linear-gradient(135deg, rgba(255, 250, 231, 0.94), rgba(226, 192, 135, 0.88));
+  box-shadow:
+    0 22px 48px rgba(52, 35, 16, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.game-overlay.flappy-bird-page {
+  padding: 84px 16px 24px;
+  background: linear-gradient(160deg, #84d9df 0%, #d9f2c1 58%, #f8df9a 100%);
+  overflow-y: auto;
+}
+.flappy-bird-page .page-top,
+.flappy-bird-page .game-layout {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+.flappy-bird-page .page-top {
+  margin-bottom: 14px;
+}
+.flappy-bird-page .game-layout {
+  display: block;
+}
+.flappy-bird-page .game-panel {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.game-overlay.fruit-basket-page {
+  padding: 84px 16px 24px;
+  background: linear-gradient(145deg, #ef9b8b 0%, #f9d49b 48%, #95c894 100%);
+  overflow-y: auto;
+}
+.fruit-basket-page .page-top,
+.fruit-basket-page .game-layout {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+.fruit-basket-page .page-top {
+  margin-bottom: 14px;
+}
+.fruit-basket-page .game-layout {
+  display: block;
+}
+.fruit-basket-page .game-panel {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+@media (max-width: 760px) {
+  .game-overlay.flappy-bird-page {
+    padding: 72px 10px 14px;
+  }
+  .flappy-bird-page .page-top {
+    margin-bottom: 10px;
+  }
+  .game-overlay.fruit-basket-page {
+    padding: 72px 10px 14px;
+  }
+  .fruit-basket-page .page-top {
+    margin-bottom: 10px;
+  }
+}
+@media (max-width: 760px) {
+  .game-overlay.book-shelf-page {
+    padding: 72px 10px 14px;
+  }
+  .book-shelf-page .page-top {
+    margin-bottom: 10px;
+  }
+  .book-shelf-page .library-game {
+    min-height: calc(100dvh - 205px);
+    padding: 14px 12px 16px;
+    border-radius: 22px;
+  }
+}
 .game-overlay.beach-radio-page {
   padding: 16px;
   overflow: hidden;
