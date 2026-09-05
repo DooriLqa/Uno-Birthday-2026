@@ -15,6 +15,12 @@ const markerPositions: Record<string, { left: string; top: string }> = {
   'ice-cream': { left: '28%', top: '65%' },
   'treasure-map': { left: '70%', top: '65%' },
   'beach-search': { left: '49%', top: '75%' },
+  'black-jack': { left: '40%', top: '35%' },
+  'find-a-pair': { left: '42%', top: '30%' },
+  'sea-battle': { left: '44%', top: '39%' },
+  'shell-game': { left: '46%', top: '30%' },
+  'wack-a-mole': { left: '48%', top: '38%' },
+  arkanoid: { left: '50%', top: '30%' },
 }
 
 export function GameIslandMap({ games, completedIds, onPlay }: Props) {

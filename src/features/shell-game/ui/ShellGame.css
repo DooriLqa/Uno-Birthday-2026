@@ -1,0 +1,255 @@
+.shell-game {
+  --cup-width: 150px;
+  --cup-height: 190px;
+  --cup-gap: 30px;
+
+  width: 100%;
+  min-height: 430px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 32px 20px;
+  box-sizing: border-box;
+}
+
+.shell-game__header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.shell-game__hint {
+  margin: 0;
+  font-size: 16px;
+}
+
+.shell-game__result {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.shell-game__result--win {
+  color: #2e9b55;
+}
+
+.shell-game__result--lose {
+  color: #d9534f;
+}
+
+.shell-game__board {
+  width: calc(var(--cup-width) * 3 + var(--cup-gap) * 2);
+
+  height: 260px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.shell-game__cups {
+  position: relative;
+
+  width: calc(var(--cup-width) * 3 + var(--cup-gap) * 2);
+
+  height: 220px;
+}
+
+.shell-game__cup-wrapper {
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  width: var(--cup-width);
+  height: var(--cup-height);
+
+  z-index: 2;
+}
+
+.shell-game__cup-wrapper--position-0 {
+  left: 0;
+}
+
+.shell-game__cup-wrapper--position-1 {
+  left: calc(var(--cup-width) + var(--cup-gap));
+}
+
+.shell-game__cup-wrapper--position-2 {
+  left: calc((var(--cup-width) + var(--cup-gap)) * 2);
+}
+
+.shell-game__cup-wrapper--swapping {
+  z-index: 20;
+
+  animation: shell-game-swap var(--shuffle-duration) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes shell-game-swap {
+  0% {
+    transform: translateX(0) translateY(0);
+  }
+
+  15% {
+    transform: translateX(calc(var(--move-x) * 0.08)) translateY(calc(var(--arc-height) * -0.18));
+  }
+
+  35% {
+    transform: translateX(calc(var(--move-x) * 0.28)) translateY(calc(var(--arc-height) * -0.72));
+  }
+
+  50% {
+    transform: translateX(calc(var(--move-x) * 0.5)) translateY(calc(var(--arc-height) * -1));
+  }
+
+  65% {
+    transform: translateX(calc(var(--move-x) * 0.72)) translateY(calc(var(--arc-height) * -0.72));
+  }
+
+  85% {
+    transform: translateX(calc(var(--move-x) * 0.92)) translateY(calc(var(--arc-height) * -0.18));
+  }
+
+  100% {
+    transform: translateX(var(--move-x)) translateY(0);
+  }
+}
+
+.shell-game__cup {
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  width: var(--cup-width);
+  height: var(--cup-height);
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  appearance: none;
+
+  cursor: default;
+  z-index: 2;
+
+  transition: transform 350ms ease;
+}
+
+.shell-game__cup--lifted {
+  transform: translateY(-65px);
+  z-index: 30;
+}
+
+.shell-game__cup--selectable {
+  cursor: pointer;
+}
+
+.shell-game__cup--selectable:hover {
+  filter: brightness(1.05);
+}
+
+.shell-game__cup--animating {
+  transform: none;
+}
+
+.shell-game__cup-image {
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  z-index: 2;
+
+  user-select: none;
+  pointer-events: none;
+}
+
+.shell-game__pearl {
+  position: absolute;
+
+  left: 50%;
+  bottom: 5px;
+
+  width: 55px;
+  height: 55px;
+
+  object-fit: contain;
+
+  transform: translateX(-50%);
+
+  z-index: 1;
+
+  user-select: none;
+  pointer-events: none;
+}
+
+.shell-game__controls {
+  min-height: 55px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 10px;
+}
+
+.shell-game__play-button {
+  min-width: 150px;
+
+  padding: 12px 24px;
+
+  border: 0;
+  border-radius: 10px;
+
+  background: #eb6c9a;
+  color: white;
+
+  font-size: 17px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: transform 150ms ease;
+}
+
+.shell-game__play-button:hover {
+  transform: translateY(-2px);
+}
+
+.shell-game__play-button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+  .shell-game {
+    --cup-width: 100px;
+    --cup-height: 145px;
+    --cup-gap: 10px;
+  }
+
+  .shell-game__board {
+    height: 200px;
+  }
+
+  .shell-game__cups {
+    height: 180px;
+  }
+
+  .shell-game__cup--lifted {
+    transform: translateY(-45px);
+  }
+
+  .shell-game__pearl {
+    width: 40px;
+    height: 40px;
+  }
+}

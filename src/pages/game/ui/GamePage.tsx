@@ -16,6 +16,12 @@ import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expan
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 import { Button } from '@/shared/ui/Button'
 import { GameHud } from '@/widgets/game-hud/GameHud'
+import { BlackJack } from '@/features/black-jack'
+import { FindAPair } from '@/features/find-a-pair'
+import { SeaBattle } from '@/features/sea-battle'
+import { ShellGamePage } from '@/pages/games/ui/ShellGame/ShellGamePage'
+import { WackAMole } from '@/features/wack-a-mole'
+import { Arkanoid } from '@/features/arkanoid'
 
 type GameScreenProps = {
   onComplete: () => void
@@ -35,6 +41,12 @@ const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
   'treasure-map': TreasureMapGame,
   'beach-search': BeachSearchGame,
   'beach-radio': BeachRadioGame,
+  'black-jack': BlackJack,
+  'find-a-pair': FindAPair,
+  'sea-battle': SeaBattle,
+  'shell-game': ShellGamePage,
+  'wack-a-mole': WackAMole,
+  arkanoid: Arkanoid,
 }
 
 const specialSceneImages: Record<string, string> = {
@@ -62,12 +74,11 @@ export function GamePage({ gameId, onBack }: Props) {
 
   return (
     <main
-      className={`beach-shell game-overlay ${isBeachSearch ? 'beach-search-page' : ''} ${
-        isTotemCode ? 'totem-code-page' : ''
-      } ${isBookShelf ? 'book-shelf-page' : ''
-      } ${isFlappyBird ? 'flappy-bird-page' : ''
-      } ${isBeachRadio ? 'beach-radio-page' : ''
-      } ${isFruitBasket ? 'fruit-basket-page' : ''}`}
+      className={`beach-shell game-overlay ${isBeachSearch ? 'beach-search-page' : ''} ${isTotemCode ? 'totem-code-page' : ''
+        } ${isBookShelf ? 'book-shelf-page' : ''
+        } ${isFlappyBird ? 'flappy-bird-page' : ''
+        } ${isBeachRadio ? 'beach-radio-page' : ''
+        } ${isFruitBasket ? 'fruit-basket-page' : ''}`}
       style={isBeachRadio || isFruitBasket ? undefined : { backgroundImage: `url(${sceneImage})` }}
     >
       <div className="page-top">
@@ -78,7 +89,7 @@ export function GamePage({ gameId, onBack }: Props) {
       </div>
       <section className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''} ${isBookShelf ? 'book-shelf-layout' : ''} ${isFlappyBird ? 'flappy-bird-layout' : ''}`}>
 
-      <GameHud onOpenRadio={openRadio} />
+        <GameHud onOpenRadio={openRadio} />
 
         <div className={`game-panel ${isBeachSearch ? 'beach-search-panel' : ''}`}>
           {!isImmersiveGame && (
