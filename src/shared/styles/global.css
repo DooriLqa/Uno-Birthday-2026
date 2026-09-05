@@ -555,3 +555,54 @@ h1 {
     left: 10px;
   }
 }
+
+
+.game-overlay.fishing-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+}
+.fishing-page .page-top,
+.fishing-page .game-hud {
+  display: none;
+}
+.fishing-page .game-layout {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.fishing-page .game-panel {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  place-items: center;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.fishing-page .game-panel > h1,
+.fishing-page .game-panel > p {
+  display: none;
+}
+
+/* Fishing: full-screen scene background + HUD above the fishing window. */
+.game-overlay.fishing-page {
+  background-color: #79cfe8;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.fishing-page .game-hud {
+  display: flex !important;
+  position: fixed;
+  z-index: 100;
+  top: 14px;
+  left: 18px;
+  right: 18px;
+}

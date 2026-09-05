@@ -1,4 +1,5 @@
 import { Radio as RadioIcon, Volume2 } from 'lucide-react'
+import type { CSSProperties } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import { useRadioStore } from '@/features/beach-radio/model/radioStore'
@@ -7,6 +8,13 @@ import './GameHud.css'
 const EMPTY_SLOTS = 2
 const RADIO_ITEM_ID = 'beach-radio'
 const CORRECT_STATION_ID = 'station-06'
+const RARITY_COLORS = {
+  common: '#f2f2f2',
+  uncommon: '#57d46f',
+  rare: '#45a8ff',
+  epic: '#b66cff',
+  legendary: '#ff9d32',
+} as const
 
 type Props = {
   onOpenRadio?: () => void
@@ -92,8 +100,14 @@ function InventorySlot({ item, onOpenRadio }: { item: InventoryItem; onOpenRadio
 
   if (!isRadio || !onOpenRadio) {
     return (
-      <span className="game-hud__slot" title={item.name} aria-label={item.name}>
+      <span
+        className={`game-hud__slot ${item.rarity ? 'game-hud__slot--rarity' : ''}`}
+        style={item.rarity ? ({ '--rarity-color': RARITY_COLORS[item.rarity] } as CSSProperties) : undefined}
+        title={item.name}
+        aria-label={item.name}
+      >
         <span>{item.icon}</span>
+        {item.quantity && item.quantity > 1 ? <small>{item.quantity}</small> : null}
       </span>
     )
   }

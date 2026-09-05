@@ -64,6 +64,15 @@ const gameList: Game[] = [
     color: '#ded1aa',
     target: 'сокровище',
   },
+  {
+    id: 'fishing',
+    title: 'Рыбалка',
+    description: 'Лови рыбок, собирай редкий улов и получай монетки.',
+    emoji: '🎣',
+    color: '#b7e2ea',
+    target: 'рыбу',
+    repeatable: true,
+  },
 ]
 
 export const games = gameList.map((game) =>

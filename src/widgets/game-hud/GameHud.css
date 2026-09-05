@@ -79,6 +79,30 @@
   box-shadow: 0 3px 0 #d9b66d;
   font-size: 1.55rem;
 }
+.game-hud__slot--rarity {
+  position: relative;
+  box-shadow: 0 0 0 2px var(--rarity-color), 0 3px 0 #d9b66d, 0 0 12px color-mix(in srgb, var(--rarity-color) 55%, transparent);
+}
+.game-hud__slot--rarity::after {
+  position: absolute;
+  inset: 4px;
+  border: 2px solid var(--rarity-color);
+  border-radius: 7px;
+  content: '';
+  pointer-events: none;
+}
+.game-hud__slot small {
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  z-index: 2;
+  padding: 0 3px;
+  border-radius: 5px;
+  background: rgba(72, 45, 28, .82);
+  color: #fff4d0;
+  font-size: .58rem;
+  line-height: 1.1;
+}
 .game-hud__slot--empty {
   border: 2px dashed #d7bd82;
   background: rgba(255, 255, 255, 0.28);

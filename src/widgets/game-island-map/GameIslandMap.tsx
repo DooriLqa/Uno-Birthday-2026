@@ -12,6 +12,7 @@ const markerPositions: Record<string, { left: string; top: string }> = {
   'ice-cream': { left: '28%', top: '65%' },
   'treasure-map': { left: '70%', top: '65%' },
   'beach-search': { left: '49%', top: '75%' },
+  fishing: { left: '58%', top: '22%' },
 }
 
 export function GameIslandMap({ games, completedIds, onPlay }: Props) {

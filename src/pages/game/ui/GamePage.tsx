@@ -9,6 +9,7 @@ import { WaveRiderGame } from '@/features/wave-rider'
 import { IceCreamGame } from '@/features/ice-cream'
 import { TreasureMapGame } from '@/features/treasure-map'
 import { BeachSearchGame } from '@/features/beach-search'
+import { FishingGame } from '@/features/fishing'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-v3.png'
 import { Button } from '@/shared/ui/Button'
@@ -17,6 +18,7 @@ import { GameHud } from '@/widgets/game-hud/GameHud'
 type GameScreenProps = {
   onComplete: () => void
   onOpenRadio?: () => void
+  onClose?: () => void
 }
 
 type Props = { gameId: string; onBack: () => void }
@@ -29,6 +31,7 @@ const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
   'treasure-map': TreasureMapGame,
   'beach-search': BeachSearchGame,
   'beach-radio': BeachRadioGame,
+  fishing: FishingGame,
 }
 
 const specialSceneImages: Record<string, string> = {
@@ -47,7 +50,8 @@ export function GamePage({ gameId, onBack }: Props) {
   const isBeachSearch = game.id === 'beach-search'
   const isTotemCode = game.id === 'shell-hunt'
   const isBeachRadio = game.id === 'beach-radio'
-  const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio
+  const isFishing = game.id === 'fishing'
+  const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio || isFishing
   const sceneImage = specialSceneImages[game.id] ?? islandMapImage
   const openRadio = () => setRadioOpen(true)
 
@@ -55,8 +59,14 @@ export function GamePage({ gameId, onBack }: Props) {
     <main
       className={`beach-shell game-overlay ${isBeachSearch ? 'beach-search-page' : ''} ${
         isTotemCode ? 'totem-code-page' : ''
-      } ${isBeachRadio ? 'beach-radio-page' : ''}`}
-      style={isBeachRadio ? undefined : { backgroundImage: `url(${sceneImage})` }}
+      } ${isBeachRadio ? 'beach-radio-page' : ''} ${isFishing ? 'fishing-page' : ''}`}
+      style={
+        isFishing
+          ? { backgroundImage: `url(${islandMapImage})` }
+          : isBeachRadio
+            ? undefined
+            : { backgroundImage: `url(${sceneImage})` }
+      }
     >
       <div className="page-top">
         <button type="button" className="back" onClick={onBack}>
@@ -78,6 +88,7 @@ export function GamePage({ gameId, onBack }: Props) {
           <GameScreen
             onComplete={() => completeGame(game.id)}
             onOpenRadio={isBeachRadio ? openRadio : undefined}
+            onClose={isFishing ? onBack : undefined}
           />
         </div>
         {!isImmersiveGame && (
