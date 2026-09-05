@@ -136,6 +136,14 @@ export const games: Game[] = [
     color: '#075290',
     target: 'торпеда',
   },
+  {
+    id: 'lock-picking',
+    title: 'Взлом замка',
+    description: 'Подбери комбинацию и открой замок.',
+    emoji: '🔐',
+    color: '#d8c28d',
+    target: 'замок',
+  },
 ]
 
 export const getGame = (id: string | undefined) => games.find((game) => game.id === id)
