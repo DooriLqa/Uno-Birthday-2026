@@ -1,0 +1,139 @@
+.find-a-pair {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 0 10px;
+}
+
+.find-a-pair__hud {
+  width: min(720px, 100%);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.find-a-pair__timer,
+.find-a-pair__pairs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 150px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #f4efe8;
+}
+
+.find-a-pair__timer strong {
+  font-size: 22px;
+}
+
+.find-a-pair__timer span,
+.find-a-pair__pairs span {
+  color: #756b63;
+}
+
+.find-a-pair__result {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.find-a-pair__result--win {
+  color: #2e9b55;
+}
+
+.find-a-pair__result--lose {
+  color: #d9534f;
+}
+
+.find-a-pair__start {
+  min-width: 170px;
+  padding: 11px 22px;
+  border: 0;
+  border-radius: 10px;
+  background: #eb6c9a;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.find-a-pair__board {
+  width: min(720px, 100%);
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  padding: 14px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: #f4efe8;
+}
+
+.find-a-pair__card {
+  aspect-ratio: 2 / 3;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #d9d1c9;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.find-a-pair__card:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.16);
+}
+
+.find-a-pair__card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.find-a-pair__back {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border: 5px solid #c5bbb2;
+  color: #8d8177;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.find-a-pair__card--matched {
+  box-shadow: 0 0 0 2px #72b989;
+  cursor: default;
+}
+
+@media (max-width: 600px) {
+  .find-a-pair__board {
+    gap: 5px;
+    padding: 8px;
+  }
+
+  .find-a-pair__hud {
+    gap: 8px;
+  }
+
+  .find-a-pair__timer,
+  .find-a-pair__pairs {
+    min-width: 0;
+    flex: 1;
+    padding: 8px 10px;
+  }
+
+  .find-a-pair__timer strong {
+    font-size: 18px;
+  }
+}
