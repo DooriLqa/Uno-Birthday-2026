@@ -1,0 +1,80 @@
+.flappy-bird-game {
+  --ink: #183d4a;
+  --coral: #f36f55;
+  width: min(840px, 100%);
+  margin: 0 auto;
+  padding: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 30px;
+  background: #f8df9a;
+  box-shadow: 0 24px 60px rgba(25, 69, 74, 0.28), inset 0 1px rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+}
+
+.flappy-bird-game__header,
+.flappy-bird-game__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.flappy-bird-game__eyebrow {
+  display: block;
+  color: #bf5543;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.flappy-bird-game h1 { margin: 3px 0 0; font-size: clamp(1.35rem, 4vw, 2rem); }
+.flappy-bird-game__score { min-width: 76px; padding: 8px 12px; border-radius: 12px; background: #fff4ca; text-align: center; }
+.flappy-bird-game__score span { display: block; font-size: 0.58rem; font-weight: 900; letter-spacing: 0.12em; }
+.flappy-bird-game__score strong { display: block; color: var(--coral); font-size: 1.6rem; line-height: 1; }
+
+.flappy-bird-game__stage {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 720 / 440;
+  margin: 20px 0 14px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 20px;
+  background: linear-gradient(#71cfe0 0 70%, #54b9a0 70% 100%);
+  box-shadow: inset 0 -10px rgba(28, 122, 119, 0.28), 0 8px 0 rgba(25, 69, 74, 0.12);
+  cursor: pointer;
+}
+
+.flappy-bird-game__world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 720px;
+  height: 440px;
+  transform-origin: top left;
+}
+
+.flappy-bird-game__sun { position: absolute; top: 30px; right: 12%; width: 72px; height: 72px; border-radius: 50%; background: #ffd36d; box-shadow: 0 0 0 12px rgba(255, 211, 109, 0.2); }
+.flappy-bird-game__bird { position: absolute; z-index: 3; display: block; width: 28px; height: 28px; font-size: 27px; line-height: 28px; transition: transform 0.05s linear; }
+.flappy-bird-game__pipe-pair { position: absolute; inset: 0 auto auto 0; z-index: 2; width: 66px; height: 440px; pointer-events: none; }
+.flappy-bird-game__pipe { position: absolute; left: 0; display: block; width: 66px; border: 3px solid #187f68; background: linear-gradient(90deg, #43b685, #8cdb8b 48%, #26936f 100%); box-shadow: inset 5px 0 rgba(255, 255, 255, 0.22); }
+.flappy-bird-game__pipe::after { position: absolute; right: -7px; left: -7px; height: 20px; border: 3px solid #187f68; background: #55bd7e; content: ''; }
+.flappy-bird-game__pipe--top { top: 0; border-radius: 0 0 7px 7px; }
+.flappy-bird-game__pipe--top::after { bottom: -3px; border-radius: 5px; }
+.flappy-bird-game__pipe--bottom { bottom: 0; border-radius: 7px 7px 0 0; }
+.flappy-bird-game__pipe--bottom::after { top: -3px; border-radius: 5px; }
+.flappy-bird-game__ground { position: absolute; right: 0; bottom: 0; left: 0; z-index: 4; height: 20px; border-top: 4px solid #eece7b; background: repeating-linear-gradient(135deg, #e5b965 0 18px, #f3d58a 18px 36px); }
+.flappy-bird-game__message { position: absolute; z-index: 5; top: 50%; left: 50%; display: grid; gap: 6px; min-width: min(260px, 75%); padding: 16px 20px; border: 2px solid rgba(255, 255, 255, 0.7); border-radius: 16px; background: rgba(255, 249, 214, 0.92); box-shadow: 0 12px 24px rgba(25, 69, 74, 0.2); transform: translate(-50%, -50%); }
+.flappy-bird-game__message strong { color: var(--coral); font-size: 1.3rem; }
+.flappy-bird-game__message small { font-size: 0.76rem; }
+.flappy-bird-game__footer { font-size: 0.8rem; font-weight: 700; }
+.flappy-bird-game__footer strong { color: #187f68; }
+.flappy-bird-game__footer button { border: 0; border-radius: 999px; padding: 8px 12px; background: var(--coral); color: white; font-weight: 800; cursor: pointer; }
+
+@media (max-width: 560px) {
+  .flappy-bird-game { padding: 14px; border-radius: 22px; }
+  .flappy-bird-game__footer { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .flappy-bird-game__footer button { align-self: flex-end; }
+}
