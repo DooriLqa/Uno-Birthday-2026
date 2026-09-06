@@ -1,0 +1,48 @@
+.ice-cream-game {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  padding: 25px;
+  border-radius: 18px;
+  background: linear-gradient(#ffdc99, #ffac8f);
+  text-align: center;
+  font-weight: 800;
+}
+.ice-cream-game__sun {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  font-size: 3rem;
+}
+.ice-cream-game__result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 142px;
+  margin-top: 25px;
+  font-size: 3.2rem;
+  line-height: 0.9;
+}
+.ice-cream-game__result span {
+  min-height: 60px;
+  letter-spacing: 5px;
+}
+.ice-cream-game__result b {
+  font-size: 5.8rem;
+  font-weight: 400;
+}
+.ice-cream-game__flavours {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+.ice-cream-game__flavours button {
+  width: 74px;
+  height: 74px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff8e9;
+  box-shadow: 0 5px 0 #d88470;
+  cursor: pointer;
+  font-size: 2.8rem;
+}
