@@ -6,10 +6,10 @@ const tracks = (stationId: string, count: number) =>
     (_, index) => `/audio/radio/${stationId}/track-${String(index + 1).padStart(2, '0')}.mp3`,
   )
 
-// 102.7 — единственная загадочная станция. В неё можно положить сколько угодно
+// 102.9 — единственная загадочная станция. В неё можно положить сколько угодно
 // треков: они будут идти последовательно и зацикливаться после последнего.
 export const CORRECT_STATION_ID = 'station-06'
-export const CORRECT_FREQUENCY = 102.7
+export const CORRECT_FREQUENCY = 102.9
 
 export const radioStations: RadioStation[] = [
   { id: 'station-01', frequency: 88.7, trackSrcs: tracks('station-01', 1) },

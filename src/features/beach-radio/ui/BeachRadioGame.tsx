@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
-import { CircleHelp, Coins, Power, Radio as RadioIcon, Volume2, X } from 'lucide-react'
+import {
+  CircleHelp,
+  Coins,
+  Pause,
+  Play,
+  Power,
+  Radio as RadioIcon,
+  Volume2,
+  VolumeX,
+  X,
+} from 'lucide-react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore } from '@/features/inventory/model/store'
 import { syncRadioAudio, useRadioStore } from '@/features/beach-radio/model/radioStore'
@@ -211,12 +221,157 @@ function QuizPanel({
   question: QuizQuestion
   onAnswer: (index: number) => void
 }) {
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const audioVolume = useQuizProgressStore((state) => state.audioVolume)
+  const setAudioVolume = useQuizProgressStore((state) => state.setAudioVolume)
+
+  useEffect(() => {
+    const audio = audioRef.current
+
+    if (!audio) return
+
+    audio.volume = audioVolume
+  }, [audioVolume, question.id])
+
+  useEffect(() => {
+    const audio = audioRef.current
+
+    if (!audio) return
+
+    audio.volume = audioVolume
+  }, [audioVolume, question.audioSrc])
+
+  useEffect(() => {
+    const audio = audioRef.current
+
+    if (!audio) return
+
+    // Сбрасываем состояние при новом audioSrc
+    setIsPlaying(false)
+    setCurrentTime(0)
+    setDuration(0)
+
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime)
+    const onLoadedMetadata = () => setDuration(Number.isFinite(audio.duration) ? audio.duration : 0)
+    const onPlay = () => setIsPlaying(true)
+    const onPause = () => setIsPlaying(false)
+    const onEnded = () => {
+      setIsPlaying(false)
+      setCurrentTime(0)
+    }
+
+    audio.addEventListener('timeupdate', onTimeUpdate)
+    audio.addEventListener('loadedmetadata', onLoadedMetadata)
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('pause', onPause)
+    audio.addEventListener('ended', onEnded)
+
+    audio.volume = audioVolume
+
+    return () => {
+      audio.pause()
+      audio.removeEventListener('timeupdate', onTimeUpdate)
+      audio.removeEventListener('loadedmetadata', onLoadedMetadata)
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('pause', onPause)
+      audio.removeEventListener('ended', onEnded)
+    }
+  }, [question.audioSrc])
+
+  const togglePlayback = () => {
+    const audio = audioRef.current
+
+    if (!audio) return
+
+    if (audio.paused) {
+      void audio.play().catch(() => setIsPlaying(false))
+    } else {
+      audio.pause()
+    }
+  }
+
+  const seek = (value: number) => {
+    const audio = audioRef.current
+
+    if (!audio) return
+
+    audio.currentTime = value
+    setCurrentTime(value)
+  }
+
+  const changeVolume = (value: number) => {
+    setAudioVolume(value)
+
+    if (audioRef.current) {
+      audioRef.current.volume = value
+    }
+  }
+
+  const formatTime = (value: number) => {
+    if (!Number.isFinite(value)) return '0:00'
+
+    const minutes = Math.floor(value / 60)
+    const seconds = Math.floor(value % 60)
+    return `${minutes}:${String(seconds).padStart(2, '0')}`
+  }
+
   return (
     <div className="quiz-panel">
-      <div className="quiz-panel__question">
-        <span>Вопрос</span>
-        <h2>{question.text}</h2>
-      </div>
+      {(question.text || question.audioSrc) && (
+        <div className="quiz-panel__question">
+          <span>Вопрос</span>
+          {question.text && <h2>{question.text}</h2>}
+
+          {question.audioSrc && (
+            <div className="quiz-audio-player">
+              <audio ref={audioRef} src={question.audioSrc} preload="metadata" />
+
+              <button
+                type="button"
+                className="quiz-audio-player__play"
+                onClick={togglePlayback}
+                aria-label={isPlaying ? 'Поставить аудио на паузу' : 'Воспроизвести аудио'}
+              >
+                {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+              </button>
+
+              <div className="quiz-audio-player__timeline">
+                <input
+                  type="range"
+                  min="0"
+                  max={duration || 0}
+                  step="0.01"
+                  value={Math.min(currentTime, duration || 0)}
+                  onChange={(event) => seek(Number(event.target.value))}
+                  aria-label="Позиция аудио"
+                  disabled={!duration}
+                />
+                <div className="quiz-audio-player__time">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
+                </div>
+              </div>
+
+              <label className="quiz-audio-player__volume">
+                {audioVolume === 0 ? <VolumeX size={17} /> : <Volume2 size={17} />}
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={audioVolume}
+                  onChange={(event) => changeVolume(Number(event.target.value))}
+                  aria-label="Громкость аудио вопроса"
+                />
+              </label>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="quiz-panel__answers">
         {question.answers.map((option, index) => (
           <button key={option} type="button" onClick={() => onAnswer(index)}>

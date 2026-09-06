@@ -464,7 +464,7 @@ export const useRadioStore = create<RadioState>()(
           !current.discoveredStationIds.includes(CORRECT_STATION_ID)
 
         /**
-         * Первый вход в диапазон 102.7.
+         * Первый вход в диапазон 102.9.
          *
          * Только здесь ставим начало трека
          * на 5 секунд.
