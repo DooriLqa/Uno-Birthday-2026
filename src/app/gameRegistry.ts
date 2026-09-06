@@ -226,6 +226,22 @@ export const games: GameDefinition[] = [
     ...islandGame,
     Screen: FishingGame,
   },
+  {
+    id: 'japonsk',
+    title: 'Японский кроссворд',
+    description: 'Реши японский кроссворд.',
+    emoji: '⛰️',
+    color: '#f0a2a2',
+    target: 'японский кроссворд',
+  },
+  {
+    id: 'robot-maze',
+    title: 'Робот-лабиринт',
+    description: 'Помоги роботу найти выход из лабиринта.',
+    emoji: '🤖',
+    color: '#a2c9f0',
+    target: 'выход из лабиринта',
+  }
 ]
 
 export const getGame = (gameId: string | null) => games.find((game) => game.id === gameId)
