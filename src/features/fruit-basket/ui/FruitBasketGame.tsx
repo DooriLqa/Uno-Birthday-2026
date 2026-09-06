@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
+import handcuffsImage from '@/assets/fruit-basket/handcuffs.png'
+import ipadImage from '@/assets/fruit-basket/ipad.png'
+import kolonkaImage from '@/assets/fruit-basket/kolonka.png'
+import laptopImage from '@/assets/fruit-basket/laptop.png'
+import gemImage from '@/assets/fruit-basket/gem.png'
+import moneyImage from '@/assets/fruit-basket/money.png'
+import unuasherThiefImage from '@/assets/fruit-basket/unuasherThief.png'
 import './FruitBasketGame.css'
 
 type Props = { onComplete: () => void }
@@ -8,7 +15,7 @@ type FallingItem = {
   x: number
   y: number
   kind: 'good' | 'bad'
-  emoji: string
+  image: string
   speed: number
 }
 
@@ -25,9 +32,12 @@ type GameState = {
 
 const TARGET_SCORE = 20
 const MAX_LIVES = 5
-const BASKET_WIDTH = 15
+const BASKET_CATCH_WIDTH = 15
+const BASKET_CATCH_OFFSET = 0
 const MAX_BASKET_LOAD = 5
 const DROP_ZONE_WIDTH = 16
+const ITEM_SPAWN_MIN_X = DROP_ZONE_WIDTH + 4
+const ITEM_SPAWN_MAX_X = 92
 const DROP_DURATION = 1000
 const BASKET_SPEED = 1.7
 const MAX_BASKET_SPEED = 3.6
@@ -36,8 +46,8 @@ const ITEM_SPAWN_INTERVAL = 1200
 const STARTUP_ITEM_SPAWN_INTERVAL = ITEM_SPAWN_INTERVAL * 2
 const STARTUP_SPAWN_COUNT = 3
 const FULL_BASKET_SPAWN_INTERVAL = ITEM_SPAWN_INTERVAL * 4
-const GOOD_ITEMS = ['💎', '💍', '👑', '📱', '💻', '🎧', '📷', '⌚']
-const BAD_ITEMS = ['⛓️', '👮‍♂️']
+const GOOD_ITEMS = [gemImage, moneyImage, laptopImage, kolonkaImage, ipadImage]
+const BAD_ITEMS = [handcuffsImage]
 
 const initialState: GameState = {
   basketX: 50,
@@ -127,10 +137,10 @@ export function FruitBasketGame({ onComplete }: Props) {
         const isGood = Math.random() > 0.28
         const item: FallingItem = {
           id: nextId.current++,
-          x: 8 + Math.random() * 84,
+          x: ITEM_SPAWN_MIN_X + Math.random() * (ITEM_SPAWN_MAX_X - ITEM_SPAWN_MIN_X),
           y: -8,
           kind: isGood ? 'good' : 'bad',
-          emoji: isGood
+          image: isGood
             ? GOOD_ITEMS[Math.floor(Math.random() * GOOD_ITEMS.length)]
             : BAD_ITEMS[Math.floor(Math.random() * BAD_ITEMS.length)],
           speed: 0.7 + Math.random() * 0.35,
@@ -171,7 +181,8 @@ export function FruitBasketGame({ onComplete }: Props) {
         current.items.forEach((item) => {
           const nextY = item.y + item.speed
           const reachesBasket = nextY >= 78
-          const inBasket = Math.abs(item.x - basketX) <= BASKET_WIDTH / 2
+          const basketCatchX = basketX + BASKET_CATCH_OFFSET
+          const inBasket = Math.abs(item.x - basketCatchX) <= BASKET_CATCH_WIDTH / 2
 
           if (reachesBasket) {
             if (inBasket) {
@@ -272,7 +283,7 @@ export function FruitBasketGame({ onComplete }: Props) {
             style={{ left: `${item.x}%`, top: `${item.y}%` }}
             aria-hidden="true"
           >
-            {item.emoji}
+            <img src={item.image} alt="" />
           </span>
         ))}
         <div
@@ -280,7 +291,7 @@ export function FruitBasketGame({ onComplete }: Props) {
           style={{ left: `${game.basketX}%` }}
           aria-hidden="true"
         >
-          <span>🧺</span>
+          <img src={unuasherThiefImage} alt="" />
           <i>●</i>
         </div>
         <div className="fruit-basket-game__ground" aria-hidden="true" />
