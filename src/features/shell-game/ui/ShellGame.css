@@ -14,6 +14,52 @@
   box-sizing: border-box;
 }
 
+.shell-game-screen {
+  width: min(100%, 860px);
+  margin: 0 auto;
+  padding: 12px 16px 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #12324a;
+  box-shadow: 0 12px 32px rgba(25, 107, 131, 0.18);
+}
+
+.shell-game-screen__header {
+  text-align: center;
+}
+
+.shell-game-screen__header h1,
+.shell-game-screen__header p {
+  margin: 0;
+}
+
+.shell-game-screen__levels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 18px 0 8px;
+}
+
+.shell-game-screen__level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 10px;
+  border: 2px solid #eadfe4;
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  cursor: pointer;
+}
+
+.shell-game-screen__level.is-active { border-color: #eb6c9a; background: #fff4f8; }
+.shell-game-screen__level.is-completed { border-color: #65ad7b; }
+
+@media (max-width: 700px) {
+  .shell-game-screen__levels { grid-template-columns: 1fr; }
+}
+
 .shell-game__header {
   text-align: center;
   margin-bottom: 20px;

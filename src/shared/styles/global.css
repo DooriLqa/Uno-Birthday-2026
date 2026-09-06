@@ -260,23 +260,6 @@ h1 {
   font-weight: 800;
   box-shadow: 0 4px 10px rgba(23, 91, 117, 0.15);
 }
-.game-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 270px;
-  gap: 24px;
-}
-.game-panel,
-.info-panel {
-  padding: 24px;
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 12px 32px rgba(25, 107, 131, 0.18);
-}
-.game-panel h1 {
-  color: #12324a;
-  font-size: 2.2rem;
-  text-shadow: none;
-}
 .has-beach-search,
 .has-beach-search #root {
   height: 100dvh;
@@ -295,12 +278,7 @@ h1 {
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto 12px;
 }
-.beach-search-layout {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-}
-.beach-search-panel {
+.beach-search-page .beach-search-game {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -311,10 +289,6 @@ h1 {
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-}
-.beach-search-panel > h1,
-.beach-search-panel > p {
-  display: none;
 }
 .pixi-stage {
   width: 100%;
@@ -471,9 +445,6 @@ h1 {
     transform: translateY(-12px) rotate(2deg);
   }
 }
-.info-panel h2 {
-  margin-top: 0;
-}
 .primary-button {
   width: 100%;
   margin-top: 16px;
@@ -497,9 +468,6 @@ h1 {
   .site-header {
     margin-bottom: 28px;
   }
-  .game-layout {
-    grid-template-columns: 1fr;
-  }
   .pixi-stage {
     height: 340px;
   }
@@ -508,16 +476,24 @@ h1 {
 .game-overlay {
   position: fixed;
   z-index: 20;
+  isolation: isolate;
   inset: 0;
   width: 100%;
   height: 100dvh;
   margin: 0;
   padding: 96px max(16px, calc((100vw - 1120px) / 2)) 32px;
   overflow: auto;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
+}
+.game-overlay__background {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
 }
 .game-overlay.beach-search-page {
   padding: 88px 0 0;
@@ -532,18 +508,10 @@ h1 {
   width: min(1120px, 100%);
   margin: 0 auto;
 }
-.totem-code-page .game-layout {
-  display: block;
+.totem-code-page .totem-code-game {
   width: min(1280px, 100%);
   height: calc(100dvh - 140px);
   margin: 0 auto;
-}
-.totem-code-page .game-panel {
-  height: 100%;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
 }
 .game-overlay.book-shelf-page {
   padding: 84px 16px 24px;
@@ -556,16 +524,9 @@ h1 {
   width: min(1120px, 100%);
   margin: 0 auto 14px;
 }
-.book-shelf-page .game-layout {
-  display: block;
+.book-shelf-page .library-game__stage {
   width: min(1120px, 100%);
   margin: 0 auto;
-}
-.book-shelf-page .game-panel {
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
 }
 .book-shelf-page .library-game {
   min-height: 0;
@@ -577,24 +538,15 @@ h1 {
 }
 .game-overlay.flappy-bird-page {
   padding: 84px 16px 24px;
-  background: linear-gradient(160deg, #84d9df 0%, #d9f2c1 58%, #f8df9a 100%);
   overflow-y: auto;
 }
 .flappy-bird-page .page-top,
-.flappy-bird-page .game-layout {
+.flappy-bird-page .flappy-bird-game {
   width: min(1120px, 100%);
   margin: 0 auto;
 }
 .flappy-bird-page .page-top {
   margin-bottom: 14px;
-}
-.flappy-bird-page .game-layout {
-  display: block;
-}
-.flappy-bird-page .game-panel {
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
 }
 .game-overlay.fruit-basket-page {
   padding: 84px 16px 24px;
@@ -602,20 +554,12 @@ h1 {
   overflow-y: auto;
 }
 .fruit-basket-page .page-top,
-.fruit-basket-page .game-layout {
+.fruit-basket-page .fruit-basket-game {
   width: min(1120px, 100%);
   margin: 0 auto;
 }
 .fruit-basket-page .page-top {
   margin-bottom: 14px;
-}
-.fruit-basket-page .game-layout {
-  display: block;
-}
-.fruit-basket-page .game-panel {
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
 }
 @media (max-width: 760px) {
   .game-overlay.flappy-bird-page {
@@ -659,20 +603,8 @@ h1 {
 .beach-radio-page .page-top > span {
   display: none;
 }
-.beach-radio-page .game-layout {
-  display: block;
+.beach-radio-page .beach-radio-game {
   height: 100%;
-}
-.beach-radio-page .game-panel {
-  height: 100%;
-  padding: 0;
-  border-radius: 30px;
-  background: transparent;
-  box-shadow: none;
-}
-.beach-radio-page .game-panel > h1,
-.beach-radio-page .game-panel > p {
-  display: none;
 }
 @media (max-width: 620px) {
   .game-overlay.beach-radio-page {
@@ -698,33 +630,8 @@ h1 {
 .fishing-page .game-hud {
   display: none;
 }
-.fishing-page .game-layout {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.fishing-page .game-panel {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  place-items: center;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-.fishing-page .game-panel > h1,
-.fishing-page .game-panel > p {
-  display: none;
-}
 
-/* Fishing: full-screen scene background + HUD above the fishing window. */
-.game-overlay.fishing-page {
-  background-color: #79cfe8;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
+/* Fishing: full-screen scene and HUD above the game window. */
 .fishing-page .game-hud {
   display: flex !important;
   position: fixed;

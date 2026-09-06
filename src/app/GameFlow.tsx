@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { MessageCircle } from 'lucide-react'
-import { games } from '@/entities/game/model/games'
+import { games, getGame } from '@/app/gameRegistry'
 import { dialogueTestSamples, openDialogue } from '@/features/dialogues'
 import { useProgressStore } from '@/features/game-progress/model/store'
 import { GamePage } from '@/pages/game'
@@ -14,10 +14,11 @@ export function GameFlow() {
   const [activeGameId, setActiveGameId] = useState<string | null>(null)
   const [radioOpen, setRadioOpen] = useState(false)
   const completedIds = useProgressStore((state) => state.completedGameIds)
+  const activeGame = getGame(activeGameId)
 
   return (
     <main className="island-map-page">
-      <SiteHeader />
+      <SiteHeader totalGames={games.length} />
       <GameIslandMap games={games} completedIds={completedIds} onPlay={setActiveGameId} />
       {!activeGameId && <GameHud onOpenRadio={() => setRadioOpen(true)} />}
       {!activeGameId && (
@@ -29,7 +30,7 @@ export function GameFlow() {
           <MessageCircle size={20} /> Поговорить с Пончиком
         </button>
       )}
-      {activeGameId && <GamePage gameId={activeGameId} onBack={() => setActiveGameId(null)} />}
+      {activeGame && <GamePage game={activeGame} onBack={() => setActiveGameId(null)} />}
       <RadioModal open={radioOpen} onClose={() => setRadioOpen(false)} />
       <DevCoinControls />
     </main>
