@@ -21,7 +21,12 @@ const NOISE_DURATION_SECONDS = 8
 // 100 мс достаточно, чтобы убрать щелчок и провал громкости.
 const NOISE_CROSSFADE_SECONDS = 0.12
 
+// МАСТЕР-ГРОМКОСТЬ: 0.3 = 30% от максимальной
+// Это глобальный множитель для ВСЕГО звука в радио
+const MASTER_VOLUME = 0.35
+
 let audioContext: AudioContext | null = null
+let masterGain: GainNode | null = null
 
 let noiseSource: AudioBufferSourceNode | null = null
 let noiseGain: GainNode | null = null
@@ -34,6 +39,21 @@ const pendingInitialSeek = new Map<string, number>()
 const getAudioContext = () => {
   audioContext ??= new AudioContext()
   return audioContext
+}
+
+/**
+ * Создаёт мастер-узел громкости.
+ * Все звуки проходят через него, что позволяет
+ * контролировать общую громкость в одном месте.
+ */
+const getMasterGain = () => {
+  const context = getAudioContext()
+  if (!masterGain) {
+    masterGain = context.createGain()
+    masterGain.gain.value = MASTER_VOLUME
+    masterGain.connect(context.destination)
+  }
+  return masterGain
 }
 
 /**
@@ -105,8 +125,9 @@ const ensureNoise = () => {
   // Радио изначально выключено.
   noiseGain.gain.value = 0
 
+  const master = getMasterGain()
   noiseSource.connect(noiseGain)
-  noiseGain.connect(context.destination)
+  noiseGain.connect(master)
 
   noiseSource.start()
 }
@@ -236,7 +257,8 @@ const getStationAudio = (stationId: string, trackSrcs: string[]) => {
 
   const source = context.createMediaElementSource(audio)
 
-  source.connect(gain).connect(context.destination)
+  const master = getMasterGain()
+  source.connect(gain).connect(master)
 
   /**
    * Если это первое включение правильной станции,
@@ -333,10 +355,14 @@ const syncAudio = (state: Pick<RadioState, 'isPowered' | 'volume' | 'frequency'>
     ensureNoise()
 
     const context = getAudioContext()
+    // const master = getMasterGain()
 
     if (context.state === 'suspended' && state.isPowered) {
       void context.resume()
     }
+
+    // Множитель громкости шума (0.7 = 70% от текущей громкости)
+    const NOISE_VOLUME_MULTIPLIER = 0.5 // 50% от обычной громкости шума
 
     /**
      * Все станции постоянно проигрываются в фоне.
@@ -377,7 +403,9 @@ const syncAudio = (state: Pick<RadioState, 'isPowered' | 'volume' | 'frequency'>
     const noisePercent = getNoisePercent(nearest.id, distance)
 
     if (noiseGain) {
-      const noiseVolume = state.isPowered ? state.volume * noisePercent : 0
+      const noiseVolume = state.isPowered
+        ? state.volume * noisePercent * NOISE_VOLUME_MULTIPLIER
+        : 0
 
       rampGain(noiseGain, noiseVolume)
     }
