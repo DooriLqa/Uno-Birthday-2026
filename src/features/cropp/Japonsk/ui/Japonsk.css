@@ -12,6 +12,14 @@
    ФОНОВАЯ СЦЕНА
    ========================================================= */
 
+.japonsk-page {
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
 .Japonsk__scene {
   position: relative;
 
