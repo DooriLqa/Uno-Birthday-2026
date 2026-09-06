@@ -1,13 +1,28 @@
-export type Game = {
-  id: string
-  title: string
-  description: string
-  emoji: string
-  color: string
-  target: string
-}
+import { BeachRadioGame } from '@/features/beach-radio'
+import { BeachSearchGame } from '@/features/beach-search'
+import { BlackJack } from '@/features/black-jack'
+import { BookShelfGame } from '@/features/book-shelf'
+import { CoconutCatchGame } from '@/features/coconut-catch'
+import { FindAPair } from '@/features/find-a-pair'
+import { FishingGame } from '@/features/fishing'
+import { FlappyBirdGame } from '@/features/flappy-bird'
+import { FruitBasketGame } from '@/features/fruit-basket'
+import { LockPickingGame } from '@/features/lock-picking'
+import { SeaBattle } from '@/features/sea-battle'
+import { ShellGameScreen } from '@/features/shell-game'
+import { TotemCodeGame } from '@/features/totem-code'
+import { WackAMole } from '@/features/wack-a-mole'
+import { Arkanoid } from '@/features/arkanoid'
+import type { GameDefinition } from '@/entities/game/model/types'
+import flappyBirdLagoonBackground from '@/shared/assets/flappy-bird/lagoon-cliff-vista-background.png'
+import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
+import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 
-export const gameList: Game[] = [
+const islandGame = {
+  backgroundImage: islandMapImage,
+} satisfies Pick<GameDefinition, 'backgroundImage'>
+
+export const games: GameDefinition[] = [
   {
     id: 'beach-radio',
     title: 'Радио Бони',
@@ -15,6 +30,9 @@ export const gameList: Game[] = [
     emoji: '📻',
     color: '#f2c98c',
     target: 'радиоприёмник',
+    mapPosition: { left: '84%', top: '72%' },
+    pageClassName: 'beach-radio-page',
+    Screen: BeachRadioGame,
   },
   {
     id: 'beach-search',
@@ -23,6 +41,10 @@ export const gameList: Game[] = [
     emoji: '🔎',
     color: '#d2edcf',
     target: 'все предметы',
+    mapPosition: { left: '49%', top: '75%' },
+    pageClassName: 'beach-search-page',
+    ...islandGame,
+    Screen: BeachSearchGame,
   },
   {
     id: 'book-shelf',
@@ -31,6 +53,10 @@ export const gameList: Game[] = [
     emoji: '📚',
     color: '#e7d5ff',
     target: 'все книги',
+    mapPosition: { left: '42%', top: '32%' },
+    pageClassName: 'book-shelf-page',
+    ...islandGame,
+    Screen: BookShelfGame,
   },
   {
     id: 'flappy-bird',
@@ -39,6 +65,10 @@ export const gameList: Game[] = [
     emoji: '🐦',
     color: '#f8df9a',
     target: '10 труб',
+    mapPosition: { left: '60%', top: '23%' },
+    pageClassName: 'flappy-bird-page',
+    backgroundImage: flappyBirdLagoonBackground,
+    Screen: FlappyBirdGame,
   },
   {
     id: 'totem-code',
@@ -47,6 +77,10 @@ export const gameList: Game[] = [
     emoji: '🗿',
     color: '#dbc09b',
     target: 'код тотемов',
+    mapPosition: { left: '27%', top: '38%' },
+    pageClassName: 'totem-code-page',
+    backgroundImage: totemBeachScene,
+    Screen: TotemCodeGame,
   },
   {
     id: 'coconut-catch',
@@ -55,6 +89,9 @@ export const gameList: Game[] = [
     emoji: '🥥',
     color: '#c9e5ae',
     target: 'кокос',
+    mapPosition: { left: '47%', top: '51%' },
+    ...islandGame,
+    Screen: CoconutCatchGame,
   },
   {
     id: 'fruit-basket',
@@ -63,31 +100,43 @@ export const gameList: Game[] = [
     emoji: '🧺',
     color: '#f6b7a8',
     target: '20 ценностей',
+    mapPosition: { left: '83%', top: '45%' },
+    pageClassName: 'fruit-basket-page',
+    Screen: FruitBasketGame,
   },
-  {
+  /* {
     id: 'wave-rider',
     title: 'На гребне волны',
     description: 'Поймай идеальную волну.',
     emoji: '🏄',
     color: '#b9e6f2',
     target: 'волну',
-  },
-  {
+    mapPosition: { left: '72%', top: '37%' },
+    ...islandGame,
+    Screen: WaveRiderGame,
+  }, */
+  /* {
     id: 'ice-cream',
     title: 'Мороженое мечты',
     description: 'Собери самый летний рожок.',
     emoji: '🍦',
     color: '#ffe19e',
     target: 'шарик мороженого',
-  },
-  {
+    mapPosition: { left: '28%', top: '65%' },
+    ...islandGame,
+    Screen: IceCreamGame,
+  }, */
+  /* {
     id: 'treasure-map',
     title: 'Карта сокровищ',
     description: 'Следуй за крестиком к призу.',
     emoji: '🗺️',
     color: '#ded1aa',
     target: 'сокровище',
-  },
+    mapPosition: { left: '70%', top: '65%' },
+    ...islandGame,
+    Screen: TreasureMapGame,
+  }, */
   {
     id: 'shell-game',
     title: 'Кручу-верчу',
@@ -95,6 +144,9 @@ export const gameList: Game[] = [
     emoji: '🥤',
     color: '#eb6c9a',
     target: 'наперсток',
+    mapPosition: { left: '46%', top: '30%' },
+    ...islandGame,
+    Screen: ShellGameScreen,
   },
   {
     id: 'black-jack',
@@ -103,6 +155,9 @@ export const gameList: Game[] = [
     emoji: '🃏',
     color: '#b8d8c0',
     target: 'очко',
+    mapPosition: { left: '40%', top: '35%' },
+    ...islandGame,
+    Screen: BlackJack,
   },
   {
     id: 'find-a-pair',
@@ -111,6 +166,9 @@ export const gameList: Game[] = [
     emoji: '🎴',
     color: '#d8c5e8',
     target: 'все пары',
+    mapPosition: { left: '42%', top: '30%' },
+    ...islandGame,
+    Screen: FindAPair,
   },
   {
     id: 'wack-a-mole',
@@ -119,6 +177,9 @@ export const gameList: Game[] = [
     emoji: '🔨',
     color: '#c9d9b4',
     target: 'крота',
+    mapPosition: { left: '48%', top: '38%' },
+    ...islandGame,
+    Screen: WackAMole,
   },
   {
     id: 'arkanoid',
@@ -127,6 +188,9 @@ export const gameList: Game[] = [
     emoji: '🧱',
     color: '#b9d7f0',
     target: 'все кирпичи',
+    mapPosition: { left: '50%', top: '30%' },
+    ...islandGame,
+    Screen: Arkanoid,
   },
   {
     id: 'sea-battle',
@@ -135,14 +199,20 @@ export const gameList: Game[] = [
     emoji: '🚢',
     color: '#075290',
     target: 'торпеда',
+    mapPosition: { left: '44%', top: '39%' },
+    ...islandGame,
+    Screen: SeaBattle,
   },
   {
     id: 'lock-picking',
     title: 'Взлом замка',
     description: 'Подбери комбинацию и открой замок.',
-    emoji: '🔐',
+    emoji: '🔓',
     color: '#d8c28d',
     target: 'замок',
+    mapPosition: { left: '54%', top: '47%' },
+    ...islandGame,
+    Screen: LockPickingGame,
   },
   {
     id: 'fishing',
@@ -151,6 +221,10 @@ export const gameList: Game[] = [
     emoji: '🎣',
     color: '#b7e2ea',
     target: 'рыбу',
+    mapPosition: { left: '58%', top: '22%' },
+    pageClassName: 'fishing-page',
+    ...islandGame,
+    Screen: FishingGame,
   },
   {
     id: 'japonsk',
@@ -170,17 +244,4 @@ export const gameList: Game[] = [
   }
 ]
 
-export const games = gameList.map((game) =>
-  game.id === 'shell-hunt'
-    ? {
-        ...game,
-        title: 'Код тотемов',
-        description: 'Собери тайную комбинацию по подсказкам.',
-        emoji: '🗿',
-        color: '#dbc09b',
-        target: 'код тотемов',
-      }
-    : game,
-)
-
-export const getGame = (id: string | undefined) => games.find((game) => game.id === id)
+export const getGame = (gameId: string | null) => games.find((game) => game.id === gameId)

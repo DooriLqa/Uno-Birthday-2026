@@ -81,7 +81,9 @@ export function FishingGame({ onClose }: Props) {
   useEffect(() => () => clearRoundTimers(), [clearRoundTimers])
 
   const playBiteSound = useCallback(() => {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
     if (!AudioContextClass) return
     const context = audioRef.current ?? new AudioContextClass()
     audioRef.current = context
