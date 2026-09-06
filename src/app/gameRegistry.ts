@@ -13,6 +13,8 @@ import { ShellGameScreen } from '@/features/shell-game'
 import { TotemCodeGame } from '@/features/totem-code'
 import { WackAMole } from '@/features/wack-a-mole'
 import { Arkanoid } from '@/features/arkanoid'
+import { Japonsk } from '@/features/cropp/Japonsk'
+import { RobotMazeGame } from '@/features/cropp/RobotMazeGame'
 import type { GameDefinition } from '@/entities/game/model/types'
 import flappyBirdLagoonBackground from '@/shared/assets/flappy-bird/lagoon-cliff-vista-background.png'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
@@ -233,6 +235,10 @@ export const games: GameDefinition[] = [
     emoji: '⛰️',
     color: '#f0a2a2',
     target: 'японский кроссворд',
+    mapPosition: { left: '55%', top: '30%' },
+    pageClassName: 'japonsk-page',
+    ...islandGame,
+    Screen: Japonsk,
   },
   {
     id: 'robot-maze',
@@ -241,6 +247,10 @@ export const games: GameDefinition[] = [
     emoji: '🤖',
     color: '#a2c9f0',
     target: 'выход из лабиринта',
+    mapPosition: { left: '60%', top: '30%' },
+    pageClassName: 'robot-maze-page',
+    ...islandGame,
+    Screen: RobotMazeGame,
   }
 ]
 
