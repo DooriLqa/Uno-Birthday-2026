@@ -95,8 +95,8 @@
 .RobotMaze__cell {
   position: relative;
 
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
 
   box-sizing: border-box;
 
@@ -106,7 +106,7 @@
 }
 
 /* =========================================================
-   FLOOR — ПЕСОК
+   FLOOR
    ========================================================= */
 
 .RobotMaze__cell--1,
@@ -121,7 +121,7 @@
 }
 
 /* =========================================================
-   WALL — ПЕСОК / КАМНИ
+   WALL
    ========================================================= */
 
 .RobotMaze__cell--0 {
@@ -148,7 +148,7 @@
 }
 
 /* =========================================================
-   EXIT — МОРЕ
+   EXIT
    ========================================================= */
 
 .RobotMaze__cell--3 {
@@ -257,7 +257,7 @@
 }
 
 /* =========================================================
-   PANEL — ТЕПЕРЬ СНИЗУ
+   PANEL
    ========================================================= */
 
 .RobotMaze__panel {
@@ -290,7 +290,7 @@
   align-items: center;
   justify-content: center;
 
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   padding: 8px 12px;
 
   box-sizing: border-box;
@@ -305,6 +305,36 @@
 
   font-size: 14px;
   font-weight: 700;
+}
+
+/* =========================================================
+   COINS
+   ========================================================= */
+
+.RobotMaze__coins {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  margin-bottom: 15px;
+  padding: 8px 12px;
+
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.45);
+
+  color: #79532d;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.RobotMaze__coins strong {
+  color: #bd7d16;
+
+  font-size: 16px;
 }
 
 /* =========================================================
@@ -487,7 +517,7 @@
   display: flex;
   justify-content: center;
 
-  gap: 40px;
+  gap: 35px;
 
   margin-top: 15px;
   padding-top: 12px;
@@ -497,6 +527,91 @@
   color: #76512e;
 
   font-size: 13px;
+
+  flex-wrap: wrap;
+}
+
+/* =========================================================
+   SUMMARY SCREEN
+   ========================================================= */
+
+.RobotMaze__summary {
+  min-height: 70vh;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 22px;
+
+  max-width: 700px;
+
+  margin: 0 auto;
+
+  text-align: center;
+}
+
+.RobotMaze__summary-title {
+  margin: 0;
+
+  font-size: 46px;
+  font-weight: 900;
+
+  color: #fff;
+
+  text-shadow:
+    3px 3px 0 #3f8fa3,
+    5px 5px 0 rgba(0, 0, 0, 0.15);
+}
+
+.RobotMaze__summary-text {
+  max-width: 550px;
+
+  color: #634326;
+
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.RobotMaze__summary-coins {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 20px 35px;
+
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.78);
+
+  border: 3px solid rgba(196, 147, 80, 0.65);
+
+  box-shadow: 0 8px 0 rgba(117, 78, 38, 0.18);
+
+  color: #79532d;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.RobotMaze__summary-coins strong {
+  color: #bd7d16;
+
+  font-size: 42px;
+  line-height: 1;
+}
+
+.RobotMaze__summary-button {
+  min-width: 220px;
+
+  min-height: 52px;
+
+  font-size: 14px;
 }
 
 /* =========================================================
@@ -524,6 +639,10 @@
 
   .RobotMaze__header {
     margin-bottom: 15px;
+
+    flex-direction: column;
+
+    gap: 10px;
   }
 
   .RobotMaze__title {
@@ -538,11 +657,15 @@
 
   .RobotMaze__maze {
     padding: 5px;
+
+    max-width: 100%;
+
+    overflow-x: auto;
   }
 
   .RobotMaze__cell {
-    width: 32px;
-    height: 32px;
+    width: 48px;
+    height: 48px;
   }
 
   .RobotMaze__robot {
@@ -559,6 +682,7 @@
 
   .RobotMaze__panel {
     width: 100%;
+
     padding: 12px;
   }
 
@@ -566,8 +690,13 @@
     grid-template-columns: repeat(5, 1fr);
   }
 
+  .RobotMaze__command-buttons {
+    gap: 6px;
+  }
+
   .RobotMaze__command {
     width: 100px;
+
     min-height: 58px;
   }
 
@@ -580,6 +709,41 @@
   }
 
   .RobotMaze__stats {
-    gap: 20px;
+    gap: 15px;
+
+    flex-direction: column;
+
+    align-items: center;
+  }
+
+  .RobotMaze__summary {
+    min-height: 80vh;
+
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .RobotMaze__summary-title {
+    font-size: 34px;
+  }
+
+  .RobotMaze__summary-text {
+    font-size: 16px;
+  }
+
+  .RobotMaze__summary-coins {
+    padding: 18px 25px;
+
+    font-size: 16px;
+  }
+
+  .RobotMaze__summary-coins strong {
+    font-size: 34px;
+  }
+
+  .RobotMaze__summary-button {
+    width: 100%;
+
+    max-width: 280px;
   }
 }

@@ -154,11 +154,11 @@ export const gameList: Game[] = [
   },
   {
     id: 'japonsk',
-    title: 'Японский язык',
-    description: 'Изучи основы японского языка.',
+    title: 'Японский кроссворд',
+    description: 'Реши японский кроссворд.',
     emoji: '⛰️',
     color: '#f0a2a2',
-    target: 'японский язык',
+    target: 'японский кроссворд',
   },
   {
     id: 'robot-maze',
