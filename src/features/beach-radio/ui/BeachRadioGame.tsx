@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
-import { CircleHelp, Coins, Power, Radio as RadioIcon, Volume2, X } from 'lucide-react'
+import {
+  CircleHelp,
+  Coins,
+  Pause,
+  Play,
+  Power,
+  Radio as RadioIcon,
+  Volume2,
+  VolumeX,
+  X,
+} from 'lucide-react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore } from '@/features/inventory/model/store'
 import { syncRadioAudio, useRadioStore } from '@/features/beach-radio/model/radioStore'
@@ -49,6 +59,7 @@ export function BeachRadioGame({ onComplete, onOpenRadio }: Props) {
     const isCorrect = answerIndex === quizQuestion.correctIndex
 
     if (!isCorrect) {
+      useQuizProgressStore.getState().setQuestionWeight(quizQuestion.id, 1)
       setCorrectAnswers(0)
       setQuizQuestion(null)
       setDialogStep('seller')
@@ -60,7 +71,7 @@ export function BeachRadioGame({ onComplete, onOpenRadio }: Props) {
       return
     }
 
-    useQuizProgressStore.getState().markCorrect(quizQuestion.id)
+    useQuizProgressStore.getState().setQuestionWeight(quizQuestion.id, 2)
     const nextCorrectAnswers = correctAnswers + 1
     setCorrectAnswers(nextCorrectAnswers)
     setQuizError('')
@@ -210,12 +221,157 @@ function QuizPanel({
   question: QuizQuestion
   onAnswer: (index: number) => void
 }) {
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const audioVolume = useQuizProgressStore((state) => state.audioVolume)
+  const setAudioVolume = useQuizProgressStore((state) => state.setAudioVolume)
+
+  useEffect(() => {
+    const audio = audioRef.current
+
+    if (!audio) return
+
+    audio.volume = audioVolume
+  }, [audioVolume, question.id])
+
+  useEffect(() => {
+    const audio = audioRef.current
+
+    if (!audio) return
+
+    audio.volume = audioVolume
+  }, [audioVolume, question.audioSrc])
+
+  useEffect(() => {
+    const audio = audioRef.current
+
+    if (!audio) return
+
+    // Сбрасываем состояние при новом audioSrc
+    setIsPlaying(false)
+    setCurrentTime(0)
+    setDuration(0)
+
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime)
+    const onLoadedMetadata = () => setDuration(Number.isFinite(audio.duration) ? audio.duration : 0)
+    const onPlay = () => setIsPlaying(true)
+    const onPause = () => setIsPlaying(false)
+    const onEnded = () => {
+      setIsPlaying(false)
+      setCurrentTime(0)
+    }
+
+    audio.addEventListener('timeupdate', onTimeUpdate)
+    audio.addEventListener('loadedmetadata', onLoadedMetadata)
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('pause', onPause)
+    audio.addEventListener('ended', onEnded)
+
+    audio.volume = audioVolume
+
+    return () => {
+      audio.pause()
+      audio.removeEventListener('timeupdate', onTimeUpdate)
+      audio.removeEventListener('loadedmetadata', onLoadedMetadata)
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('pause', onPause)
+      audio.removeEventListener('ended', onEnded)
+    }
+  }, [question.audioSrc])
+
+  const togglePlayback = () => {
+    const audio = audioRef.current
+
+    if (!audio) return
+
+    if (audio.paused) {
+      void audio.play().catch(() => setIsPlaying(false))
+    } else {
+      audio.pause()
+    }
+  }
+
+  const seek = (value: number) => {
+    const audio = audioRef.current
+
+    if (!audio) return
+
+    audio.currentTime = value
+    setCurrentTime(value)
+  }
+
+  const changeVolume = (value: number) => {
+    setAudioVolume(value)
+
+    if (audioRef.current) {
+      audioRef.current.volume = value
+    }
+  }
+
+  const formatTime = (value: number) => {
+    if (!Number.isFinite(value)) return '0:00'
+
+    const minutes = Math.floor(value / 60)
+    const seconds = Math.floor(value % 60)
+    return `${minutes}:${String(seconds).padStart(2, '0')}`
+  }
+
   return (
     <div className="quiz-panel">
-      <div className="quiz-panel__question">
-        <span>Вопрос</span>
-        <h2>{question.text}</h2>
-      </div>
+      {(question.text || question.audioSrc) && (
+        <div className="quiz-panel__question">
+          <span>Вопрос</span>
+          {question.text && <h2>{question.text}</h2>}
+
+          {question.audioSrc && (
+            <div className="quiz-audio-player">
+              <audio ref={audioRef} src={question.audioSrc} preload="metadata" />
+
+              <button
+                type="button"
+                className="quiz-audio-player__play"
+                onClick={togglePlayback}
+                aria-label={isPlaying ? 'Поставить аудио на паузу' : 'Воспроизвести аудио'}
+              >
+                {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+              </button>
+
+              <div className="quiz-audio-player__timeline">
+                <input
+                  type="range"
+                  min="0"
+                  max={duration || 0}
+                  step="0.01"
+                  value={Math.min(currentTime, duration || 0)}
+                  onChange={(event) => seek(Number(event.target.value))}
+                  aria-label="Позиция аудио"
+                  disabled={!duration}
+                />
+                <div className="quiz-audio-player__time">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
+                </div>
+              </div>
+
+              <label className="quiz-audio-player__volume">
+                {audioVolume === 0 ? <VolumeX size={17} /> : <Volume2 size={17} />}
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={audioVolume}
+                  onChange={(event) => changeVolume(Number(event.target.value))}
+                  aria-label="Громкость аудио вопроса"
+                />
+              </label>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="quiz-panel__answers">
         {question.answers.map((option, index) => (
           <button key={option} type="button" onClick={() => onAnswer(index)}>
@@ -230,13 +386,6 @@ function QuizPanel({
 
 export function RadioModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { isPowered, volume, frequency, setPowered, setVolume, setFrequency } = useRadioStore()
-  const [localFrequency, setLocalFrequency] = useState(frequency)
-
-  useEffect(() => {
-    if (open && localFrequency !== frequency) {
-      setFrequency(localFrequency)
-    }
-  }, [localFrequency, open, frequency, setFrequency])
 
   useEffect(() => {
     if (!open) return
@@ -248,25 +397,17 @@ export function RadioModal({ open, onClose }: { open: boolean; onClose: () => vo
       }
 
       if (event.key === 'ArrowLeft') {
-        setLocalFrequency((value) => Math.max(87, Number((value - 0.1).toFixed(1))))
+        setFrequency(Number(Math.max(87, frequency - 0.1).toFixed(1)))
       }
 
       if (event.key === 'ArrowRight') {
-        setLocalFrequency((value) => Math.min(108, Number((value + 0.1).toFixed(1))))
+        setFrequency(Number(Math.min(108, frequency + 0.1).toFixed(1)))
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [onClose, open])
-
-  const prevOpenRef = useRef(open)
-  useEffect(() => {
-    if (open && !prevOpenRef.current) {
-      setLocalFrequency(frequency)
-    }
-    prevOpenRef.current = open
-  }, [open, frequency])
+  }, [frequency, onClose, open, setFrequency])
 
   if (!open) return null
 
@@ -282,7 +423,8 @@ export function RadioModal({ open, onClose }: { open: boolean; onClose: () => vo
         >
           <X size={22} />
         </button>
-        <div className="radio-device">
+
+        <div className="radio-device" aria-label="Радиоприёмник Beach Waves">
           <div className="radio-device__antenna" />
           <div className="radio-device__handle" />
           <div className="radio-device__brand">
@@ -290,9 +432,9 @@ export function RadioModal({ open, onClose }: { open: boolean; onClose: () => vo
             <br />
             WAVES
           </div>
-          <div className="radio-device__screen">
+          <div className="radio-device__screen" aria-live="polite">
             <span>FM</span>
-            <strong>{localFrequency.toFixed(1)}</strong>
+            <strong>{frequency.toFixed(1)}</strong>
             <small>MHz</small>
           </div>
           <div className="radio-device__speaker">
@@ -312,8 +454,8 @@ export function RadioModal({ open, onClose }: { open: boolean; onClose: () => vo
               min="87"
               max="108"
               step="0.1"
-              value={localFrequency}
-              onChange={(event) => setLocalFrequency(Number(event.target.value))}
+              value={frequency}
+              onChange={(event) => setFrequency(Number(event.target.value))}
               aria-label="Настройка частоты"
             />
             <div className="radio-device__frequency-markers">
@@ -325,6 +467,7 @@ export function RadioModal({ open, onClose }: { open: boolean; onClose: () => vo
               <span>108</span>
             </div>
           </div>
+
           <div className="radio-device__controls">
             <button
               type="button"

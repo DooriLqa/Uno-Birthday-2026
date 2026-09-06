@@ -2,30 +2,30 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 type QuizProgressState = {
-  seenQuestionIds: string[]
-  correctQuestionIds: string[]
-  markSeen: (id: string) => void
-  markCorrect: (id: string) => void
+  questionWeights: Record<string, number>
+  audioVolume: number
+  setQuestionWeight: (id: string, weight: 1 | 2) => void
+  setAudioVolume: (value: number) => void
+  resetQuizMemory: () => void
 }
 
 export const useQuizProgressStore = create<QuizProgressState>()(
   persist(
     (set) => ({
-      seenQuestionIds: [],
-      correctQuestionIds: [],
-      markSeen: (id) =>
-        set((state) =>
-          state.seenQuestionIds.includes(id)
-            ? state
-            : { seenQuestionIds: [...state.seenQuestionIds, id] },
-        ),
-      markCorrect: (id) =>
-        set((state) =>
-          state.correctQuestionIds.includes(id)
-            ? state
-            : { correctQuestionIds: [...state.correctQuestionIds, id] },
-        ),
+      questionWeights: {},
+      audioVolume: 0.7,
+      setQuestionWeight: (id, weight) =>
+        set((state) => ({
+          questionWeights: { ...state.questionWeights, [id]: weight },
+        })),
+      setAudioVolume: (value) =>
+        set({
+          audioVolume: Math.min(1, Math.max(0, value)),
+        }),
+      resetQuizMemory: () => set({ questionWeights: {} }),
     }),
-    { name: 'beach-party-quiz-progress' },
+    {
+      name: 'beach-party-quiz-progress-v2',
+    },
   ),
 )

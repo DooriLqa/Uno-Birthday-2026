@@ -570,8 +570,7 @@ h1 {
 .book-shelf-page .library-game {
   min-height: 0;
   border-color: rgba(255, 245, 215, 0.42);
-  background:
-    linear-gradient(135deg, rgba(255, 250, 231, 0.94), rgba(226, 192, 135, 0.88));
+  background: linear-gradient(135deg, rgba(255, 250, 231, 0.94), rgba(226, 192, 135, 0.88));
   box-shadow:
     0 22px 48px rgba(52, 35, 16, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.75);
@@ -586,9 +585,17 @@ h1 {
   width: min(1120px, 100%);
   margin: 0 auto;
 }
-.flappy-bird-page .page-top { margin-bottom: 14px; }
-.flappy-bird-page .game-layout { display: block; }
-.flappy-bird-page .game-panel { padding: 0; background: transparent; box-shadow: none; }
+.flappy-bird-page .page-top {
+  margin-bottom: 14px;
+}
+.flappy-bird-page .game-layout {
+  display: block;
+}
+.flappy-bird-page .game-panel {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
 .game-overlay.fruit-basket-page {
   padding: 84px 16px 24px;
   background: linear-gradient(145deg, #ef9b8b 0%, #f9d49b 48%, #95c894 100%);
@@ -599,14 +606,30 @@ h1 {
   width: min(1120px, 100%);
   margin: 0 auto;
 }
-.fruit-basket-page .page-top { margin-bottom: 14px; }
-.fruit-basket-page .game-layout { display: block; }
-.fruit-basket-page .game-panel { padding: 0; background: transparent; box-shadow: none; }
+.fruit-basket-page .page-top {
+  margin-bottom: 14px;
+}
+.fruit-basket-page .game-layout {
+  display: block;
+}
+.fruit-basket-page .game-panel {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
 @media (max-width: 760px) {
-  .game-overlay.flappy-bird-page { padding: 72px 10px 14px; }
-  .flappy-bird-page .page-top { margin-bottom: 10px; }
-  .game-overlay.fruit-basket-page { padding: 72px 10px 14px; }
-  .fruit-basket-page .page-top { margin-bottom: 10px; }
+  .game-overlay.flappy-bird-page {
+    padding: 72px 10px 14px;
+  }
+  .flappy-bird-page .page-top {
+    margin-bottom: 10px;
+  }
+  .game-overlay.fruit-basket-page {
+    padding: 72px 10px 14px;
+  }
+  .fruit-basket-page .page-top {
+    margin-bottom: 10px;
+  }
 }
 @media (max-width: 760px) {
   .game-overlay.book-shelf-page {
@@ -659,4 +682,54 @@ h1 {
     top: 10px;
     left: 10px;
   }
+}
+
+.game-overlay.fishing-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+}
+.fishing-page .page-top,
+.fishing-page .game-hud {
+  display: none;
+}
+.fishing-page .game-layout {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.fishing-page .game-panel {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  place-items: center;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.fishing-page .game-panel > h1,
+.fishing-page .game-panel > p {
+  display: none;
+}
+
+/* Fishing: full-screen scene background + HUD above the fishing window. */
+.game-overlay.fishing-page {
+  background-color: #79cfe8;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.fishing-page .game-hud {
+  display: flex !important;
+  position: fixed;
+  z-index: 100;
+  top: 14px;
+  left: 18px;
+  right: 18px;
 }

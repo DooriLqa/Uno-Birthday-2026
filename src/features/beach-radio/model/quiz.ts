@@ -57,7 +57,7 @@ export const questions: QuizQuestion[] = [
   },
   {
     id: 'q09',
-    text: 'В Hades 2 последний босс нижнего мира Хроносс в раннем доступе игры имел уникальнуюмеханику: Если игрок ставил паузу в битве с ним, он произносил ехидную реплику и принудительно снимал её. Что сделали разработчики в релизной версии?',
+    text: 'В Hades 2 последний босс нижнего мира Хроносс в раннем доступе игры имел уникальную механику: Если игрок ставил паузу в битве с ним, он произносил ехидную реплику и принудительно снимал её. Что сделали разработчики в релизной версии?',
     answers: [
       'Оставили эту механику какой и была',
       'Теперь Хронос ехидничает и возвращает на начало битвы (диалога с ним)',
@@ -66,40 +66,110 @@ export const questions: QuizQuestion[] = [
     ],
     correctIndex: 2,
   },
-  // { id: 'q10', text: 'Какой предмет помогает защитить глаза от яркого солнца?', answers: ['Солнцезащитные очки', 'Вилка', 'Шарф', 'Ковш'], correctIndex: 0 },
-  // { id: 'q11', text: 'Как называется место, где продают товары?', answers: ['Ларёк', 'Маяк', 'Риф', 'Причал'], correctIndex: 0 },
-  // { id: 'q12', text: 'Сколько пальцев на одной руке?', answers: ['3', '4', '5', '6'], correctIndex: 2 },
-  // { id: 'q13', text: 'Что из этого умеет плавать?', answers: ['Лодка', 'Кресло', 'Кастрюля', 'Лампа'], correctIndex: 0 },
-  // { id: 'q14', text: 'Как называется звук моря?', answers: ['Шум волн', 'Звон будильника', 'Треск льда', 'Гул мотора'], correctIndex: 0 },
-  // { id: 'q15', text: 'Какой предмет нужен, чтобы регулировать громкость?', answers: ['Регулятор', 'Компас', 'Линейка', 'Лупа'], correctIndex: 0 },
-  // { id: 'q16', text: 'Что из этого является радиочастотой?', answers: ['98.7 MHz', '98.7 kg', '98.7 °C', '98.7 cm'], correctIndex: 0 },
-  // { id: 'q17', text: 'Как называется домашнее животное, которое говорит «гав»?', answers: ['Собака', 'Кошка', 'Попугай', 'Хомяк'], correctIndex: 0 },
-  // { id: 'q18', text: 'Что лучше всего подходит для пляжного дня?', answers: ['Полотенце', 'Снегоочиститель', 'Ёлочная гирлянда', 'Лопата для снега'], correctIndex: 0 },
-  // { id: 'q19', text: 'Какой напиток чаще всего подают с трубочкой на пляже?', answers: ['Тропический коктейль', 'Горячий борщ', 'Эспрессо', 'Какао'], correctIndex: 0 },
-  // { id: 'q20', text: 'Какой символ мы выбрали для общей валюты?', answers: [':feet:', ':lemon:', ':star:', ':shell:'], correctIndex: 0 },
+  {
+    id: 'q10',
+    text: 'Из какой игры OST?',
+    audioSrc: '/audio/quiz/ost/raven.mp3',
+    answers: ['Clair Obscur: Expedition 33', 'Diablo 4', 'Ravenswatch', 'Grim Dawn'],
+    correctIndex: 2,
+  },
+  {
+    id: 'q11',
+    text: 'Из какой игры OST?',
+    audioSrc: '/audio/quiz/ost/fable.mp3',
+    answers: [
+      'Ori and The Blind Forest',
+      'Minecraft',
+      'Harry Potter and the Goblet of Fire',
+      'Fable',
+    ],
+    correctIndex: 3,
+  },
+  {
+    id: 'q12',
+    text: 'Из какой игры OST?',
+    audioSrc: '/audio/quiz/ost/hlf2.mp3',
+    answers: ['Half-Life 2', 'S.T.A.L.K.E.R.: Shadow of Chernobyl', 'Deus Ex', 'BioShock'],
+    correctIndex: 0,
+  },
+  {
+    id: 'q13',
+    text: 'Из какой игры OST?',
+    audioSrc: '/audio/quiz/ost/linage.mp3',
+    answers: ['Heroes of Might & Magic 5', 'Yes, you grace', 'Guild Wars', 'Lineage 2'],
+    correctIndex: 3,
+  },
+  {
+    id: 'q14',
+    text: 'Из какой игры OST?',
+    audioSrc: '/audio/quiz/ost/mor.mp3',
+    answers: ['Gothic', 'The Elder Scrolls III: Morrowind', 'Dragon Age: Origins', 'Risen'],
+    correctIndex: 1,
+  },
+  {
+    id: 'q15',
+    text: 'Из какой игры OST?',
+    audioSrc: '/audio/quiz/ost/wog.mp3',
+    answers: ['World of Goo', 'Disco Elysium', 'Deponia', 'Worms 4 Mayhem'],
+    correctIndex: 0,
+  },
+  {
+    id: 'q16',
+    text: 'Какой пароль для входа к магам Воды в Gothic?',
+    answers: ['Я забыл пароль!', 'Териантрох', 'Тетриданох', 'Тетриандох'],
+    correctIndex: 3,
+  },
+  {
+    id: 'q17',
+    text: 'Тормоз замедлитель (8 букв)',
+    answers: ['Рекордер', 'Ретардер', 'Интардер', 'Детандер'],
+    correctIndex: 1,
+  },
+  {
+    id: 'q18',
+    text: 'О какой игре идёт речь?',
+    audioSrc: '/audio/quiz/stream/factorio.mp3',
+    answers: ['Factorio', '2', '3', '4'],
+    correctIndex: 0,
+  },
+  {
+    id: 'q18',
+    text: 'О какой игре идёт речь?',
+    audioSrc: '/audio/quiz/stream/until.mp3',
+    answers: ['Until Dawn', 'Life Is Strange', '3', '4'],
+    correctIndex: 0,
+  },
+  {
+    id: 'q18',
+    text: 'О какой игре идёт речь?',
+    audioSrc: '/audio/quiz/stream/another.mp3',
+    answers: ['Another Crab ́s Treasure', '2', '3', '4'],
+    correctIndex: 0,
+  },
+  {
+    id: 'q18',
+    text: 'О какой игре идёт речь?',
+    audioSrc: '/audio/quiz/stream/darksouls.mp3',
+    answers: ['Dark Souls', '2', '3', '4'],
+    correctIndex: 0,
+  },
+  {
+    id: 'q18',
+    text: 'О какой игре идёт речь?',
+    audioSrc: '/audio/quiz/stream/sekiro.mp3',
+    answers: ['Sekiro: Shadows Die Twice', '2', 'Dark Souls', 'Elden Ring'],
+    correctIndex: 0,
+  },
 ]
 
 export function pickQuestion(excludedIds: string[] = []): QuizQuestion {
-  const state = useQuizProgressStore.getState()
-  const available = (pool: QuizQuestion[]) => {
-    const filtered = pool.filter((question) => !excludedIds.includes(question.id))
-    return filtered.length > 0 ? filtered : pool
-  }
-  const unasked = available(
-    questions.filter((question) => !state.seenQuestionIds.includes(question.id)),
-  )
-  const notSolved = available(
-    questions.filter(
-      (question) =>
-        state.seenQuestionIds.includes(question.id) &&
-        !state.correctQuestionIds.includes(question.id),
-    ),
-  )
-  const correct = available(
-    questions.filter((question) => state.correctQuestionIds.includes(question.id)),
-  )
-  const pool = unasked.length > 0 ? unasked : notSolved.length > 0 ? notSolved : correct
-  const question = pool[Math.floor(Math.random() * pool.length)] ?? questions[0]
-  state.markSeen(question.id)
-  return question
+  const { questionWeights } = useQuizProgressStore.getState()
+  const excluded = new Set(excludedIds)
+  const available = questions.filter((question) => !excluded.has(question.id))
+  const pool = available.length > 0 ? available : questions
+
+  const minWeight = Math.min(...pool.map((question) => questionWeights[question.id] ?? 0))
+  const candidates = pool.filter((question) => (questionWeights[question.id] ?? 0) === minWeight)
+
+  return candidates[Math.floor(Math.random() * candidates.length)] ?? questions[0]
 }

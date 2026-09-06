@@ -86,3 +86,6 @@
 .dev-coin-controls__dialogues button {
   min-width: 0;
 }
+.dev-coin-controls__quiz-reset {
+  width: 100%;
+}

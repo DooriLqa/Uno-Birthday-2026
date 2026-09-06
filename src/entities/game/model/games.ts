@@ -7,7 +7,7 @@ export type Game = {
   target: string
 }
 
-export const games: Game[] = [
+export const gameList: Game[] = [
   {
     id: 'beach-radio',
     title: 'Радио Бони',
@@ -144,6 +144,27 @@ export const games: Game[] = [
     color: '#d8c28d',
     target: 'замок',
   },
+  {
+    id: 'fishing',
+    title: 'Рыбалка',
+    description: 'Лови рыбок, собирай редкий улов и получай монетки.',
+    emoji: '🎣',
+    color: '#b7e2ea',
+    target: 'рыбу',
+  },
 ]
+
+export const games = gameList.map((game) =>
+  game.id === 'shell-hunt'
+    ? {
+        ...game,
+        title: 'Код тотемов',
+        description: 'Собери тайную комбинацию по подсказкам.',
+        emoji: '🗿',
+        color: '#dbc09b',
+        target: 'код тотемов',
+      }
+    : game,
+)
 
 export const getGame = (id: string | undefined) => games.find((game) => game.id === id)

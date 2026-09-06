@@ -12,6 +12,7 @@ import { TreasureMapGame } from '@/features/treasure-map'
 import { BeachSearchGame } from '@/features/beach-search'
 import { BookShelfGame } from '@/features/book-shelf'
 import { FlappyBirdGame } from '@/features/flappy-bird'
+import { FishingGame } from '@/features/fishing'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 import { Button } from '@/shared/ui/Button'
@@ -27,6 +28,7 @@ import { LockPickingGame } from '@/features/lock-picking'
 type GameScreenProps = {
   onComplete: () => void
   onOpenRadio?: () => void
+  onClose?: () => void
 }
 
 type Props = { gameId: string; onBack: () => void }
@@ -47,8 +49,9 @@ const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
   'sea-battle': SeaBattle,
   'shell-game': ShellGamePage,
   'wack-a-mole': WackAMole,
-  'arkanoid': Arkanoid,
+  arkanoid: Arkanoid,
   'lock-picking': LockPickingGame,
+  fishing: FishingGame,
 }
 
 const specialSceneImages: Record<string, string> = {
@@ -70,18 +73,28 @@ export function GamePage({ gameId, onBack }: Props) {
   const isTotemCode = game.id === 'totem-code'
   const isBeachRadio = game.id === 'beach-radio'
   const isFruitBasket = game.id === 'fruit-basket'
-  const isImmersiveGame = isBeachSearch || isTotemCode || isBeachRadio || isBookShelf || isFlappyBird || isFruitBasket
+  const isImmersiveGame =
+    isBeachSearch || isTotemCode || isBeachRadio || isBookShelf || isFlappyBird || isFruitBasket
+  const isFishing = game.id === 'fishing'
   const sceneImage = specialSceneImages[game.id] ?? islandMapImage
   const openRadio = () => setRadioOpen(true)
 
   return (
     <main
-      className={`beach-shell game-overlay ${isBeachSearch ? 'beach-search-page' : ''} ${isTotemCode ? 'totem-code-page' : ''
-        } ${isBookShelf ? 'book-shelf-page' : ''
-        } ${isFlappyBird ? 'flappy-bird-page' : ''
-        } ${isBeachRadio ? 'beach-radio-page' : ''
-        } ${isFruitBasket ? 'fruit-basket-page' : ''}`}
-      style={isBeachRadio || isFruitBasket ? undefined : { backgroundImage: `url(${sceneImage})` }}
+      className={`beach-shell game-overlay ${isBeachSearch ? 'beach-search-page' : ''} ${
+        isTotemCode ? 'totem-code-page' : ''
+      } ${isBookShelf ? 'book-shelf-page' : ''} ${isTotemCode ? 'totem-code-page' : ''} ${
+        isFlappyBird ? 'flappy-bird-page' : ''
+      } ${isBeachRadio ? 'beach-radio-page' : ''} ${
+        isFishing ? 'fishing-page' : ''
+      } ${isFruitBasket ? 'fruit-basket-page' : ''}`}
+      style={
+        isFishing
+          ? { backgroundImage: `url(${islandMapImage})` }
+          : isBeachRadio || isFruitBasket
+            ? undefined
+            : { backgroundImage: `url(${sceneImage})` }
+      }
     >
       <div className="page-top">
         <button type="button" className="back" onClick={onBack}>
@@ -89,8 +102,9 @@ export function GamePage({ gameId, onBack }: Props) {
         </button>
         <span>{game.emoji}</span>
       </div>
-      <section className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''} ${isBookShelf ? 'book-shelf-layout' : ''} ${isFlappyBird ? 'flappy-bird-layout' : ''}`}>
-
+      <section
+        className={`game-layout ${isBeachSearch ? 'beach-search-layout' : ''} ${isBookShelf ? 'book-shelf-layout' : ''} ${isFlappyBird ? 'flappy-bird-layout' : ''}`}
+      >
         <GameHud onOpenRadio={openRadio} />
 
         <div className={`game-panel ${isBeachSearch ? 'beach-search-panel' : ''}`}>
@@ -103,6 +117,7 @@ export function GamePage({ gameId, onBack }: Props) {
           <GameScreen
             onComplete={() => completeGame(game.id)}
             onOpenRadio={isBeachRadio ? openRadio : undefined}
+            onClose={isFishing ? onBack : undefined}
           />
         </div>
         {!isImmersiveGame && (

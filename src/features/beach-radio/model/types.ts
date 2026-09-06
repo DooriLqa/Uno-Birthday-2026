@@ -1,6 +1,7 @@
 export type QuizQuestion = {
   id: string
-  text: string
+  text?: string
+  audioSrc?: string
   answers: string[]
   correctIndex: number
 }
