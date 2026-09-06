@@ -24,6 +24,8 @@ import { ShellGamePage } from '@/pages/games/ui/ShellGame/ShellGamePage'
 import { WackAMole } from '@/features/wack-a-mole'
 import { Arkanoid } from '@/features/arkanoid'
 import { LockPickingGame } from '@/features/lock-picking'
+import { Japonsk } from '@/features/cropp/Japonsk'
+import { RobotMazeGame } from '@/features/cropp/RobotMazeGame'
 
 type GameScreenProps = {
   onComplete: () => void
@@ -52,6 +54,8 @@ const gameScreens: Record<string, ComponentType<GameScreenProps>> = {
   arkanoid: Arkanoid,
   'lock-picking': LockPickingGame,
   fishing: FishingGame,
+  'japonsk': Japonsk,
+  'robot-maze': RobotMazeGame,
 }
 
 const specialSceneImages: Record<string, string> = {
@@ -73,8 +77,10 @@ export function GamePage({ gameId, onBack }: Props) {
   const isTotemCode = game.id === 'totem-code'
   const isBeachRadio = game.id === 'beach-radio'
   const isFruitBasket = game.id === 'fruit-basket'
+  const isJaponsk = game.id === 'japonsk'
+  const isRobot = game.id === 'robot-maze'
   const isImmersiveGame =
-    isBeachSearch || isTotemCode || isBeachRadio || isBookShelf || isFlappyBird || isFruitBasket
+    isBeachSearch || isTotemCode || isBeachRadio || isBookShelf || isFlappyBird || isFruitBasket || isJaponsk || isRobot
   const isFishing = game.id === 'fishing'
   const sceneImage = specialSceneImages[game.id] ?? islandMapImage
   const openRadio = () => setRadioOpen(true)
@@ -83,11 +89,13 @@ export function GamePage({ gameId, onBack }: Props) {
     <main
       className={`beach-shell game-overlay ${isBeachSearch ? 'beach-search-page' : ''} ${
         isTotemCode ? 'totem-code-page' : ''
-      } ${isBookShelf ? 'book-shelf-page' : ''} ${isTotemCode ? 'totem-code-page' : ''} ${
+      } ${isBookShelf ? 'book-shelf-page' : ''} ${
         isFlappyBird ? 'flappy-bird-page' : ''
       } ${isBeachRadio ? 'beach-radio-page' : ''} ${
         isFishing ? 'fishing-page' : ''
-      } ${isFruitBasket ? 'fruit-basket-page' : ''}`}
+      } ${isFruitBasket ? 'fruit-basket-page' : ''} ${
+        isJaponsk ? 'japonsk-page' : ''
+      }`}
       style={
         isFishing
           ? { backgroundImage: `url(${islandMapImage})` }

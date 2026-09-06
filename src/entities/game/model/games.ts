@@ -152,6 +152,22 @@ export const gameList: Game[] = [
     color: '#b7e2ea',
     target: 'рыбу',
   },
+  {
+    id: 'japonsk',
+    title: 'Японский кроссворд',
+    description: 'Реши японский кроссворд.',
+    emoji: '⛰️',
+    color: '#f0a2a2',
+    target: 'японский кроссворд',
+  },
+  {
+    id: 'robot-maze',
+    title: 'Робот-лабиринт',
+    description: 'Помоги роботу найти выход из лабиринта.',
+    emoji: '🤖',
+    color: '#a2c9f0',
+    target: 'выход из лабиринта',
+  }
 ]
 
 export const games = gameList.map((game) =>
