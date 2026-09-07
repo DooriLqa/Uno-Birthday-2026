@@ -6,8 +6,9 @@ import {
   type CSSProperties,
   type PointerEvent,
 } from 'react'
-import { Fish as FishIcon, X } from 'lucide-react'
+import { Fish as FishIcon } from 'lucide-react'
 import { usePawCoinStore } from '@/features/currency/model/store'
+import fishSheet from '../../../assets/fishing/fish-sheet.png'
 import {
   DISTANCE_LABELS,
   getRarity,
@@ -19,14 +20,16 @@ import {
   type FishingDistance,
 } from '../model/fish'
 import { audioController } from '@/shared/lib/audio/audioController'
+import rod from '@/shared/assets/fishing/rod.png'
+import bobber from '@/shared/assets/fishing/bobber.png'
 import './FishingGame.css'
 
 type Phase = 'idle' | 'charging' | 'casting' | 'returning' | 'waiting' | 'bite' | 'fight' | 'result'
 type Props = { onClose?: () => void }
 type CatchResult = { fish: Fish; rarity: FishRarity; message: string }
 
-const BITE_MIN = 8000
-const BITE_MAX = 15000
+const BITE_MIN = 5000
+const BITE_MAX = 10000
 const BITE_WINDOW = 1000
 const GREEN_HEIGHT = 18
 const STORAGE_KEY = 'fishing_catches'
@@ -65,7 +68,6 @@ export function FishingGame({ onClose }: Props) {
   const [power, setPower] = useState(0)
   const [bobberX, setBobberX] = useState(54)
   const [bobberTop, setBobberTop] = useState(62)
-  const [biteBobber, setBiteBobber] = useState(false)
   const [fishY, setFishY] = useState(52)
   const [greenY, setGreenY] = useState(41)
   const [catchProgress, setCatchProgress] = useState(20)
@@ -125,7 +127,6 @@ export function FishingGame({ onClose }: Props) {
     setPower(0)
     setBobberX(58)
     setBobberTop(62)
-    setBiteBobber(false)
     setFishY(52)
     setGreenY(41)
     setCatchProgress(20)
@@ -190,7 +191,6 @@ export function FishingGame({ onClose }: Props) {
   const returnRod = useCallback(() => {
     clearRoundTimers()
     holdingRef.current = false
-    setBiteBobber(false)
     setRodJerk(0)
     setPhase('returning')
     window.setTimeout(resetToIdle, 700)
@@ -215,7 +215,6 @@ export function FishingGame({ onClose }: Props) {
     setFishY(50)
     setGreenY(41)
     setCatchProgress(20)
-    setBiteBobber(false)
     setPhase('fight')
 
     const tick = (now: number) => {
@@ -276,7 +275,6 @@ export function FishingGame({ onClose }: Props) {
   const triggerBite = useCallback(() => {
     if (phaseRef.current !== 'waiting') return
     playBiteSound()
-    setBiteBobber(true)
     setPhase('bite')
     biteWindowRef.current = window.setTimeout(() => {
       if (phaseRef.current === 'bite') returnRod()
@@ -295,7 +293,7 @@ export function FishingGame({ onClose }: Props) {
     rarityRef.current = pickRarity(distance)
     setCastDistance(distance)
     setBobberX(58)
-    setBobberTop(distance === 'near' ? 70 : distance === 'mid' ? 59 : 47)
+    setBobberTop(distance === 'near' ? 65 : distance === 'mid' ? 47 : 39)
     setPhase('casting')
     window.setTimeout(() => {
       if (phaseRef.current !== 'casting') return
@@ -398,14 +396,8 @@ export function FishingGame({ onClose }: Props) {
   }, [resetToIdle])
 
   return (
-    <div
-      className={`fishing-window fishing-window--${phase}`}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerCancel}
-      onContextMenu={(event) => event.preventDefault()}
-    >
-      <button
+    <div className={`fishing-window fishing-window--${phase}`}>
+      {/* <button
         type="button"
         className="fishing-window__close"
         onPointerDown={(event) => event.stopPropagation()}
@@ -415,51 +407,38 @@ export function FishingGame({ onClose }: Props) {
         title="Закрыть"
       >
         <X size={22} />
-      </button>
+      </button> */}
 
-      <div className="fishing-scene" aria-label="Пляж и море">
-        <div className="fishing-sky" />
-        <div className="fishing-sun" />
-        <div className="fishing-cloud fishing-cloud--one" />
-        <div className="fishing-cloud fishing-cloud--two" />
-        <div className="fishing-ocean">
-          <span className="wave wave--one" />
-          <span className="wave wave--two" />
-          <span className="wave wave--three" />
-          <span className="deep-water" />
-          <span className="fishing-sector-lines" />
-        </div>
-        <div className="fishing-sand" />
-        <div className="fishing-rock fishing-rock--one" />
-        <div className="fishing-rock fishing-rock--two" />
-        <div className="fishing-gear">
-          <span>🪣</span>
-          <span>🪱</span>
-          <span>🪝</span>
-          <span>🧺</span>
-        </div>
+      <div
+        className={`fishing-rod fishing-rod--${phase}`}
+        style={{ '--rod-jerk': `${rodJerk}px` } as CSSProperties}
+      >
+        <img className="fishing-rod-image" src={rod} alt="" />
+      </div>
 
-        <div
-          className={`fishing-rod fishing-rod--${phase}`}
-          style={{ '--rod-jerk': `${rodJerk}px` } as CSSProperties}
-        >
-          <div className="fishing-arm" />
-          <div className="fishing-rod__shaft" />
-          <div className="fishing-rod__reel" />
-          <div className="fishing-rod__line" />
-        </div>
-
-        {(phase === 'waiting' || phase === 'bite') && (
+      <div
+        className="fishing-scene"
+        aria-label="Пляж и море"
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
+        onContextMenu={(event) => event.preventDefault()}
+      >
+        {(phase === 'waiting' || phase === 'bite' || phase === 'fight') && (
           <div className="fishing-bobber" style={{ left: `${bobberX}%`, top: `${bobberTop}%` }}>
-            <span className={biteBobber ? 'is-biting' : ''} />
+            <img
+              src={bobber}
+              alt=""
+              className={phase === 'bite' ? 'is-biting' : phase === 'fight' ? 'is-fighting' : ''}
+            />
             {phase === 'bite' && <b>!</b>}
           </div>
         )}
 
-        <div className="fishing-title">
+        {/* <div className="fishing-title">
           <span>🎣 РЫБАЛКА</span>
           <strong>{phase === 'fight' ? 'БОРЬБА С РЫБОЙ' : DISTANCE_LABELS[castDistance]}</strong>
-        </div>
+        </div> */}
 
         {phase === 'idle' && (
           <div className="fishing-prompt">Зажмите ЛКМ и отпустите для заброса</div>
@@ -503,12 +482,12 @@ export function FishingGame({ onClose }: Props) {
                     transform: `scaleY(${catchProgress / 100})`,
                   }}
                 />
-                <span>{Math.round(catchProgress)}%</span>
+                {/* <span>{Math.round(catchProgress)}%</span> */}
               </div>
             </div>
-            <div className="fishing-fight__hint">
+            {/* <div className="fishing-fight__hint">
               ЛКМ вверх • отпустили — вниз • держите рыбку внутри зелёной зоны
-            </div>
+            </div> */}
           </div>
         )}
 
@@ -524,33 +503,40 @@ export function FishingGame({ onClose }: Props) {
         </div>
 
         {coinBurst > 0 && <div className="fishing-coin-burst">🪙 +{coinBurst}</div>}
-
-        {phase === 'result' && result && (
-          <div className="fishing-result-backdrop" onClick={closeResult}>
-            <button
-              type="button"
-              className={`fishing-result fishing-result--${result.rarity}`}
-              style={{ '--rarity-color': getRarity(result.rarity).color } as CSSProperties}
-              onClick={(event) => {
-                event.stopPropagation()
-                closeResult()
-              }}
-            >
-              <span className="fishing-result__rarity">{getRarity(result.rarity).name}</span>
-              <div
-                className="fishing-result__fish"
-                style={{ '--rarity-color': getRarity(result.rarity).color } as CSSProperties}
-              >
-                {result.fish.emoji}
-              </div>
-              <h2>{result.fish.name}</h2>
-              <p>{result.fish.description}</p>
-              <strong>{result.message}</strong>
-              <small>Нажмите в любом месте, чтобы продолжить</small>
-            </button>
-          </div>
-        )}
       </div>
+
+      {phase === 'result' && result && (
+        <div className="fishing-result-backdrop" onClick={closeResult}>
+          <div
+            className={`fishing-result fishing-result--${result.rarity}`}
+            style={{ '--rarity-color': getRarity(result.rarity).color } as CSSProperties}
+            onClick={closeResult}
+          >
+            <span className="fishing-result__rarity">{getRarity(result.rarity).name}</span>
+            <div className="fishing-result__fish">
+              <span
+                className="fishing-result__fish-image"
+                style={{
+                  backgroundImage: `url(${fishSheet})`,
+                  backgroundPosition: `${result.fish.sprite.column * 25}% ${result.fish.sprite.row * 50}%`,
+                }}
+                aria-hidden="true"
+              />
+            </div>
+            <h2>{result.fish.name}</h2>
+            <p>{result.fish.description}</p>
+            <strong>{result.message}</strong>
+            <small>Нажмите в любом месте, чтобы продолжить</small>
+          </div>
+        </div>
+      )}
+
+      <button
+        type="button"
+        className="fishing-navigator__back-zone"
+        onClick={onClose}
+        aria-label={history.length ? 'Вернуться назад' : 'Вернуться к карте'}
+      />
     </div>
   )
 }

@@ -76,6 +76,13 @@ export const locations: Record<LocationId, LocationDefinition> = {
         cursor: 'magnify',
         action: { type: 'location', locationId: 'beach-shop' },
       },
+      {
+        id: 'fishing',
+        label: 'Порыбачить',
+        area: { left: '80%', top: '14%', width: '28%', height: '75%' },
+        cursor: 'arrow-right',
+        action: { type: 'game', gameId: 'fishing' },
+      },
     ],
   },
   'beach-shop': {
