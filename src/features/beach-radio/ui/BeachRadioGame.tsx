@@ -1,3 +1,4 @@
+import { audioController, type Sound } from '@/shared/lib/audio/audioController'
 import { useEffect, useRef, useState } from 'react'
 import {
   CircleHelp,
@@ -159,7 +160,7 @@ export function BeachRadioGame({ onComplete, onOpenRadio }: Props) {
         )}
 
         {dialogStep === 'quiz' && quizQuestion && (
-          <QuizPanel question={quizQuestion} onAnswer={answer} />
+          <QuizPanel key={quizQuestion.id} question={quizQuestion} onAnswer={answer} />
         )}
 
         {dialogStep === 'win' && (
@@ -221,7 +222,7 @@ function QuizPanel({
   question: QuizQuestion
   onAnswer: (index: number) => void
 }) {
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const audioRef = useRef<Sound | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -229,30 +230,12 @@ function QuizPanel({
   const setAudioVolume = useQuizProgressStore((state) => state.setAudioVolume)
 
   useEffect(() => {
-    const audio = audioRef.current
-
-    if (!audio) return
-
-    audio.volume = audioVolume
-  }, [audioVolume, question.id])
-
-  useEffect(() => {
-    const audio = audioRef.current
-
-    if (!audio) return
-
-    audio.volume = audioVolume
-  }, [audioVolume, question.audioSrc])
-
-  useEffect(() => {
-    const audio = audioRef.current
-
-    if (!audio) return
-
-    // Сбрасываем состояние при новом audioSrc
-    setIsPlaying(false)
-    setCurrentTime(0)
-    setDuration(0)
+    if (!question.audioSrc) return
+    const sound = audioController.createSound(question.audioSrc, {
+      volume: useQuizProgressStore.getState().audioVolume,
+    })
+    audioRef.current = sound
+    const audio = sound.element
 
     const onTimeUpdate = () => setCurrentTime(audio.currentTime)
     const onLoadedMetadata = () => setDuration(Number.isFinite(audio.duration) ? audio.duration : 0)
@@ -269,25 +252,28 @@ function QuizPanel({
     audio.addEventListener('pause', onPause)
     audio.addEventListener('ended', onEnded)
 
-    audio.volume = audioVolume
-
     return () => {
-      audio.pause()
+      audioRef.current = null
       audio.removeEventListener('timeupdate', onTimeUpdate)
       audio.removeEventListener('loadedmetadata', onLoadedMetadata)
       audio.removeEventListener('play', onPlay)
       audio.removeEventListener('pause', onPause)
       audio.removeEventListener('ended', onEnded)
+      sound.dispose()
     }
   }, [question.audioSrc])
+
+  useEffect(() => {
+    audioRef.current?.setVolume(audioVolume)
+  }, [audioVolume])
 
   const togglePlayback = () => {
     const audio = audioRef.current
 
     if (!audio) return
 
-    if (audio.paused) {
-      void audio.play().catch(() => setIsPlaying(false))
+    if (audio.element.paused) {
+      void audio.play()
     } else {
       audio.pause()
     }
@@ -298,16 +284,14 @@ function QuizPanel({
 
     if (!audio) return
 
-    audio.currentTime = value
+    audio.element.currentTime = value
     setCurrentTime(value)
   }
 
   const changeVolume = (value: number) => {
     setAudioVolume(value)
 
-    if (audioRef.current) {
-      audioRef.current.volume = value
-    }
+    audioRef.current?.setVolume(value)
   }
 
   const formatTime = (value: number) => {
@@ -327,8 +311,6 @@ function QuizPanel({
 
           {question.audioSrc && (
             <div className="quiz-audio-player">
-              <audio ref={audioRef} src={question.audioSrc} preload="metadata" />
-
               <button
                 type="button"
                 className="quiz-audio-player__play"

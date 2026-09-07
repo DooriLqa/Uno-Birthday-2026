@@ -12,6 +12,7 @@ import {
   type FishRarity,
   type FishingDistance,
 } from '../model/fish'
+import { audioController } from '@/shared/lib/audio/audioController'
 import './FishingGame.css'
 
 type Phase = 'idle' | 'charging' | 'casting' | 'returning' | 'waiting' | 'bite' | 'fight' | 'result'
@@ -60,7 +61,6 @@ export function FishingGame({ onClose }: Props) {
   const greenVelocityRef = useRef(0)
   const catchRef = useRef(20)
   const lastFightTimeRef = useRef(0)
-  const audioRef = useRef<AudioContext | null>(null)
 
   const setPhase = useCallback((next: Phase) => {
     phaseRef.current = next
@@ -81,25 +81,7 @@ export function FishingGame({ onClose }: Props) {
   useEffect(() => () => clearRoundTimers(), [clearRoundTimers])
 
   const playBiteSound = useCallback(() => {
-    const AudioContextClass =
-      window.AudioContext ||
-      (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-    if (!AudioContextClass) return
-    const context = audioRef.current ?? new AudioContextClass()
-    audioRef.current = context
-    void context.resume()
-    const now = context.currentTime
-    const oscillator = context.createOscillator()
-    const gain = context.createGain()
-    oscillator.type = 'square'
-    oscillator.frequency.setValueAtTime(900, now)
-    oscillator.frequency.exponentialRampToValueAtTime(470, now + 0.12)
-    gain.gain.setValueAtTime(0.0001, now)
-    gain.gain.exponentialRampToValueAtTime(0.13, now + 0.01)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2)
-    oscillator.connect(gain).connect(context.destination)
-    oscillator.start(now)
-    oscillator.stop(now + 0.21)
+    audioController.playTone({ frequency: 900, endFrequency: 470 })
   }, [])
 
   const resetToIdle = useCallback(() => {
