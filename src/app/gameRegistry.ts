@@ -18,9 +18,14 @@ import flappyBirdLagoonBackground from '@/shared/assets/flappy-bird/lagoon-cliff
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 
+const locationTransition = {
+  transitionSound: '/audio/sfx/location-footsteps.ogg',
+} satisfies Pick<GameDefinition, 'transitionSound'>
+
 const islandGame = {
   backgroundImage: islandMapImage,
-} satisfies Pick<GameDefinition, 'backgroundImage'>
+  ...locationTransition,
+} satisfies Pick<GameDefinition, 'backgroundImage' | 'transitionSound'>
 
 export const games: GameDefinition[] = [
   {
@@ -32,6 +37,7 @@ export const games: GameDefinition[] = [
     target: 'радиоприёмник',
     mapPosition: { left: '84%', top: '72%' },
     pageClassName: 'beach-radio-page',
+    ...locationTransition,
     Screen: BeachRadioGame,
   },
   {
@@ -68,6 +74,7 @@ export const games: GameDefinition[] = [
     mapPosition: { left: '60%', top: '23%' },
     pageClassName: 'flappy-bird-page',
     backgroundImage: flappyBirdLagoonBackground,
+    ...locationTransition,
     Screen: FlappyBirdGame,
   },
   {
@@ -80,6 +87,7 @@ export const games: GameDefinition[] = [
     mapPosition: { left: '27%', top: '38%' },
     pageClassName: 'totem-code-page',
     backgroundImage: totemBeachScene,
+    ...locationTransition,
     Screen: TotemCodeGame,
   },
   {
@@ -102,6 +110,7 @@ export const games: GameDefinition[] = [
     target: '20 ценностей',
     mapPosition: { left: '83%', top: '45%' },
     pageClassName: 'fruit-basket-page',
+    ...locationTransition,
     Screen: FruitBasketGame,
   },
   /* {
@@ -226,7 +235,7 @@ export const games: GameDefinition[] = [
     ...islandGame,
     Screen: FishingGame,
   },
-  {
+  /* {
     id: 'japonsk',
     title: 'Японский кроссворд',
     description: 'Реши японский кроссворд.',
@@ -241,7 +250,7 @@ export const games: GameDefinition[] = [
     emoji: '🤖',
     color: '#a2c9f0',
     target: 'выход из лабиринта',
-  }
+  } */
 ]
 
 export const getGame = (gameId: string | null) => games.find((game) => game.id === gameId)

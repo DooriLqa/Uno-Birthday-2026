@@ -16,5 +16,7 @@ export type GameDefinition = {
   mapPosition: { left: string; top: string }
   pageClassName?: string
   backgroundImage?: string
+  /** Звук, который проигрывается при переходе на эту игровую локацию. */
+  transitionSound?: string
   Screen: ComponentType<GameScreenProps>
 }

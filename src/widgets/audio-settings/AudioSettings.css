@@ -1,0 +1,37 @@
+.audio-settings {
+  position: fixed;
+  z-index: 300;
+  top: max(76px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 80px);
+  padding: 9px 12px;
+  border: 2px solid rgba(112, 66, 29, 0.25);
+  border-radius: 13px;
+  background: rgba(255, 250, 228, 0.94);
+  box-shadow: 0 6px 16px rgba(23, 91, 117, 0.18);
+  color: #70421d;
+  font-size: 0.75rem;
+  font-weight: 800;
+  backdrop-filter: blur(7px);
+}
+.audio-settings input {
+  width: clamp(65px, 10vw, 120px);
+  min-width: 0;
+  accent-color: #70421d;
+}
+.audio-settings output {
+  min-width: 4ch;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 420px) {
+  .audio-settings {
+    gap: 5px;
+    padding: 8px;
+  }
+  .audio-settings span {
+    display: none;
+  }
+}

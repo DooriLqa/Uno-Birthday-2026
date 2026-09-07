@@ -1,0 +1,203 @@
+.location-navigator {
+  --cursor-default: url('../../../shared/assets/cursors/pointer.png') 8 6, auto;
+  --cursor-forward: url('../../../shared/assets/cursors/arrow-right.png') 52 32, e-resize;
+  --cursor-pan-left: url('../../../shared/assets/cursors/arrow-left.png') 12 32, w-resize;
+  --cursor-back: url('../../../shared/assets/cursors/projected-back.png') 32 50, pointer;
+  position: fixed;
+  z-index: 15;
+  inset: 0;
+  overflow: hidden;
+  background: #168cc3;
+  cursor: var(--cursor-default);
+}
+.location-navigator__scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.location-navigator__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.location-navigator__scene-layer {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+}
+.location-navigator__scene-layer.is-incoming,
+.location-navigator__scene-layer.is-visible {
+  z-index: 1;
+}
+.location-navigator__scene-layer.is-incoming {
+  opacity: 0;
+}
+.location-navigator__scene-layer.is-visible {
+  opacity: 1;
+  transition: opacity 0.14s linear;
+}
+.location-navigator__hotspot-layer {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+}
+.location-navigator__hotspot-canvas {
+  position: absolute;
+  will-change: transform;
+}
+.location-navigator__hotspot-canvas:not(.is-wide) {
+  inset: 0;
+}
+.location-navigator__image {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  will-change: transform;
+}
+.location-navigator__hotspot {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 22px;
+  background: transparent;
+  cursor: var(--cursor-forward);
+  pointer-events: auto;
+}
+.location-navigator__hotspot.is-interactive {
+  cursor: url('../../../shared/assets/cursors/hand-point.png') 28 8, pointer;
+}
+.location-navigator__hotspot.cursor-arrow-left {
+  cursor: url('../../../shared/assets/cursors/arrow-left.png') 13 32, w-resize;
+}
+.location-navigator__hotspot.cursor-pointer {
+  cursor: url('../../../shared/assets/cursors/pointer.png') 8 6, pointer;
+}
+.location-navigator__hotspot.cursor-magnify {
+  cursor: url('../../../shared/assets/cursors/magnify.png') 21 21, zoom-in;
+}
+.location-navigator__hotspot.cursor-arrow-up {
+  cursor: url('../../../shared/assets/cursors/arrow-up.png') 32 12, n-resize;
+}
+.location-navigator__hotspot.cursor-arrow-down {
+  cursor: url('../../../shared/assets/cursors/arrow-down.png') 32 52, s-resize;
+}
+.location-navigator__hotspot.cursor-arrow-right {
+  cursor: url('../../../shared/assets/cursors/arrow-right.png') 51 32, e-resize;
+}
+.location-navigator__hotspot.cursor-turn-left {
+  cursor: url('../../../shared/assets/cursors/turn-left.png') 18 18, pointer;
+}
+.location-navigator__hotspot.cursor-turn-right {
+  cursor: url('../../../shared/assets/cursors/turn-right.png') 46 18, pointer;
+}
+.location-navigator__hotspot.cursor-projected-back {
+  cursor: url('../../../shared/assets/cursors/projected-back.png') 32 50, pointer;
+}
+.location-navigator__hotspot.cursor-projected-forward {
+  cursor: url('../../../shared/assets/cursors/projected-forward.png') 53 30, pointer;
+}
+.location-navigator__hotspot.cursor-dialogue {
+  cursor: url('../../../shared/assets/cursors/dialogue.png') 30 48, help;
+}
+.location-navigator__hotspot.cursor-hand-point {
+  cursor: url('../../../shared/assets/cursors/hand-point.png') 28 8, pointer;
+}
+.location-navigator__hotspot.cursor-hand-grab {
+  cursor: url('../../../shared/assets/cursors/hand-grab.png') 29 29, grab;
+}
+.location-navigator__hotspot.cursor-hand-open {
+  cursor: url('../../../shared/assets/cursors/hand-open.png') 30 30, move;
+}
+.location-navigator__hotspot span {
+  max-width: 190px;
+  padding: 8px 12px;
+  border: 2px solid rgba(255, 248, 211, 0.86);
+  border-radius: 999px;
+  background: rgba(37, 87, 74, 0.78);
+  box-shadow: 0 4px 14px rgba(9, 43, 56, 0.36);
+  color: #fff9df;
+  font-size: 0.88rem;
+  font-weight: 900;
+  opacity: 0;
+  translate: 0 8px;
+}
+.location-navigator__hotspot:hover,
+.location-navigator__hotspot:focus-visible {
+  outline: none;
+}
+.location-navigator__hotspot:hover span,
+.location-navigator__hotspot:focus-visible span {
+  opacity: 1;
+  translate: 0 0;
+}
+.location-navigator__pan-zone {
+  position: absolute;
+  z-index: 3;
+  top: 30%;
+  bottom: 12%;
+  width: min(11vw, 130px);
+  border: 0;
+  background: transparent;
+  cursor: var(--cursor-default);
+}
+.location-navigator__pan-zone--left {
+  left: 0;
+  cursor: var(--cursor-pan-left);
+}
+.location-navigator__pan-zone--right {
+  right: 0;
+  cursor: var(--cursor-forward);
+}
+.location-navigator__pan-zone:hover,
+.location-navigator__pan-zone:focus-visible {
+  outline: none;
+}
+.location-navigator__caption {
+  position: absolute;
+  z-index: 2;
+  top: 82px;
+  left: 50%;
+  padding: 8px 18px;
+  border: 2px solid rgba(255, 248, 211, 0.72);
+  border-radius: 999px;
+  background: rgba(20, 78, 93, 0.76);
+  color: #fff9df;
+  font-weight: 900;
+  translate: -50% 0;
+}
+.location-navigator__back-zone {
+  position: absolute;
+  z-index: 4;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 11%;
+  border: 0;
+  background: transparent;
+  cursor: var(--cursor-back);
+}
+.location-navigator__back-zone:hover,
+.location-navigator__back-zone:focus-visible {
+  outline: none;
+}
+@media (max-width: 700px) {
+  .location-navigator__caption {
+    top: 72px;
+    font-size: 0.86rem;
+  }
+  .location-navigator__back-zone {
+    height: 13%;
+  }
+  .location-navigator__hotspot span {
+    opacity: 1;
+    font-size: 0.72rem;
+    translate: 0 0;
+  }
+}
