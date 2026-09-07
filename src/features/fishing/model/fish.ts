@@ -166,7 +166,7 @@ export const FISH: Fish[] = [
     emoji: '🐟',
     behavior: 'mixed',
     speed: 2,
-    jump: 1,
+    jump: 2,
     description: 'Тяжёлая рыба с длинными рывками.',
   },
   {
@@ -207,4 +207,4 @@ export function pickFish(distance: FishingDistance) {
 }
 
 export const rarityDifficulty = (rarity: FishRarity) =>
-  ({ common: 0.8, uncommon: 1.2, rare: 1.5, epic: 2, legendary: 2.5 })[rarity]
+  ({ common: 0.8, uncommon: 1.2, rare: 1.6, epic: 2.1, legendary: 2.7 })[rarity]
