@@ -34,6 +34,11 @@ const BITE_WINDOW = 1000
 const GREEN_HEIGHT = 18
 const STORAGE_KEY = 'fishing_catches'
 
+// Максимальный dt для защиты от "залипания" вкладки
+const MAX_DT = 0.05
+// Минимальный dt для защиты от слишком быстрых обновлений
+const MIN_DT = 0.001
+
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
 // Загрузка сохранённых данных
@@ -219,15 +224,21 @@ export function FishingGame({ onClose }: Props) {
 
     const tick = (now: number) => {
       if (phaseRef.current !== 'fight') return
-      const dt = Math.min(0.035, Math.max(0.008, (now - lastFightTimeRef.current) / 1000))
+
+      // Вычисляем dt с защитой от слишком больших/малых значений
+      const rawDt = (now - lastFightTimeRef.current) / 1000
+      const dt = clamp(rawDt, MIN_DT, MAX_DT)
       lastFightTimeRef.current = now
 
+      // Движение зелёной зоны
       const acceleration = holdingRef.current ? -180 : 180
       greenVelocityRef.current += acceleration * dt
+      // Демпфирование (зависит от dt для стабильности)
       greenVelocityRef.current *= Math.pow(0.018, dt)
       const nextGreen = clamp(greenYRef.current + greenVelocityRef.current * dt, 1, 80)
       greenYRef.current = nextGreen
 
+      // Движение рыбы
       const behaviorFactor =
         fish.behavior === 'dart'
           ? 1.75
@@ -235,6 +246,7 @@ export function FishingGame({ onClose }: Props) {
             ? 1.25
             : 1
       const gravity = fish.behavior === 'sinker' ? 0.85 : fish.behavior === 'floater' ? -0.65 : 0
+
       fishVelocityRef.current += gravity * dt * difficulty
       fishVelocityRef.current = clamp(
         fishVelocityRef.current,
@@ -243,6 +255,7 @@ export function FishingGame({ onClose }: Props) {
       )
       fishVelocityRef.current +=
         (Math.random() - 0.5) * fish.jump * difficulty * behaviorFactor * dt * 7
+
       let nextFish = fishYRef.current + fishVelocityRef.current * dt * 18
       if (nextFish <= 2 || nextFish >= 88) {
         fishVelocityRef.current *= -0.8
@@ -250,14 +263,17 @@ export function FishingGame({ onClose }: Props) {
       }
       fishYRef.current = nextFish
 
+      // Проверка попадания в зону
       const inside = nextFish >= greenYRef.current && nextFish <= greenYRef.current + GREEN_HEIGHT
       catchRef.current = clamp(catchRef.current + (inside ? 14 : -12) * dt, 0, 100)
 
+      // Обновление состояния
       setGreenY(greenYRef.current)
       setFishY(fishYRef.current)
       setCatchProgress(catchRef.current)
       setRodJerk(Math.sin(now / 58) * 2.4)
 
+      // Проверка условий победы/поражения
       if (catchRef.current >= 100) {
         awardCatch()
         return
@@ -266,6 +282,7 @@ export function FishingGame({ onClose }: Props) {
         returnRod()
         return
       }
+
       fightFrameRef.current = requestAnimationFrame(tick)
     }
 
@@ -316,11 +333,15 @@ export function FishingGame({ onClose }: Props) {
 
       const tick = (now: number) => {
         if (!holdingRef.current || phaseRef.current !== 'charging') return
-        const dt = Math.min(0.05, (now - lastTime) / 1000)
+
+        // Вычисляем dt с защитой от слишком больших значений
+        const rawDt = (now - lastTime) / 1000
+        const dt = Math.min(rawDt, MAX_DT)
         lastTime = now
 
         const speed = 165 // условных единиц в секунду
         let next = powerRef.current + powerDirectionRef.current * speed * dt
+
         if (next >= 100) {
           next = 100
           powerDirectionRef.current = -1
@@ -328,6 +349,7 @@ export function FishingGame({ onClose }: Props) {
           next = 0
           powerDirectionRef.current = 1
         }
+
         powerRef.current = next
         setPower(next)
         powerFrameRef.current = requestAnimationFrame(tick)
@@ -397,18 +419,6 @@ export function FishingGame({ onClose }: Props) {
 
   return (
     <div className={`fishing-window fishing-window--${phase}`}>
-      {/* <button
-        type="button"
-        className="fishing-window__close"
-        onPointerDown={(event) => event.stopPropagation()}
-        onPointerUp={(event) => event.stopPropagation()}
-        onClick={onClose}
-        aria-label="Закрыть рыбалку"
-        title="Закрыть"
-      >
-        <X size={22} />
-      </button> */}
-
       <div
         className={`fishing-rod fishing-rod--${phase}`}
         style={{ '--rod-jerk': `${rodJerk}px` } as CSSProperties}
@@ -434,11 +444,6 @@ export function FishingGame({ onClose }: Props) {
             {phase === 'bite' && <b>!</b>}
           </div>
         )}
-
-        {/* <div className="fishing-title">
-          <span>🎣 РЫБАЛКА</span>
-          <strong>{phase === 'fight' ? 'БОРЬБА С РЫБОЙ' : DISTANCE_LABELS[castDistance]}</strong>
-        </div> */}
 
         {phase === 'idle' && (
           <div className="fishing-prompt">Зажмите ЛКМ и отпустите для заброса</div>
@@ -482,12 +487,8 @@ export function FishingGame({ onClose }: Props) {
                     transform: `scaleY(${catchProgress / 100})`,
                   }}
                 />
-                {/* <span>{Math.round(catchProgress)}%</span> */}
               </div>
             </div>
-            {/* <div className="fishing-fight__hint">
-              ЛКМ вверх • отпустили — вниз • держите рыбку внутри зелёной зоны
-            </div> */}
           </div>
         )}
 
