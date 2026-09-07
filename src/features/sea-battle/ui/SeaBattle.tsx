@@ -1,3 +1,4 @@
+import { audioController, type Sound } from '@/shared/lib/audio/audioController'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import './SeaBattle.css'
 
@@ -97,8 +98,8 @@ export function SeaBattle({ onComplete }: SeaBattleProps) {
   const torpedoesRef = useRef<Torpedo[]>([])
   const cooldownTimerRef = useRef<number | null>(null)
   const cooldownUntilRef = useRef(0)
-  const audioShotRef = useRef<HTMLAudioElement | null>(null)
-  const audioExplosionRef = useRef<HTMLAudioElement | null>(null)
+  const audioShotRef = useRef<Sound | null>(null)
+  const audioExplosionRef = useRef<Sound | null>(null)
 
   const resetGame = useCallback(() => {
     // При старте visor оказывается точно по центру мира.
@@ -165,11 +166,7 @@ export function SeaBattle({ onComplete }: SeaBattleProps) {
     setTorpedoesLeft((value) => value - 1)
     setCooldown(SHOT_COOLDOWN)
 
-    const audio = audioShotRef.current
-    if (audio) {
-      audio.currentTime = 0
-      void audio.play().catch(() => undefined)
-    }
+    void audioShotRef.current?.play(true)
 
     if (cooldownTimerRef.current !== null) {
       window.clearInterval(cooldownTimerRef.current)
@@ -223,12 +220,12 @@ export function SeaBattle({ onComplete }: SeaBattleProps) {
   }, [fire, moveCamera, started])
 
   useEffect(() => {
-    audioShotRef.current = new Audio(shotSound)
-    audioExplosionRef.current = new Audio(explosionSound)
+    audioShotRef.current = audioController.createSound(shotSound)
+    audioExplosionRef.current = audioController.createSound(explosionSound)
 
     return () => {
-      audioShotRef.current?.pause()
-      audioExplosionRef.current?.pause()
+      audioShotRef.current?.dispose()
+      audioExplosionRef.current?.dispose()
     }
   }, [])
 
@@ -298,11 +295,7 @@ export function SeaBattle({ onComplete }: SeaBattleProps) {
           return next
         })
 
-        const audio = audioExplosionRef.current
-        if (audio) {
-          audio.currentTime = 0
-          void audio.play().catch(() => undefined)
-        }
+        void audioExplosionRef.current?.play(true)
 
         setExplosions((current) => [...current, ...newExplosions])
         window.setTimeout(() => {

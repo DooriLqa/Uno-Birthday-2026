@@ -1,7 +1,7 @@
 .game-hud {
   position: fixed;
   z-index: 55;
-  top: 76px;
+  top: 16px;
   left: 16px;
   right: 16px;
   display: flex;
@@ -10,15 +10,33 @@
   gap: 14px;
   pointer-events: none;
 }
+.game-hud__left {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
 .game-hud__coins,
 .game-hud__inventory,
-.game-hud__radio-widget {
+.game-hud__radio-widget,
+.game-hud__map-button {
   border: 2px solid rgba(112, 66, 29, 0.25);
   background: rgba(255, 250, 228, 0.94);
   box-shadow: 0 6px 16px rgba(23, 91, 117, 0.18);
   color: #70421d;
   backdrop-filter: blur(7px);
   pointer-events: auto;
+}
+.game-hud__map-button {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  padding: 0;
+  border-radius: 15px;
+  cursor: pointer;
+}
+.game-hud__map-button:hover {
+  transform: translateY(-1px);
 }
 .game-hud__coins {
   display: flex;
@@ -81,7 +99,10 @@
 }
 .game-hud__slot--rarity {
   position: relative;
-  box-shadow: 0 0 0 2px var(--rarity-color), 0 3px 0 #d9b66d, 0 0 12px color-mix(in srgb, var(--rarity-color) 55%, transparent);
+  box-shadow:
+    0 0 0 2px var(--rarity-color),
+    0 3px 0 #d9b66d,
+    0 0 12px color-mix(in srgb, var(--rarity-color) 55%, transparent);
 }
 .game-hud__slot--rarity::after {
   position: absolute;
@@ -98,9 +119,9 @@
   z-index: 2;
   padding: 0 3px;
   border-radius: 5px;
-  background: rgba(72, 45, 28, .82);
+  background: rgba(72, 45, 28, 0.82);
   color: #fff4d0;
-  font-size: .58rem;
+  font-size: 0.58rem;
   line-height: 1.1;
 }
 .game-hud__slot--empty {
@@ -160,7 +181,7 @@
 }
 @media (max-width: 620px) {
   .game-hud {
-    top: 68px;
+    top: 10px;
     left: 10px;
     right: 10px;
     gap: 7px;
@@ -170,12 +191,17 @@
   }
   .game-hud__coins,
   .game-hud__inventory,
-  .game-hud__radio-widget {
+  .game-hud__radio-widget,
+  .game-hud__map-button {
     padding: 6px 8px;
   }
   .game-hud__slot {
     width: 37px;
     height: 37px;
+  }
+  .game-hud__map-button {
+    width: 42px;
+    height: 42px;
   }
   .game-hud__radio-widget {
     max-width: calc(100vw - 20px);

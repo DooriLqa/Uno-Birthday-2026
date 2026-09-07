@@ -1,4 +1,4 @@
-import { Radio as RadioIcon, Volume2 } from 'lucide-react'
+import { Map as MapIcon, Radio as RadioIcon, Volume2 } from 'lucide-react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import { useRadioStore } from '@/features/beach-radio/model/radioStore'
@@ -10,13 +10,14 @@ const CORRECT_STATION_ID = 'station-06'
 
 type Props = {
   onOpenRadio?: () => void
+  onOpenMap?: () => void
 }
 
-export function GameHud({ onOpenRadio }: Props) {
+export function GameHud({ onOpenRadio, onOpenMap }: Props) {
   const pawCoins = usePawCoinStore((state) => state.pawCoins)
   const inventory = useInventoryStore((state) => state.items)
-  const discoveredStationIds = useRadioStore((state) => state.discoveredStationIds)
   const isPowered = useRadioStore((state) => state.isPowered)
+  const discoveredStationIds = useRadioStore((state) => state.discoveredStationIds)
   const volume = useRadioStore((state) => state.volume)
   const setPowered = useRadioStore((state) => state.setPowered)
   const setVolume = useRadioStore((state) => state.setVolume)
@@ -24,11 +25,23 @@ export function GameHud({ onOpenRadio }: Props) {
 
   return (
     <div className="game-hud" aria-label="Игровой интерфейс">
-      <div className="game-hud__coins" title="Монетки с лапкой">
-        <span className="game-hud__coin-icon">🐾</span>
-        <strong>{pawCoins}</strong>
+      <div className="game-hud__left">
+        {onOpenMap && (
+          <button
+            type="button"
+            className="game-hud__map-button"
+            onClick={onOpenMap}
+            aria-label="Открыть карту"
+            title="Карта"
+          >
+            <MapIcon size={20} />
+          </button>
+        )}
+        <div className="game-hud__coins" title="Монетки с лапкой">
+          <span className="game-hud__coin-icon">🐾</span>
+          <strong>{pawCoins}</strong>
+        </div>
       </div>
-
       <div className="game-hud__right">
         <div className="game-hud__inventory" aria-label="Инвентарь">
           <span className="game-hud__inventory-label">Инвентарь</span>

@@ -1,136 +1,20 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { audioController, type Sound } from '@/shared/lib/audio/audioController'
 import { CORRECT_STATION_ID, radioStations } from './stations'
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
-
 const RADIO_MIN = 87
 const RADIO_MAX = 108
 const RADIO_STEP = 0.1
 const MAX_TUNING_DISTANCE = 0.2
 
-// Плавность изменения громкости.
-// Чем больше значение, тем медленнее происходит изменение.
-const AUDIO_RAMP_SECONDS = 0.04
-
-// Длина генерируемого шума.
-// Больший буфер делает повторение практически незаметным.
-const NOISE_DURATION_SECONDS = 8
-
-// Длина кроссфейда между концом и началом шума.
-// 100 мс достаточно, чтобы убрать щелчок и провал громкости.
-const NOISE_CROSSFADE_SECONDS = 0.12
-
-// МАСТЕР-ГРОМКОСТЬ: 0.3 = 30% от максимальной
-// Это глобальный множитель для ВСЕГО звука в радио
-const MASTER_VOLUME = 0.35
-
-let audioContext: AudioContext | null = null
-let masterGain: GainNode | null = null
-
-let noiseSource: AudioBufferSourceNode | null = null
-let noiseGain: GainNode | null = null
-
-const stationAudio = new Map<string, HTMLAudioElement>()
-const stationGains = new Map<string, GainNode>()
+// Local mix coefficients; the controller applies master volume after this mix.
+const RADIO_MIX = { station: 1, noise: 1 }
+let noise: ReturnType<typeof audioController.createNoiseLoop> | null = null
+const stationAudio = new Map<string, Sound>()
 const stationTrackIndexes = new Map<string, number>()
 const pendingInitialSeek = new Map<string, number>()
-
-const getAudioContext = () => {
-  audioContext ??= new AudioContext()
-  return audioContext
-}
-
-/**
- * Создаёт мастер-узел громкости.
- * Все звуки проходят через него, что позволяет
- * контролировать общую громкость в одном месте.
- */
-const getMasterGain = () => {
-  const context = getAudioContext()
-  if (!masterGain) {
-    masterGain = context.createGain()
-    masterGain.gain.value = MASTER_VOLUME
-    masterGain.connect(context.destination)
-  }
-  return masterGain
-}
-
-/**
- * Создаёт бесшовный loop белого шума.
- *
- * В старой версии начало и конец буфера затухали до 0.
- * Из-за этого каждые 2 секунды возникал слышимый провал.
- *
- * Здесь конец буфера плавно смешивается с началом.
- * При переходе:
- *
- *   конец ──────╮
- *               ╰──── начало
- *
- * громкость не падает в ноль.
- */
-const createSeamlessNoiseBuffer = (context: AudioContext) => {
-  const sampleRate = context.sampleRate
-  const length = Math.floor(sampleRate * NOISE_DURATION_SECONDS)
-  const buffer = context.createBuffer(1, length, sampleRate)
-  const data = buffer.getChannelData(0)
-
-  // Генерируем обычный white noise.
-  for (let index = 0; index < length; index += 1) {
-    data[index] = Math.random() * 2 - 1
-  }
-
-  const crossfadeSamples = Math.floor(sampleRate * NOISE_CROSSFADE_SECONDS)
-
-  /**
-   * Последние N сэмплов постепенно смешиваются
-   * с первыми N сэмплами.
-   *
-   * В самом конце:
-   *   data[last] ≈ data[0]
-   *
-   * Поэтому переход loop -> начало не создаёт скачка.
-   */
-  for (let index = 0; index < crossfadeSamples; index += 1) {
-    const fade = index / crossfadeSamples
-
-    const tailIndex = length - crossfadeSamples + index
-    const headIndex = index
-
-    const tail = data[tailIndex]
-    const head = data[headIndex]
-
-    data[tailIndex] = tail * (1 - fade) + head * fade
-  }
-
-  return buffer
-}
-
-const ensureNoise = () => {
-  const context = getAudioContext()
-
-  if (noiseSource && noiseGain) {
-    return
-  }
-
-  const buffer = createSeamlessNoiseBuffer(context)
-
-  noiseSource = context.createBufferSource()
-  noiseGain = context.createGain()
-
-  noiseSource.buffer = buffer
-  noiseSource.loop = true
-
-  // Радио изначально выключено.
-  noiseGain.gain.value = 0
-
-  const master = getMasterGain()
-  noiseSource.connect(noiseGain)
-  noiseGain.connect(master)
-
-  noiseSource.start()
-}
 
 const getNearestStation = (frequency: number) =>
   radioStations.reduce(
@@ -211,125 +95,34 @@ const getNoisePercent = (stationId: string, distance: number) => {
   return 1
 }
 
-/**
- * Плавно меняет громкость.
- *
- * Важно:
- * здесь мы НЕ останавливаем аудио,
- * НЕ меняем currentTime и НЕ создаём новый источник.
- *
- * Поэтому при вращении частоты шум остаётся непрерывным.
- */
-const rampGain = (gain: GainNode, target: number) => {
-  if (!audioContext) return
-
-  const now = audioContext.currentTime
-
-  gain.gain.cancelScheduledValues(now)
-
-  gain.gain.setTargetAtTime(clamp(target, 0, 1), now, AUDIO_RAMP_SECONDS)
-}
-
-/**
- * Получает один HTMLAudioElement для станции.
- *
- * Важно: один элемент создаётся один раз и живёт
- * всё время существования страницы.
- */
 const getStationAudio = (stationId: string, trackSrcs: string[]) => {
   const existing = stationAudio.get(stationId)
+  if (existing) return existing
 
-  if (existing) {
-    return existing
-  }
-
-  const context = getAudioContext()
-
-  const audio = new Audio(trackSrcs[0])
-
-  const gain = context.createGain()
-
-  audio.preload = 'auto'
-  audio.volume = 1
-
-  // Реальная громкость контролируется через Web Audio GainNode.
-  gain.gain.value = 0
-
-  const source = context.createMediaElementSource(audio)
-
-  const master = getMasterGain()
-  source.connect(gain).connect(master)
-
-  /**
-   * Если это первое включение правильной станции,
-   * переносим проигрывание на 5 секунд.
-   */
+  const sound = audioController.createSound(trackSrcs[0], { volume: 0 })
+  const audio = sound.element
   audio.addEventListener('loadedmetadata', () => {
     const seekTo = pendingInitialSeek.get(stationId)
-
-    if (seekTo === undefined) {
-      return
-    }
-
+    if (seekTo === undefined || !Number.isFinite(audio.duration)) return
     pendingInitialSeek.delete(stationId)
-
-    try {
-      audio.currentTime = Math.min(seekTo, Math.max(0, audio.duration - 0.05))
-    } catch {
-      // Браузер может ещё не разрешать менять currentTime.
-    }
+    audio.currentTime = Math.min(seekTo, Math.max(0, audio.duration - 0.05))
   })
-
-  /**
-   * Когда заканчивается трек:
-   *
-   * track-01
-   *   ↓
-   * track-02
-   *   ↓
-   * track-03
-   *   ↓
-   * ...
-   *   ↓
-   * track-01
-   *
-   * При этом GainNode станции остаётся тем же.
-   * Поэтому громкость НЕ сбрасывается.
-   */
   audio.addEventListener('ended', () => {
-    const station = radioStations.find((item) => item.id === stationId)
-
-    if (!station) {
-      return
-    }
-
-    const nextIndex = ((stationTrackIndexes.get(stationId) ?? 0) + 1) % station.trackSrcs.length
-
+    const nextIndex = ((stationTrackIndexes.get(stationId) ?? 0) + 1) % trackSrcs.length
     stationTrackIndexes.set(stationId, nextIndex)
-
-    audio.src = station.trackSrcs[nextIndex]
-
+    audio.src = trackSrcs[nextIndex]
     audio.currentTime = 0
-
-    void audio.play().catch(() => undefined)
+    if (useRadioStore.getState().isPowered) void sound.play()
   })
-
-  stationAudio.set(stationId, audio)
-
-  stationGains.set(stationId, gain)
-
-  return audio
+  stationAudio.set(stationId, sound)
+  return sound
 }
 
 const ensureStationPlayback = (stationId: string, startAt?: number) => {
   const station = radioStations.find((item) => item.id === stationId)
-
-  if (!station) {
-    return
-  }
-
-  const audio = getStationAudio(station.id, station.trackSrcs)
-
+  if (!station) return
+  const sound = getStationAudio(station.id, station.trackSrcs)
+  const audio = sound.element
   if (startAt !== undefined) {
     if (Number.isFinite(audio.duration) && audio.duration > 0) {
       audio.currentTime = Math.min(startAt, Math.max(0, audio.duration - 0.05))
@@ -337,86 +130,34 @@ const ensureStationPlayback = (stationId: string, startAt?: number) => {
       pendingInitialSeek.set(stationId, startAt)
     }
   }
-
-  void audio.play().catch(() => undefined)
+  void sound.play()
 }
 
-/**
- * Синхронизирует ВСЕ источники звука.
- *
- * Ключевой момент:
- * аудио никогда не перезапускается при смене громкости
- * или частоты.
- *
- * Мы меняем только GainNode.
- */
 const syncAudio = (state: Pick<RadioState, 'isPowered' | 'volume' | 'frequency'>) => {
-  try {
-    ensureNoise()
-
-    const context = getAudioContext()
-    // const master = getMasterGain()
-
-    if (context.state === 'suspended' && state.isPowered) {
-      void context.resume()
-    }
-
-    // Множитель громкости шума (0.7 = 70% от текущей громкости)
-    const NOISE_VOLUME_MULTIPLIER = 0.5 // 50% от обычной громкости шума
-
-    /**
-     * Все станции постоянно проигрываются в фоне.
-     *
-     * Но слышна только та, которая соответствует
-     * текущей частоте.
-     */
-    radioStations.forEach((station) => {
-      const audio = getStationAudio(station.id, station.trackSrcs)
-
-      const gain = stationGains.get(station.id)
-
-      if (!gain) {
-        return
-      }
-
-      const stationVolume = state.isPowered
-        ? state.volume * getStationSignal(station.frequency, state.frequency)
-        : 0
-
-      rampGain(gain, stationVolume)
-
-      /**
-       * play() здесь не начинает трек заново.
-       *
-       * Если audio уже играет — браузер просто
-       * оставляет его на текущей позиции.
-       */
-      if (audio.paused) {
-        void audio.play().catch(() => undefined)
-      }
+  if (!state.isPowered) {
+    noise?.setVolume(0)
+    stationAudio.forEach((sound) => {
+      sound.setVolume(0)
+      sound.pause()
     })
-
+    return
+  }
+  try {
+    void audioController.unlock()
+    noise ??= audioController.createNoiseLoop()
+    radioStations.forEach((station) => {
+      const sound = getStationAudio(station.id, station.trackSrcs)
+      sound.setVolume(
+        state.volume * RADIO_MIX.station * getStationSignal(station.frequency, state.frequency),
+      )
+      // Volume/frequency changes retain the playback position of every station.
+      if (sound.element.paused) void sound.play()
+    })
     const nearest = getNearestStation(state.frequency)
-
     const distance = Math.abs(nearest.frequency - state.frequency)
-
-    const noisePercent = getNoisePercent(nearest.id, distance)
-
-    if (noiseGain) {
-      const noiseVolume = state.isPowered
-        ? state.volume * noisePercent * NOISE_VOLUME_MULTIPLIER
-        : 0
-
-      rampGain(noiseGain, noiseVolume)
-    }
+    noise.setVolume(state.volume * RADIO_MIX.noise * getNoisePercent(nearest.id, distance))
   } catch {
-    /**
-     * Браузер может запретить AudioContext
-     * до первого пользовательского действия.
-     *
-     * В этом случае просто ждём следующего
-     * взаимодействия пользователя.
-     */
+    // Retry on the next user interaction if audio is unavailable.
   }
 }
 
@@ -540,43 +281,12 @@ export const useRadioStore = create<RadioState>()(
 
 export const syncRadioAudio = () => syncAudio(useRadioStore.getState())
 
-/**
- * При HMR / обновлении кода
- * плавно выключаем весь звук.
- *
- * Это также защищает от ситуации,
- * когда старый AudioContext остаётся
- * играть вместе с новым.
- */
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
-    stationGains.forEach((gain) => {
-      rampGain(gain, 0)
-    })
-
-    if (noiseGain) {
-      rampGain(noiseGain, 0)
-    }
-
-    stationAudio.forEach((audio) => {
-      audio.pause()
-    })
-
-    if (noiseSource) {
-      try {
-        noiseSource.stop()
-      } catch {
-        // Источник мог уже быть остановлен.
-      }
-
-      noiseSource.disconnect()
-      noiseSource = null
-    }
-
-    if (noiseGain) {
-      noiseGain.disconnect()
-      noiseGain = null
-    }
+    stationAudio.forEach((sound) => sound.dispose())
+    stationAudio.clear()
+    noise?.dispose()
+    noise = null
   })
 }
 

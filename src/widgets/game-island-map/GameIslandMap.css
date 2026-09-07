@@ -47,6 +47,26 @@
     filter 0.16s ease,
     background 0.16s ease;
 }
+.game-island-map__beach-area {
+  position: absolute;
+  width: clamp(118px, 16vw, 250px);
+  height: clamp(84px, 12vw, 170px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: e-resize;
+  translate: -50% -50%;
+}
+.game-island-map__beach-area:hover,
+.game-island-map__beach-area:focus-visible {
+  outline: none;
+}
+.game-island-map__beach-area:hover .game-island-map__tooltip,
+.game-island-map__beach-area:focus-visible .game-island-map__tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
 .game-island-map__marker:hover,
 .game-island-map__marker:focus-visible {
   z-index: 2;
