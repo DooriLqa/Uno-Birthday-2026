@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import playerImage from '@/assets/flappy-bird/aaaa.png'
+import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import './FlappyBirdGame.css'
 
 type Props = { onComplete: () => void }
@@ -31,21 +32,26 @@ type GameState = {
   completed: boolean
 }
 
+const FLAPPY_GAME_KEY = 'flappy-game'
 const GAME_WIDTH = 720
 const GAME_HEIGHT = 440
 const BIRD_X = 154
 const BIRD_SIZE = 28
 const PIPE_WIDTH = 66
-const PIPE_GAP = 170
+const PIPE_GAP = 160
 const PIPE_SPEED = 190
 const GRAVITY = 1080
-const FLAP_VELOCITY = -500
+const FLAP_VELOCITY = -470
 const GLIDE_SPEED = 55
 const FIRST_PIPE_X = 480
 const COINS_TO_COMPLETE = 20
 const COIN_SPAWN_INTERVAL = 1.1
 const COIN_SIZE = 24
 const COIN_SPEED = PIPE_SPEED
+const SCREAM_SOUND = '/audio/sfx/scream.MP3'
+const START_SOUND = '/audio/sfx/bird.MP3'
+const WIN_SOUND = '/audio/sfx/winSound.MP3'
+const COIN_SOUND = '/audio/sfx/coin.mp3'
 
 const createInitialState = (): GameState => ({
   birdY: GAME_HEIGHT / 2 - BIRD_SIZE / 2,
@@ -64,7 +70,7 @@ const createInitialState = (): GameState => ({
 const createPipe = (id: number, x: number): Pipe => ({
   id,
   x,
-  gapTop: id === 1 ? (GAME_HEIGHT - PIPE_GAP) / 2 : 90 + Math.random() * 70,
+  gapTop: id === 1 ? (GAME_HEIGHT - PIPE_GAP) / 2 : 90 + Math.random() * 100,
   counted: false,
 })
 
@@ -120,6 +126,7 @@ export function FlappyBirdGame({ onComplete }: Props) {
     }
 
     const isFirstFlap = current.pipes.length === 0
+    const isGameStart = !current.running
     updateGame({
       ...current,
       running: true,
@@ -127,7 +134,8 @@ export function FlappyBirdGame({ onComplete }: Props) {
       pipes: isFirstFlap ? [createPipe(1, FIRST_PIPE_X)] : current.pipes,
       nextPipeId: isFirstFlap ? 2 : current.nextPipeId,
     })
-  }, [updateGame])
+    if (isGameStart) playOneShotSound(START_SOUND, FLAPPY_GAME_KEY)
+  }, [playOneShotSound, updateGame])
 
   const startHolding = useCallback(() => {
     if (holdingRef.current) return
@@ -212,6 +220,7 @@ export function FlappyBirdGame({ onComplete }: Props) {
 
           if (overlapsBird) {
             collectedCoins += 1
+            playOneShotSound(COIN_SOUND, FLAPPY_GAME_KEY, 0.1)
             return false
           }
           return coin.x > -COIN_SIZE - 10
@@ -232,6 +241,12 @@ export function FlappyBirdGame({ onComplete }: Props) {
         })
         const hitBoundary = birdBottom >= GAME_HEIGHT
         const gameOver = hitBoundary || birdHitPipe
+
+        if (gameOver && !current.gameOver) {
+          playOneShotSound(SCREAM_SOUND, FLAPPY_GAME_KEY)
+        } else if (collectedCoins >= COINS_TO_COMPLETE && !current.completed) {
+          playOneShotSound(WIN_SOUND, FLAPPY_GAME_KEY)
+        }
 
         updateGame({
           ...current,
@@ -256,7 +271,7 @@ export function FlappyBirdGame({ onComplete }: Props) {
     return () => {
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
     }
-  }, [updateGame])
+  }, [playOneShotSound, updateGame])
 
   const restart = () => {
     updateGame(createInitialState())

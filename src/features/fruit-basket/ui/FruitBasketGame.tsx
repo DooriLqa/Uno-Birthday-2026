@@ -9,6 +9,7 @@ import moneyImage from '@/assets/fruit-basket/money.png'
 import x2Image from '@/assets/fruit-basket/2x.png'
 import magnetImage from '@/assets/fruit-basket/magnet.png'
 import unuasherThiefImage from '@/assets/fruit-basket/unuasherThief.png'
+import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import './FruitBasketGame.css'
 
 type Props = { onComplete: () => void }
@@ -37,7 +38,8 @@ type GameState = {
   magnetUntil: number | null
 }
 
-const TARGET_SCORE = 20
+const BASKET_GAME_KEY = 'basket-game'
+const TARGET_SCORE = 30
 const MAX_LIVES = 5
 const BASKET_CATCH_WIDTH = 15
 const BASKET_CATCH_OFFSET = 0
@@ -61,11 +63,18 @@ const FULL_BASKET_SPAWN_INTERVAL = ITEM_SPAWN_INTERVAL * 4
 // Скорость притягивания магнитом
 const MAGNET_SPEED_MULTIPLIER = 2
 
-const BONUS_SPAWN_INTERVAL_SECONDS = 5
-const MAGNET_DURATION_SECONDS = 10
+const BONUS_SPAWN_INTERVAL_SECONDS = 12
+const MAGNET_DURATION_SECONDS = 8
 
 const BONUS_SPAWN_INTERVAL = BONUS_SPAWN_INTERVAL_SECONDS * 1000
 const MAGNET_DURATION = MAGNET_DURATION_SECONDS * 1000
+
+const LOOSE_SOUND = '/audio/sfx/blya.MP3'
+const START_SOUND = '/audio/sfx/pognali.MP3'
+const WIN_SOUND = '/audio/sfx/winSound.MP3'
+const COIN_SOUND = '/audio/sfx/coin.mp3'
+const HANDCUFFS_SOUND = '/audio/sfx/handcuffs.mp3'
+const CATCH_SOUND = '/audio/sfx/location-footsteps.ogg'
 
 const GOOD_ITEMS = [
   gemImage,
@@ -148,6 +157,8 @@ export function FruitBasketGame({ onComplete }: Props) {
   useEffect(() => {
     addPawCoinsRef.current = addPawCoins
   }, [addPawCoins])
+
+  const isGameStart = !gameRef.current.won && !gameRef.current.gameOver
 
   // Управление корзиной
   useEffect(() => {
@@ -271,10 +282,12 @@ export function FruitBasketGame({ onComplete }: Props) {
       STARTUP_ITEM_SPAWN_INTERVAL,
     )
 
+    if (isGameStart) playOneShotSound(START_SOUND, BASKET_GAME_KEY)
+
     return () => {
       window.clearTimeout(spawnTimer)
     }
-  }, [])
+  }, [playOneShotSound])
 
   // Отдельный спавн бонусов
   useEffect(() => {
@@ -436,6 +449,7 @@ export function FruitBasketGame({ onComplete }: Props) {
                   basketLoad <
                   MAX_BASKET_LOAD
                 ) {
+                  playOneShotSound(CATCH_SOUND, BASKET_GAME_KEY)
                   basketLoad += 1
                 }
 
@@ -463,6 +477,7 @@ export function FruitBasketGame({ onComplete }: Props) {
 
               // Плохой предмет
               if (item.kind === 'bad') {
+                playOneShotSound(HANDCUFFS_SOUND, BASKET_GAME_KEY)
                 lives -= 1
                 continue
               }
@@ -524,7 +539,7 @@ export function FruitBasketGame({ onComplete }: Props) {
           score +=
             basketLoad *
             (x2Active ? 2 : 1)
-
+          playOneShotSound(COIN_SOUND, BASKET_GAME_KEY, 0.1)
           basketLoad = 0
 
           // После сдачи x2 обязательно
@@ -559,6 +574,12 @@ export function FruitBasketGame({ onComplete }: Props) {
         if (won) {
           addPawCoinsRef.current(1)
           completeRef.current()
+        }
+
+        if (gameOver && !current.gameOver) {
+          playOneShotSound(LOOSE_SOUND, BASKET_GAME_KEY)
+        } else if (won && !current.gameOver) {
+          playOneShotSound(WIN_SOUND, BASKET_GAME_KEY)
         }
 
         return {
