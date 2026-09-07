@@ -1,3 +1,5 @@
+import treasureOpen from '@/shared/assets/robot/treasure-open.png'
+import treasurePile from '@/shared/assets/robot/treasure-pile.png'
 import { useEffect, useState } from 'react'
 import './RobotMazeGame.css'
 
@@ -10,7 +12,7 @@ const EXIT = 3
 const CHEST = 4
 
 const STORAGE_KEY = 'robotMazeProgress'
-const CELL_SIZE = 48
+const CELL_SIZE = 72
 
 type Direction = 'up' | 'right' | 'down' | 'left'
 type CommandType = 'forward' | 'left' | 'right'
@@ -742,15 +744,17 @@ export function RobotMazeGame({ onComplete }: Props) {
   return (
     <div className="RobotMaze">
       <div className="RobotMaze__header">
+        <div className="RobotMaze__levels">
+          <div className="RobotMaze__level">
+            Пройдено: {playedLevels.length} / {levels.length}
+          </div>
+
+          <div className="RobotMaze__level">
+            Монеты: {collectedCoins} / {totalCoins} 🪙
+          </div>
+        </div>
+
         <h1 className="RobotMaze__title">Робот-лабиринт</h1>
-
-        <div className="RobotMaze__level">
-          Пройдено: {playedLevels.length} / {levels.length}
-        </div>
-
-        <div className="RobotMaze__level">
-          Монеты: {collectedCoins} / {totalCoins} 🪙
-        </div>
       </div>
 
       <div className="RobotMaze__content">
@@ -775,11 +779,13 @@ export function RobotMazeGame({ onComplete }: Props) {
 
                   {cell === CHEST && (
                     <div
-                      className={`RobotMaze__chest ${
-                        isChestOpened ? 'RobotMaze__chest--opened' : ''
-                      }`}
+                      className={`RobotMaze__chest ${isChestOpened ? 'RobotMaze__chest--opened' : ''
+                        }`}
                     >
-                      {isChestOpened ? '✨' : '📦'}
+                      <img
+                        src={isChestOpened ? treasureOpen : treasurePile}
+                        alt={isChestOpened ? 'Открытое сокровище' : 'Зарытое сокровище'}
+                      />
                     </div>
                   )}
 
@@ -790,7 +796,10 @@ export function RobotMazeGame({ onComplete }: Props) {
                         transform: `rotate(${getRobotRotation()}deg)`,
                       }}
                     >
-                      🤖
+                      <img
+                        src="/corgi-pirate.png"
+                        alt="Корги-пират"
+                      />
                     </div>
                   )}
                 </div>
@@ -813,9 +822,8 @@ export function RobotMazeGame({ onComplete }: Props) {
               return (
                 <div
                   key={index}
-                  className={`RobotMaze__slot ${
-                    currentCommand === index ? 'RobotMaze__slot--active' : ''
-                  }`}
+                  className={`RobotMaze__slot ${currentCommand === index ? 'RobotMaze__slot--active' : ''
+                    }`}
                 >
                   {command?.icon ?? ''}
                 </div>

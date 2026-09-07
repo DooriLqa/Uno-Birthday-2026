@@ -19,6 +19,7 @@ import type { GameDefinition } from '@/entities/game/model/types'
 import flappyBirdLagoonBackground from '@/shared/assets/flappy-bird/lagoon-cliff-vista-background.png'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
+import robotMazeGameBackground from '@/shared/assets/robot/background.png'
 
 const islandGame = {
   backgroundImage: islandMapImage,
@@ -249,7 +250,7 @@ export const games: GameDefinition[] = [
     target: 'выход из лабиринта',
     mapPosition: { left: '60%', top: '30%' },
     pageClassName: 'robot-maze-page',
-    ...islandGame,
+    backgroundImage: robotMazeGameBackground,
     Screen: RobotMazeGame,
   }
 ]
