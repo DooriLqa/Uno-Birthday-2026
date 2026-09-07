@@ -11,3 +11,10 @@ Source: https://opengameart.org/content/100-cc0-metal-and-wood-sfx
 
 License: [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
 Source: https://opengameart.org/content/ogazuhl-sound-effects
+
+## Location transition
+
+`location-footsteps.ogg` is `01-footstep.ogg` by GboxMikeFozzy from OpenGameArt.
+
+License: [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
+Source: https://opengameart.org/content/footsteps-0
