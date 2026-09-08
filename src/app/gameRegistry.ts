@@ -14,7 +14,7 @@ import { TotemCodeGame } from '@/features/totem-code'
 import { WackAMole } from '@/features/wack-a-mole'
 import { Arkanoid } from '@/features/arkanoid'
 import type { GameDefinition } from '@/entities/game/model/types'
-import flappyBirdLagoonBackground from '@/shared/assets/flappy-bird/lagoon-cliff-vista-background.png'
+import arcadeFrameImage from '@/shared/assets/flappy-bird/arcade-frame-transparent.png'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 import fishingScene from '@/shared/assets/locations/fishing.png'
@@ -74,7 +74,7 @@ export const games: GameDefinition[] = [
     target: '10 труб',
     mapPosition: { left: '60%', top: '23%' },
     pageClassName: 'flappy-bird-page',
-    backgroundImage: flappyBirdLagoonBackground,
+    backgroundImage: arcadeFrameImage,
     ...locationTransition,
     Screen: FlappyBirdGame,
   },
