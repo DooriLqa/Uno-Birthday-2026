@@ -371,10 +371,14 @@ body {
 
   width: 100%;
   height: 100%;
+}
 
-  font-size: clamp(20px, 3vw, 40px);
+.RobotMaze__exit img {
+  width: 100%;
+  height: 100%;
 
-  filter: drop-shadow(2px 3px 0 rgba(49, 36, 20, 0.35));
+  object-fit: contain;
+  display: block;
 }
 
 /* =========================================================

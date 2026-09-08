@@ -14,6 +14,8 @@ import corgiLeft from '@/shared/assets/robot/corgi-pirate-left.png'
 import cartTracks from '@/shared/assets/robot/cart-tracks.png'
 import cartTracksTurn from '@/shared/assets/robot/cart-tracks-turn.png'
 
+import exitCross from '@/shared/assets/robot/exit.png'
+
 import { useEffect, useState } from 'react'
 import './RobotMazeGame.css'
 
@@ -92,8 +94,8 @@ const levels: Level[] = [
       [0, 0, 1, 0, 0, 1, 0],
       [0, 2, 1, 0, 0, 1, 0],
       [0, 0, 1, 1, 1, 1, 0],
+      [0, 0, 0, 0, 0, 1, 0],
       [0, 0, 0, 0, 0, 3, 0],
-      [0, 0, 0, 0, 0, 0, 0],
     ],
     startRow: 3,
     startCol: 1,
@@ -125,7 +127,7 @@ const levels: Level[] = [
       [0, 0, 0, 1, 0, 1, 1, 0],
       [0, 1, 1, 1, 1, 1, 0, 0],
       [0, 1, 0, 0, 0, 1, 0, 0],
-      [0, 1, 1, 1, 1, 1, 3, 0],
+      [0, 1, 1, 1, 1, 1, 1, 3],
       [0, 0, 0, 0, 0, 0, 0, 0],
     ],
     startRow: 1,
@@ -141,7 +143,7 @@ const levels: Level[] = [
       [0, 0, 1, 0, 1, 0, 1, 0, 0],
       [0, 2, 1, 0, 1, 1, 1, 0, 0],
       [0, 0, 1, 1, 1, 0, 1, 0, 0],
-      [0, 0, 0, 0, 1, 1, 1, 3, 0],
+      [0, 0, 0, 0, 1, 1, 1, 1, 3],
       [0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
     startRow: 3,
@@ -152,7 +154,6 @@ const levels: Level[] = [
 
   {
     maze: [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 3, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 1, 1, 1, 4, 1, 1, 1, 1, 0],
       [0, 1, 0, 1, 0, 0, 0, 0, 1, 0],
@@ -162,7 +163,7 @@ const levels: Level[] = [
       [0, 0, 0, 0, 0, 0, 0, 0, 2, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
-    startRow: 7,
+    startRow: 6,
     startCol: 8,
     startDirection: 'up',
     maxCommands: 24,
@@ -175,7 +176,7 @@ const levels: Level[] = [
       [0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0],
       [0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
       [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-      [0, 1, 1, 1, 1, 4, 1, 1, 1, 3, 0],
+      [0, 1, 1, 1, 1, 4, 1, 1, 1, 1, 3],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
     startRow: 1,
@@ -191,8 +192,8 @@ const levels: Level[] = [
       [0, 0, 0, 1, 0, 1, 0, 1, 0],
       [0, 4, 1, 1, 1, 1, 0, 1, 0],
       [0, 0, 0, 0, 0, 1, 1, 1, 0],
+      [0, 0, 0, 0, 0, 0, 0, 1, 0],
       [0, 0, 0, 0, 0, 0, 0, 3, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
     startRow: 1,
     startCol: 1,
@@ -224,7 +225,7 @@ const levels: Level[] = [
       [0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0],
       [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
       [0, 1, 1, 1, 1, 4, 1, 1, 0, 1, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 3, 0],
+      [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 3],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
     startRow: 1,
@@ -1001,7 +1002,11 @@ export function RobotMazeGame({ onComplete }: Props) {
                       )
                     })}
 
-                  {cell === EXIT && <div className="RobotMaze__exit">🚪</div>}
+                  {cell === EXIT && (
+                    <div className="RobotMaze__exit">
+                      <img src={exitCross} alt="Выход" />
+                    </div>
+                  )}
 
                   {cell === CHEST && (
                     <div
