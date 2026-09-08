@@ -17,6 +17,7 @@ type Props = {
   onOpenDialogue: (dialogueId: 'merchant-greeting') => void
 }
 
+const LOCATION_TRANSITION_KEY = 'location-transition'
 const IMAGE_REVEAL_MS = 140
 
 async function preloadImage(source: string): Promise<ImageSize> {
@@ -142,7 +143,7 @@ export function LocationNavigator({
   const navigate = (nextLocationId: LocationId) => {
     if (transitionLock.current) return
 
-    playOneShotSound(locations[nextLocationId].transitionSound)
+    playOneShotSound(locations[nextLocationId].transitionSound, LOCATION_TRANSITION_KEY)
     setHistory((current) => [...current, scene])
     void changeScene({ locationId: nextLocationId, pan: 0 })
   }
@@ -162,7 +163,7 @@ export function LocationNavigator({
       return
     }
 
-    playOneShotSound(locations[previousScene.locationId].transitionSound)
+    playOneShotSound(locations[previousScene.locationId].transitionSound, LOCATION_TRANSITION_KEY)
     setHistory((current) => current.slice(0, -1))
     void changeScene(previousScene)
   }

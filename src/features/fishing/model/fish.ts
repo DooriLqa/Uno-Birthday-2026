@@ -5,7 +5,7 @@ export type Fish = {
   id: string
   name: string
   distance: FishingDistance
-  emoji: string
+  sprite: { column: number; row: number }
   behavior: FishBehavior
   speed: number
   jump: number
@@ -29,24 +29,160 @@ export const RARITIES = [
 ] as const
 
 export const FISH: Fish[] = [
-  { id: 'sand-sardine', name: 'Песчаная сардинка', distance: 'near', emoji: '🐟', behavior: 'smooth', speed: 1.4, jump: 0.9, description: 'Спокойная маленькая рыбка у самого берега.' },
-  { id: 'reef-goby', name: 'Рифовый бычок', distance: 'near', emoji: '🐠', behavior: 'sinker', speed: 1.6, jump: 1.4, description: 'Резко ныряет вниз и возвращается к камням.' },
-  { id: 'coral-perch', name: 'Коралловый окунь', distance: 'near', emoji: '🐟', behavior: 'mixed', speed: 1.8, jump: 1.5, description: 'Прыгает небольшими рывками.' },
-  { id: 'tiny-mackerel', name: 'Юркая скумбрия', distance: 'near', emoji: '🐟', behavior: 'dart', speed: 2, jump: 2.1, description: 'Маленькая, но неожиданно резкая.' },
-  { id: 'shellfish-bream', name: 'Ракушечный лещ', distance: 'near', emoji: '🐠', behavior: 'floater', speed: 1.5, jump: 1.3, description: 'Плавно всплывает и снова опускается.' },
-  { id: 'silver-mackerel', name: 'Серебряная скумбрия', distance: 'mid', emoji: '🐟', behavior: 'mixed', speed: 2.1, jump: 1.8, description: 'Классическая средняя морская рыба.' },
-  { id: 'coral-trout', name: 'Коралловая форель', distance: 'mid', emoji: '🐠', behavior: 'sinker', speed: 2.2, jump: 2, description: 'Ныряет быстрее, чем кажется.' },
-  { id: 'turquoise-bass', name: 'Бирюзовый бас', distance: 'mid', emoji: '🐟', behavior: 'dart', speed: 2.3, jump: 2.4, description: 'Двигается короткими хаотичными сериями.' },
-  { id: 'sunny-bream', name: 'Янтарный лещ', distance: 'mid', emoji: '🐠', behavior: 'floater', speed: 2, jump: 2.1, description: 'Любит резко всплывать к поверхности.' },
-  { id: 'striped-jack', name: 'Полосатый джек', distance: 'mid', emoji: '🐟', behavior: 'smooth', speed: 2.4, jump: 1.9, description: 'Быстро, но предсказуемо меняет направление.' },
-  { id: 'deep-marlin', name: 'Глубинный марлин', distance: 'far', emoji: '🐟', behavior: 'dart', speed: 2.7, jump: 2.6, description: 'Мощно мечется по всей глубине.' },
-  { id: 'storm-tuna', name: 'Штормовой тунец', distance: 'far', emoji: '🐟', behavior: 'sinker', speed: 2.6, jump: 2.4, description: 'После каждого разворота резко ускоряется.' },
-  { id: 'moon-snapper', name: 'Лунный снаппер', distance: 'far', emoji: '🐠', behavior: 'floater', speed: 2.4, jump: 2.5, description: 'Парит, а затем внезапно взмывает вверх.' },
-  { id: 'ocean-giant', name: 'Океанский гигант', distance: 'far', emoji: '🐟', behavior: 'mixed', speed: 2.9, jump: 2.3, description: 'Тяжёлая рыба с длинными рывками.' },
-  { id: 'golden-swordfish', name: 'Золотой меч-рыба', distance: 'far', emoji: '🐠', behavior: 'dart', speed: 3.1, jump: 2.8, description: 'Почти не сидит на одном месте.' },
+  {
+    id: 'perch',
+    name: 'Окунь',
+    distance: 'near',
+    sprite: { column: 0, row: 0 },
+    behavior: 'smooth',
+    speed: 2,
+    jump: 2,
+    description: 'Полосатый хищник, который спокойно держится у берега.',
+  },
+  {
+    id: 'herring',
+    name: 'Сельдь',
+    distance: 'near',
+    sprite: { column: 1, row: 0 },
+    behavior: 'sinker',
+    speed: 2.2,
+    jump: 2.2,
+    description: 'Серебристая стайная рыбка, быстро уходящая в глубину.',
+  },
+  {
+    id: 'largemouth-bass',
+    name: 'Большеротый бас',
+    distance: 'near',
+    sprite: { column: 2, row: 0 },
+    behavior: 'mixed',
+    speed: 2.3,
+    jump: 2.3,
+    description: 'Крепкий хищник с широкой пастью и резкими рывками.',
+  },
+  {
+    id: 'goldfish',
+    name: 'Золотая рыбка',
+    distance: 'near',
+    sprite: { column: 3, row: 0 },
+    behavior: 'dart',
+    speed: 2.5,
+    jump: 2.5,
+    description: 'Яркая декоративная рыбка, неожиданно юркая в воде.',
+  },
+  {
+    id: 'rainbow-trout',
+    name: 'Радужная форель',
+    distance: 'near',
+    sprite: { column: 4, row: 0 },
+    behavior: 'floater',
+    speed: 1.5,
+    jump: 5,
+    description: 'Пятнистая форель, любит всплывать и снова уходить вниз.',
+  },
+  {
+    id: 'catfish',
+    name: 'Сом',
+    distance: 'mid',
+    sprite: { column: 0, row: 1 },
+    behavior: 'mixed',
+    speed: 6,
+    jump: 0.7,
+    description: 'Усатый донный гигант, который двигается тяжело и уверенно.',
+  },
+  {
+    id: 'tuna',
+    name: 'Тунец',
+    distance: 'mid',
+    sprite: { column: 1, row: 1 },
+    behavior: 'sinker',
+    speed: 1.6,
+    jump: 3,
+    description: 'Сильная морская рыба с обтекаемым телом и быстрым ходом.',
+  },
+  {
+    id: 'pike',
+    name: 'Щука',
+    distance: 'mid',
+    sprite: { column: 2, row: 1 },
+    behavior: 'dart',
+    speed: 1.5,
+    jump: 2.5,
+    description: 'Длинный хищник, способный внезапно броситься за добычей.',
+  },
+  {
+    id: 'rockfish',
+    name: 'Морской окунь',
+    distance: 'mid',
+    sprite: { column: 3, row: 1 },
+    behavior: 'floater',
+    speed: 4,
+    jump: 1.2,
+    description: 'Крепкая красная рыба, предпочитающая скалистые участки.',
+  },
+  {
+    id: 'bream',
+    name: 'Лещ',
+    distance: 'mid',
+    sprite: { column: 4, row: 1 },
+    behavior: 'smooth',
+    speed: 2,
+    jump: 2,
+    description: 'Спокойная серебристая рыба, плавно меняющая направление.',
+  },
+  {
+    id: 'flounder',
+    name: 'Камбала',
+    distance: 'far',
+    sprite: { column: 0, row: 2 },
+    behavior: 'dart',
+    speed: 2.5,
+    jump: 1.5,
+    description: 'Плоская донная рыба, почти незаметная среди камней и песка.',
+  },
+  {
+    id: 'sergeant-major',
+    name: 'Сержант-майор',
+    distance: 'far',
+    sprite: { column: 1, row: 2 },
+    behavior: 'sinker',
+    speed: 2,
+    jump: 2,
+    description: 'Полосатая рифовая рыбка, ловко снующая между кораллами.',
+  },
+  {
+    id: 'parrotfish',
+    name: 'Рыба-попугай',
+    distance: 'far',
+    sprite: { column: 2, row: 2 },
+    behavior: 'floater',
+    speed: 3,
+    jump: 2,
+    description: 'Яркая тропическая рыба, медленно скользящая над рифом.',
+  },
+  {
+    id: 'garfish',
+    name: 'Сарган',
+    distance: 'far',
+    sprite: { column: 3, row: 2 },
+    behavior: 'mixed',
+    speed: 2,
+    jump: 2,
+    description: 'Тонкая стремительная рыба с длинной острой мордой.',
+  },
+  {
+    id: 'carp',
+    name: 'Карп',
+    distance: 'far',
+    sprite: { column: 4, row: 2 },
+    behavior: 'dart',
+    speed: 2,
+    jump: 2,
+    description: 'Крупная золотистая рыба, способная дать сильный рывок.',
+  },
 ]
 
-export const getRarity = (rarity: FishRarity) => RARITIES.find((item) => item.id === rarity) ?? RARITIES[0]
+export const getRarity = (rarity: FishRarity) =>
+  RARITIES.find((item) => item.id === rarity) ?? RARITIES[0]
 
 const DISTANCE_RARITY_WEIGHTS: Record<FishingDistance, Record<FishRarity, number>> = {
   near: { common: 50, uncommon: 30, rare: 13, epic: 5, legendary: 2 },
@@ -71,4 +207,4 @@ export function pickFish(distance: FishingDistance) {
 }
 
 export const rarityDifficulty = (rarity: FishRarity) =>
-  ({ common: 0.7, uncommon: 1, rare: 1.3, epic: 1.7, legendary: 2.5 })[rarity]
+  ({ common: 0.8, uncommon: 1.2, rare: 1.6, epic: 2.1, legendary: 2.7 })[rarity]
