@@ -257,13 +257,11 @@ export const games: GameDefinition[] = [
     emoji: '🤖',
     color: '#a2c9f0',
     target: 'выход из лабиринта',
-
     mapPosition: { left: '60%', top: '30%' },
     pageClassName: 'robot-maze-page',
     backgroundImage: robotMazeGameBackground,
     Screen: RobotMazeGame,
-  }
-  } 
+  },
 ]
 
 export const getGame = (gameId: string | null) => games.find((game) => game.id === gameId)
