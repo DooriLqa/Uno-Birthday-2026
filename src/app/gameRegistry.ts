@@ -17,6 +17,7 @@ import type { GameDefinition } from '@/entities/game/model/types'
 import flappyBirdLagoonBackground from '@/shared/assets/flappy-bird/lagoon-cliff-vista-background.png'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
+import findAPairBackground from '@/shared/assets/find-a-pair/findapairbackground.png'
 
 const locationTransition = {
   transitionSound: '/audio/sfx/location-footsteps.ogg',
@@ -176,7 +177,9 @@ export const games: GameDefinition[] = [
     color: '#d8c5e8',
     target: 'все пары',
     mapPosition: { left: '42%', top: '30%' },
-    ...islandGame,
+    pageClassName: 'find-a-pair-page',
+    backgroundImage: findAPairBackground,
+    ...locationTransition,
     Screen: FindAPair,
   },
   {
