@@ -10,7 +10,7 @@ const RADIO_STEP = 0.1
 const MAX_TUNING_DISTANCE = 0.2
 
 // Local mix coefficients; the controller applies master volume after this mix.
-const RADIO_MIX = { station: 1, noise: 1 }
+const RADIO_MIX = { station: 1, noise: 0.3 }
 let noise: ReturnType<typeof audioController.createNoiseLoop> | null = null
 const stationAudio = new Map<string, Sound>()
 const stationTrackIndexes = new Map<string, number>()
