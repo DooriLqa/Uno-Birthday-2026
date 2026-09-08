@@ -238,7 +238,7 @@ export const games: GameDefinition[] = [
     ...islandGame,
     Screen: FishingGame,
   },
-  /* {
+  {
     id: 'japonsk',
     title: 'Японский кроссворд',
     description: 'Реши японский кроссворд.',
@@ -257,15 +257,13 @@ export const games: GameDefinition[] = [
     emoji: '🤖',
     color: '#a2c9f0',
     target: 'выход из лабиринта',
-<<<<<<< HEAD
+
     mapPosition: { left: '60%', top: '30%' },
     pageClassName: 'robot-maze-page',
     backgroundImage: robotMazeGameBackground,
     Screen: RobotMazeGame,
   }
-=======
-  } */
->>>>>>> 767173c2435d1247fbeba08fcf40815ef0619209
+  } 
 ]
 
 export const getGame = (gameId: string | null) => games.find((game) => game.id === gameId)
