@@ -1,5 +1,4 @@
 import { Map as MapIcon, Radio as RadioIcon, Volume2 } from 'lucide-react'
-import type { CSSProperties } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import { useRadioStore } from '@/features/beach-radio/model/radioStore'
@@ -7,13 +6,7 @@ import './GameHud.css'
 
 const EMPTY_SLOTS = 2
 const RADIO_ITEM_ID = 'beach-radio'
-const RARITY_COLORS = {
-  common: '#f2f2f2',
-  uncommon: '#57d46f',
-  rare: '#45a8ff',
-  epic: '#b66cff',
-  legendary: '#ff9d32',
-} as const
+const CORRECT_STATION_ID = 'station-06'
 
 type Props = {
   onOpenRadio?: () => void
@@ -24,9 +17,11 @@ export function GameHud({ onOpenRadio, onOpenMap }: Props) {
   const pawCoins = usePawCoinStore((state) => state.pawCoins)
   const inventory = useInventoryStore((state) => state.items)
   const isPowered = useRadioStore((state) => state.isPowered)
+  const discoveredStationIds = useRadioStore((state) => state.discoveredStationIds)
   const volume = useRadioStore((state) => state.volume)
   const setPowered = useRadioStore((state) => state.setPowered)
   const setVolume = useRadioStore((state) => state.setVolume)
+  const radioFound = discoveredStationIds.includes(CORRECT_STATION_ID)
 
   return (
     <div className="game-hud" aria-label="Игровой интерфейс">
@@ -64,40 +59,42 @@ export function GameHud({ onOpenRadio, onOpenMap }: Props) {
           </div>
         </div>
 
-        <div className="game-hud__radio-widget" aria-label="Управление радиоприёмником">
-          <button
-            type="button"
-            className={`game-hud__radio-power ${isPowered ? 'is-on' : ''}`}
-            onClick={() => setPowered(!isPowered)}
-            aria-label={isPowered ? 'Выключить радио' : 'Включить радио'}
-            title={isPowered ? 'Выключить радио' : 'Включить радио'}
-          >
-            <RadioIcon size={18} />
-          </button>
-          <label className="game-hud__radio-volume" title="Громкость радио">
-            <Volume2 size={15} />
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={(event) => setVolume(Number(event.target.value))}
-              aria-label="Громкость радио"
-            />
-          </label>
-          {onOpenRadio && (
+        {radioFound && (
+          <div className="game-hud__radio-widget" aria-label="Управление радиоприёмником">
             <button
               type="button"
-              className="game-hud__radio-open"
-              onClick={onOpenRadio}
-              aria-label="Открыть радиоприёмник"
-              title="Открыть радиоприёмник"
+              className={`game-hud__radio-power ${isPowered ? 'is-on' : ''}`}
+              onClick={() => setPowered(!isPowered)}
+              aria-label={isPowered ? 'Выключить радио' : 'Включить радио'}
+              title={isPowered ? 'Выключить радио' : 'Включить радио'}
             >
-              Настроить
+              <RadioIcon size={18} />
             </button>
-          )}
-        </div>
+            <label className="game-hud__radio-volume" title="Громкость радио">
+              <Volume2 size={15} />
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={(event) => setVolume(Number(event.target.value))}
+                aria-label="Громкость радио"
+              />
+            </label>
+            {onOpenRadio && (
+              <button
+                type="button"
+                className="game-hud__radio-open"
+                onClick={onOpenRadio}
+                aria-label="Открыть радиоприёмник"
+                title="Открыть радиоприёмник"
+              >
+                Настроить
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -108,18 +105,8 @@ function InventorySlot({ item, onOpenRadio }: { item: InventoryItem; onOpenRadio
 
   if (!isRadio || !onOpenRadio) {
     return (
-      <span
-        className={`game-hud__slot ${item.rarity ? 'game-hud__slot--rarity' : ''}`}
-        style={
-          item.rarity
-            ? ({ '--rarity-color': RARITY_COLORS[item.rarity] } as CSSProperties)
-            : undefined
-        }
-        title={item.name}
-        aria-label={item.name}
-      >
+      <span className={`game-hud__slot`} title={item.name} aria-label={item.name}>
         <span>{item.icon}</span>
-        {item.quantity && item.quantity > 1 ? <small>{item.quantity}</small> : null}
       </span>
     )
   }

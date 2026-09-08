@@ -18,6 +18,7 @@ import flappyBirdLagoonBackground from '@/shared/assets/flappy-bird/lagoon-cliff
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
 import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 import findAPairBackground from '@/shared/assets/find-a-pair/findapairbackground.png'
+import fishingScene from '@/shared/assets/locations/fishing.png'
 
 const locationTransition = {
   transitionSound: '/audio/sfx/location-footsteps.ogg',
@@ -235,7 +236,8 @@ export const games: GameDefinition[] = [
     target: 'рыбу',
     mapPosition: { left: '58%', top: '22%' },
     pageClassName: 'fishing-page',
-    ...islandGame,
+    backgroundImage: fishingScene,
+    ...locationTransition,
     Screen: FishingGame,
   },
   /* {
