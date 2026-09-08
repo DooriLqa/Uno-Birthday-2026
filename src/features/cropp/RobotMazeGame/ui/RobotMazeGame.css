@@ -1,43 +1,147 @@
 /* =========================================================
-   ROBOT MAZE
+   СБРОС СТРАНИЦЫ
+   ========================================================= */
+
+html,
+body,
+#root {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  margin: 0;
+  padding: 0;
+
+  box-sizing: border-box;
+
+  overflow: clip;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+body {
+  width: 100vw;
+  height: 100dvh;
+
+  overflow: clip;
+}
+
+/* =========================================================
+   ОСНОВНОЙ ЭКРАН
    ========================================================= */
 
 .RobotMaze {
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  padding: 20px;
+  --robot-cell-size: min(72px, calc((100dvh - 120px) / 9), calc((100vw - 600px) / 12));
+
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: 100vw;
+  height: 100dvh;
+
+  min-width: 0;
+  min-height: 0;
+
+  max-width: 100vw;
+  max-height: 100dvh;
+
+  margin: 0;
+  padding: 12px 20px;
+
   box-sizing: border-box;
 
+  overflow: clip;
+
   color: #fff3c9;
-  overflow: hidden;
 
   background: transparent;
 }
 
-/* ФОН ПИРАТСКОГО ОСТРОВА */
+.RobotMaze__cell {
+  position: relative;
+  width: var(--robot-cell-size);
+  height: var(--robot-cell-size);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.RobotMaze__cart-track {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  object-position: center;
+
+  display: block;
+  pointer-events: none;
+
+  z-index: 1;
+
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotate(var(--track-rotation));
+}
+
+/* =========================================================
+   ФОН
+   ========================================================= */
+
 .RobotMaze::before {
   content: '';
+
   position: absolute;
-  inset: 0;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
 
   background-image: url('../../../../shared/assets/robot/background.png');
+
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 
+  background-color: transparent;
+
   z-index: 0;
+
+  pointer-events: none;
 }
 
-/* Весь интерфейс игры поверх фона */
 .RobotMaze > * {
   position: relative;
   z-index: 1;
 }
 
-
 /* =========================================================
-   HEADER
+   ЗАГОЛОВОК
    ========================================================= */
 
 .RobotMaze__header {
@@ -46,91 +150,171 @@
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 
   width: 100%;
-  max-width: 1400px;
+  min-width: 0;
 
-  margin: 0 auto 20px;
+  height: 46px;
+
+  margin: 0 auto 6px;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
 }
 
 .RobotMaze__title {
+  max-width: 100%;
+
   margin: 0;
 
-  font-size: 32px;
-  font-weight: 800;
+  font-size: clamp(20px, 2.2vw, 32px);
+  line-height: 1;
+  font-weight: 900;
 
   color: #fff3c9;
+
+  text-align: center;
 
   text-shadow:
     2px 2px 0 rgba(61, 34, 16, 0.8),
     3px 3px 0 rgba(0, 0, 0, 0.2);
 }
 
-.RobotMaze__level {
-  padding: 9px 17px;
-
-  border-radius: 20px;
-
-  background: rgba(75, 45, 21, 0.78);
-
-  color: #fff3c9;
-
-  font-weight: 800;
-
-  border: 1px solid rgba(255, 228, 160, 0.55);
-
-  box-shadow:
-    0 3px 0 rgba(59, 27, 11, 0.45);
-}
-
-
 /* =========================================================
-   CONTENT
+   ОСНОВНАЯ СЕТКА
    ========================================================= */
 
 .RobotMaze__content {
   position: relative;
   z-index: 2;
 
-  display: flex;
-  flex-direction: column;
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 190px)
+    minmax(0, 1fr)
+    minmax(0, 330px);
+
   align-items: center;
 
   width: 100%;
-  max-width: 1400px;
+  max-width: 1500px;
+
+  min-width: 0;
+  min-height: 0;
+
+  height: calc(100dvh - 64px);
+  max-height: calc(100dvh - 64px);
 
   margin: 0 auto;
+
+  column-gap: clamp(8px, 1.5vw, 24px);
+
+  overflow: clip;
 }
 
+/* =========================================================
+   ЛЕВАЯ ПАНЕЛЬ
+   ========================================================= */
+
+.RobotMaze__sidebar {
+  position: relative;
+  z-index: 3;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  padding: 16px 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  justify-content: center;
+
+  border-radius: 16px;
+
+  background: linear-gradient(180deg, rgba(106, 61, 27, 0.97), rgba(61, 31, 13, 0.98));
+
+  border: 3px solid rgba(49, 25, 10, 0.95);
+
+  box-shadow:
+    inset 0 0 0 2px rgba(221, 166, 92, 0.18),
+    0 7px 0 rgba(45, 22, 8, 0.55),
+    0 12px 25px rgba(35, 18, 7, 0.3);
+
+  color: #fff3c9;
+
+  overflow: hidden;
+}
+
+.RobotMaze__level {
+  width: 100%;
+  min-width: 0;
+
+  padding: 12px 8px;
+
+  border-radius: 10px;
+
+  background: rgba(48, 25, 11, 0.48);
+
+  color: #fff3c9;
+
+  text-align: center;
+
+  font-size: clamp(11px, 1vw, 14px);
+  line-height: 1.35;
+  font-weight: 800;
+
+  border: 1px solid rgba(255, 228, 160, 0.2);
+}
+
+.RobotMaze__levels {
+  display: contents;
+}
 
 /* =========================================================
-   MAZE
+   ЛАБИРИНТ
    ========================================================= */
 
 .RobotMaze__maze {
   display: grid;
+
   gap: 0;
+
+  width: max-content;
+  height: max-content;
+
+  max-width: 100%;
+  max-height: 100%;
+
   padding: 0;
 
+  justify-self: center;
+  align-self: center;
+
   background: transparent;
+
   border: none;
-  border-radius: 0;
+
   box-shadow: none;
 
   overflow: visible;
 }
 
-
 /* =========================================================
-   CELLS
+   КЛЕТКА
    ========================================================= */
 
 .RobotMaze__cell {
   position: relative;
 
-  width: 72px;
-  height: 72px;
+  width: var(--robot-cell-size);
+  height: var(--robot-cell-size);
 
   box-sizing: border-box;
 
@@ -139,36 +323,33 @@
   justify-content: center;
 
   flex-shrink: 0;
+
+  background: transparent;
 }
 
-
 /* =========================================================
-   FLOOR
+   ПРОЗРАЧНЫЕ ТАЙЛЫ
    ========================================================= */
 
 .RobotMaze__cell--1,
 .RobotMaze__cell--2,
 .RobotMaze__cell--3,
 .RobotMaze__cell--4 {
-  background-color: transparent;
-
-  background-image: url('../../../../shared/assets/robot/tile.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background: transparent;
+  background-image: none;
 
   border: none;
 }
 
-
 /* =========================================================
-   WALL
+   СТЕНЫ
    ========================================================= */
 
 .RobotMaze__cell--0 {
   background-color: transparent;
 
   background-image: url('../../../../shared/assets/robot/wall.png');
+
   background-position: center;
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -178,59 +359,27 @@
   box-shadow: none;
 }
 
-
 /* =========================================================
-   START
+   ВЫХОД
    ========================================================= */
-
-.RobotMaze__cell--2 {
-  background-color: transparent;
-
-  background-image: url('../../../../shared/assets/robot/tile.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-
-  border: none;
-}
-
-
-/* =========================================================
-   EXIT
-   ========================================================= */
-
-.RobotMaze__cell--3 {
-  background-color: transparent;
-
-  background-image: url('../../../../shared/assets/robot/tile.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-
-  border: none;
-}
 
 .RobotMaze__exit {
-  font-size: 40px;
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  font-size: clamp(20px, 3vw, 40px);
+
   filter: drop-shadow(2px 3px 0 rgba(49, 36, 20, 0.35));
 }
 
-
-
 /* =========================================================
-   CHEST
+   СОКРОВИЩЕ
    ========================================================= */
-
-.RobotMaze__cell--4 {
-  background-color: transparent;
-
-  background-image: url('../../../../shared/assets/robot/tile.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-
-  border: none;
-}
 
 .RobotMaze__chest {
   position: relative;
@@ -242,9 +391,7 @@
   align-items: center;
   justify-content: center;
 
-  filter:
-    drop-shadow(2px 3px 0 rgba(79, 51, 24, 0.3));
-
+  filter: none;
 }
 
 .RobotMaze__chest img {
@@ -257,122 +404,83 @@
 }
 
 .RobotMaze__chest::after {
-  content: '';
-
-  position: absolute;
-
-  left: 50%;
-  bottom: -5px;
-
-  width: 25px;
-  height: 5px;
-
-  transform: translateX(-50%);
-
-  background: rgba(76, 52, 29, 0.2);
-
-  border-radius: 50%;
-
-  filter: blur(2px);
+  display: none;
 }
 
 .RobotMaze__chest--opened {
   animation: none;
 
-  filter:
-    drop-shadow(0 0 8px rgba(255, 220, 80, 0.9));
+  filter: none;
 }
-
-@keyframes chestBounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
 
 /* =========================================================
-   ROBOT
+   РОБОТ
    ========================================================= */
 
 .RobotMaze__robot {
   position: absolute;
-
-  z-index: 5;
-
+  inset: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  width: 100%;
-  height: 100%;
-
-  transition: transform 0.25s ease;
-
-  filter:
-    drop-shadow(2px 3px 0 rgba(50, 60, 60, 0.25));
 }
 
 .RobotMaze__robot img {
   width: 100%;
   height: 100%;
-
   object-fit: contain;
-
   display: block;
 }
 
-
 /* =========================================================
-   PANEL
+   ПРАВАЯ ПАНЕЛЬ
    ========================================================= */
 
 .RobotMaze__panel {
   position: relative;
   z-index: 3;
 
-  width: min(100%, 900px);
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
 
-  margin-top: 28px;
-  padding: 18px;
+  max-height: calc(100dvh - 80px);
 
-  box-sizing: border-box;
+  padding: 14px;
 
-  border-radius: 18px;
+  border-radius: 16px;
 
-  background: rgba(75, 45, 21, 0.78);
+  background: linear-gradient(180deg, rgba(89, 50, 23, 0.97), rgba(59, 31, 14, 0.98));
 
-  border: 1px solid rgba(255, 228, 160, 0.55);
+  border: 3px solid rgba(49, 25, 10, 0.95);
 
   box-shadow:
-    0 8px 0 rgba(59, 27, 11, 0.35),
-    0 15px 30px rgba(30, 15, 7, 0.25);
+    inset 0 0 0 2px rgba(209, 153, 81, 0.18),
+    0 8px 0 rgba(46, 23, 9, 0.55),
+    0 15px 30px rgba(30, 15, 7, 0.35);
 
   color: #fff3c9;
+
+  overflow: hidden;
 }
 
-
 /* =========================================================
-   STATUS
+   СТАТУС
    ========================================================= */
 
 .RobotMaze__status {
-  min-height: 44px;
+  min-height: 40px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  margin-bottom: 12px;
-  padding: 8px 12px;
+  margin-bottom: 10px;
 
-  box-sizing: border-box;
+  padding: 7px 10px;
 
-  border-radius: 12px;
+  border-radius: 10px;
 
   background: rgba(61, 32, 15, 0.55);
 
@@ -380,15 +488,15 @@
 
   text-align: center;
 
-  font-size: 14px;
+  font-size: clamp(10px, 0.85vw, 13px);
+  line-height: 1.2;
   font-weight: 700;
 
   border: 1px solid rgba(255, 228, 160, 0.3);
 }
 
-
 /* =========================================================
-   COINS
+   МОНЕТЫ
    ========================================================= */
 
 .RobotMaze__coins {
@@ -398,36 +506,35 @@
 
   gap: 8px;
 
-  margin-bottom: 15px;
-  padding: 8px 12px;
+  margin-bottom: 12px;
 
-  border-radius: 10px;
+  padding: 7px 10px;
+
+  border-radius: 9px;
 
   background: rgba(61, 32, 15, 0.45);
 
   color: #ffe9a8;
 
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .RobotMaze__coins strong {
   color: #ffd24a;
-
-  font-size: 16px;
+  font-size: 15px;
 }
 
-
 /* =========================================================
-   PROGRAM
+   ПРОГРАММА
    ========================================================= */
 
 .RobotMaze__program-title {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 
   color: #ffe9bd;
 
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 800;
 
   text-transform: uppercase;
@@ -436,21 +543,25 @@
 .RobotMaze__program {
   display: grid;
 
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 
-  gap: 5px;
+  gap: 4px;
 
-  margin-bottom: 16px;
+  margin-bottom: 10px;
+
+  min-width: 0;
 }
 
 .RobotMaze__slot {
-  height: 38px;
+  height: clamp(26px, 3.5vh, 38px);
+
+  min-width: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 7px;
+  border-radius: 6px;
 
   background: rgba(61, 32, 15, 0.5);
 
@@ -458,10 +569,8 @@
 
   color: #fff0c7;
 
-  font-size: 21px;
+  font-size: clamp(15px, 1.7vw, 21px);
   font-weight: 700;
-
-  box-sizing: border-box;
 }
 
 .RobotMaze__slot--active {
@@ -469,33 +578,38 @@
 
   border-color: #ffe0a0;
 
-  box-shadow:
-    0 0 0 3px rgba(229, 173, 50, 0.25);
+  box-shadow: 0 0 0 3px rgba(229, 173, 50, 0.25);
 
   transform: translateY(-2px);
 }
 
-
 /* =========================================================
-   COMMAND BUTTONS
+   КНОПКИ КОМАНД
    ========================================================= */
 
 .RobotMaze__command-buttons {
-  display: flex;
-  justify-content: center;
+  display: grid;
 
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
-  margin-bottom: 12px;
+  gap: 6px;
+
+  margin-bottom: 9px;
+
+  min-width: 0;
 }
 
 .RobotMaze__command {
-  width: 130px;
-  min-height: 64px;
+  width: 100%;
+  min-width: 0;
+
+  min-height: clamp(46px, 7vh, 64px);
+
+  padding: 4px;
 
   border: 1px solid rgba(255, 228, 160, 0.65);
 
-  border-radius: 11px;
+  border-radius: 9px;
 
   background: rgba(91, 48, 23, 0.86);
 
@@ -503,7 +617,7 @@
 
   cursor: pointer;
 
-  font-size: 12px;
+  font-size: clamp(8px, 0.75vw, 12px);
   font-weight: 700;
 
   transition:
@@ -517,8 +631,7 @@
 
   background: #9a5528;
 
-  box-shadow:
-    0 4px 0 rgba(59, 27, 11, 0.5);
+  box-shadow: 0 4px 0 rgba(59, 27, 11, 0.5);
 }
 
 .RobotMaze__command:active:not(:disabled) {
@@ -534,42 +647,51 @@
 .RobotMaze__command-icon {
   display: block;
 
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 
-  font-size: 25px;
+  font-size: clamp(19px, 2vw, 25px);
+
+  line-height: 1;
 }
 
-
 /* =========================================================
-   MAIN BUTTONS
+   ОСНОВНЫЕ КНОПКИ
    ========================================================= */
 
 .RobotMaze__buttons {
-  display: flex;
-  justify-content: center;
+  display: grid;
 
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 6px;
+
+  margin-bottom: 7px;
+
+  min-width: 0;
 }
 
 .RobotMaze__button {
-  min-width: 120px;
-  min-height: 40px;
+  width: 100%;
+  min-width: 0;
+
+  min-height: clamp(32px, 5vh, 40px);
+
+  padding: 5px 7px;
 
   border: none;
-
-  border-radius: 9px;
+  border-radius: 8px;
 
   background: #75411f;
 
   color: #fff;
 
-  font-size: 12px;
+  font-size: clamp(8px, 0.72vw, 12px);
+  line-height: 1.1;
   font-weight: 800;
 
   cursor: pointer;
 
-  box-shadow:
-    0 4px 0 #3d1f0d;
+  box-shadow: 0 4px 0 #3d1f0d;
 
   transition:
     transform 0.12s ease,
@@ -586,19 +708,13 @@
 .RobotMaze__button:active:not(:disabled) {
   transform: translateY(2px);
 
-  box-shadow:
-    0 2px 0 #3d1f0d;
+  box-shadow: 0 2px 0 #3d1f0d;
 }
 
 .RobotMaze__button--run {
-  background: linear-gradient(
-    180deg,
-    #49b8c5,
-    #258d9e
-  );
+  background: linear-gradient(180deg, #49b8c5, #258d9e);
 
-  box-shadow:
-    0 4px 0 #1e6d79;
+  box-shadow: 0 4px 0 #1e6d79;
 }
 
 .RobotMaze__button:disabled {
@@ -607,56 +723,72 @@
   cursor: not-allowed;
 }
 
-
 /* =========================================================
-   STATS
+   СТАТИСТИКА
    ========================================================= */
 
 .RobotMaze__stats {
   display: flex;
+
+  flex-direction: column;
+
   justify-content: center;
 
-  gap: 35px;
+  gap: 4px;
 
-  margin-top: 15px;
-  padding-top: 12px;
+  margin-top: 6px;
+
+  padding-top: 8px;
 
   border-top: 1px dashed rgba(255, 228, 160, 0.3);
 
   color: #ffe9bd;
 
-  font-size: 13px;
+  font-size: clamp(8px, 0.72vw, 11px);
 
-  flex-wrap: wrap;
+  line-height: 1.2;
+
+  text-align: center;
 }
 
+.RobotMaze__stats strong {
+  color: #fff3c9;
+}
 
 /* =========================================================
-   SUMMARY SCREEN
+   ЭКРАН ПОБЕДЫ
    ========================================================= */
 
 .RobotMaze__summary {
-  min-height: 70vh;
+  width: min(700px, 100%);
+  max-width: 100%;
+
+  height: 100%;
+  min-height: 0;
 
   display: flex;
+
   flex-direction: column;
 
   align-items: center;
   justify-content: center;
 
-  gap: 22px;
-
-  max-width: 700px;
+  gap: 18px;
 
   margin: 0 auto;
 
+  padding: 20px;
+
   text-align: center;
+
+  overflow: hidden;
 }
 
 .RobotMaze__summary-title {
   margin: 0;
 
-  font-size: 46px;
+  font-size: clamp(32px, 5vw, 46px);
+
   font-weight: 900;
 
   color: #fff3c9;
@@ -671,19 +803,21 @@
 
   color: #fff0c7;
 
-  font-size: 19px;
+  font-size: clamp(14px, 1.5vw, 19px);
+
   line-height: 1.5;
 }
 
 .RobotMaze__summary-coins {
   display: flex;
+
   flex-direction: column;
 
   align-items: center;
 
   gap: 7px;
 
-  padding: 20px 35px;
+  padding: 18px 30px;
 
   border-radius: 18px;
 
@@ -691,12 +825,11 @@
 
   border: 1px solid rgba(255, 228, 160, 0.65);
 
-  box-shadow:
-    0 8px 0 rgba(59, 27, 11, 0.35);
+  box-shadow: 0 8px 0 rgba(59, 27, 11, 0.35);
 
   color: #fff0c7;
 
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
 }
 
@@ -704,132 +837,468 @@
   color: #ffd24a;
 
   font-size: 42px;
+
   line-height: 1;
 }
 
 .RobotMaze__summary-button {
   min-width: 220px;
-
   min-height: 52px;
 
   font-size: 14px;
 }
 
+/* =========================================================
+   НЕБОЛЬШАЯ ВЫСОТА
+   ========================================================= */
+
+@media (max-height: 850px) and (min-width: 901px) {
+  .RobotMaze {
+    --robot-cell-size: min(68px, calc((100dvh - 100px) / 9), calc((100vw - 600px) / 12));
+
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+
+  .RobotMaze__header {
+    height: 38px;
+    margin-bottom: 2px;
+  }
+
+  .RobotMaze__title {
+    font-size: 25px;
+  }
+
+  .RobotMaze__content {
+    height: calc(100dvh - 47px);
+    max-height: calc(100dvh - 47px);
+  }
+
+  .RobotMaze__sidebar {
+    padding: 11px 9px;
+
+    gap: 7px;
+  }
+
+  .RobotMaze__level {
+    padding: 9px 6px;
+  }
+
+  .RobotMaze__panel {
+    max-height: calc(100dvh - 55px);
+
+    padding: 10px;
+  }
+
+  .RobotMaze__status {
+    min-height: 34px;
+
+    margin-bottom: 6px;
+  }
+
+  .RobotMaze__program-title {
+    margin-bottom: 4px;
+  }
+
+  .RobotMaze__program {
+    margin-bottom: 6px;
+  }
+
+  .RobotMaze__slot {
+    height: 28px;
+  }
+
+  .RobotMaze__command-buttons {
+    margin-bottom: 6px;
+  }
+
+  .RobotMaze__command {
+    min-height: 48px;
+  }
+
+  .RobotMaze__buttons {
+    margin-bottom: 5px;
+  }
+
+  .RobotMaze__stats {
+    margin-top: 4px;
+
+    padding-top: 6px;
+  }
+}
 
 /* =========================================================
-   RESPONSIVE
+   ОЧЕНЬ МАЛЕНЬКАЯ ВЫСОТА
+   ========================================================= */
+
+@media (max-height: 700px) and (min-width: 901px) {
+  .RobotMaze {
+    --robot-cell-size: min(54px, calc((100dvh - 65px) / 9), calc((100vw - 560px) / 12));
+
+    padding: 4px 10px;
+  }
+
+  .RobotMaze__header {
+    height: 30px;
+
+    margin-bottom: 1px;
+  }
+
+  .RobotMaze__title {
+    font-size: 19px;
+  }
+
+  .RobotMaze__content {
+    height: calc(100dvh - 35px);
+    max-height: calc(100dvh - 35px);
+
+    column-gap: 8px;
+  }
+
+  .RobotMaze__sidebar {
+    padding: 7px;
+
+    gap: 5px;
+  }
+
+  .RobotMaze__level {
+    padding: 7px 4px;
+
+    font-size: 9px;
+  }
+
+  .RobotMaze__panel {
+    max-height: calc(100dvh - 40px);
+
+    padding: 7px;
+  }
+
+  .RobotMaze__status {
+    min-height: 28px;
+
+    margin-bottom: 4px;
+
+    font-size: 9px;
+  }
+
+  .RobotMaze__program-title {
+    margin-bottom: 3px;
+
+    font-size: 9px;
+  }
+
+  .RobotMaze__program {
+    gap: 2px;
+
+    margin-bottom: 4px;
+  }
+
+  .RobotMaze__slot {
+    height: 23px;
+
+    font-size: 14px;
+  }
+
+  .RobotMaze__command-buttons {
+    gap: 3px;
+
+    margin-bottom: 4px;
+  }
+
+  .RobotMaze__command {
+    min-height: 40px;
+
+    font-size: 8px;
+  }
+
+  .RobotMaze__command-icon {
+    font-size: 18px;
+  }
+
+  .RobotMaze__buttons {
+    gap: 3px;
+
+    margin-bottom: 3px;
+  }
+
+  .RobotMaze__button {
+    min-height: 28px;
+
+    padding: 3px;
+
+    font-size: 8px;
+  }
+
+  .RobotMaze__stats {
+    gap: 2px;
+
+    padding-top: 4px;
+
+    font-size: 8px;
+  }
+}
+
+/* =========================================================
+   УЗКИЙ ЭКРАН
    ========================================================= */
 
 @media (max-width: 900px) {
   .RobotMaze {
-    padding: 20px;
-  }
+    --robot-cell-size: min(58px, calc((100dvh - 150px) / 9), calc((100vw - 330px) / 12));
 
-  .RobotMaze__panel {
-    width: min(100%, 700px);
-  }
-
-  .RobotMaze__program {
-    grid-template-columns: repeat(10, 1fr);
-  }
-}
-
-
-@media (max-width: 600px) {
-  .RobotMaze {
-    padding: 12px;
+    padding: 8px 10px;
   }
 
   .RobotMaze__header {
-    margin-bottom: 15px;
+    height: 36px;
 
-    flex-direction: column;
-
-    gap: 10px;
+    margin-bottom: 4px;
   }
 
   .RobotMaze__title {
-    font-size: 23px;
+    font-size: 22px;
+  }
+
+  .RobotMaze__content {
+    grid-template-columns:
+      minmax(0, 145px)
+      minmax(0, 1fr)
+      minmax(0, 250px);
+
+    column-gap: 8px;
+
+    height: calc(100dvh - 48px);
+    max-height: calc(100dvh - 48px);
+  }
+
+  .RobotMaze__sidebar {
+    padding: 10px 7px;
   }
 
   .RobotMaze__level {
-    padding: 7px 11px;
+    padding: 9px 4px;
+
+    font-size: 10px;
+  }
+
+  .RobotMaze__panel {
+    padding: 9px;
+  }
+
+  .RobotMaze__program {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .RobotMaze__buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   МОБИЛЬНЫЙ
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .RobotMaze {
+    --robot-cell-size: min(42px, calc((100dvh - 210px) / 9), calc((100vw - 24px) / 12));
+
+    padding: 5px;
+  }
+
+  .RobotMaze__header {
+    height: 30px;
+  }
+
+  .RobotMaze__title {
+    font-size: 18px;
+  }
+
+  .RobotMaze__content {
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+
+    grid-template-rows:
+      auto
+      minmax(0, 1fr);
+
+    gap: 6px;
+
+    height: calc(100dvh - 40px);
+    max-height: calc(100dvh - 40px);
+  }
+
+  .RobotMaze__sidebar {
+    grid-column: 1;
+
+    width: 100%;
+
+    padding: 5px;
+
+    flex-direction: row;
+
+    gap: 4px;
+  }
+
+  .RobotMaze__level {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 32px;
+
+    padding: 4px;
+
+    font-size: 8px;
+  }
+
+  .RobotMaze__maze {
+    grid-column: 1 / -1;
+    grid-row: 2;
+
+    align-self: center;
+    justify-self: center;
+  }
+
+  .RobotMaze__panel {
+    grid-column: 2;
+    grid-row: 1;
+
+    max-height: 100%;
+
+    padding: 5px;
+  }
+
+  .RobotMaze__status {
+    min-height: 24px;
+
+    margin-bottom: 3px;
+
+    padding: 3px;
+
+    font-size: 8px;
+  }
+
+  .RobotMaze__program-title {
+    margin-bottom: 2px;
+
+    font-size: 7px;
+  }
+
+  .RobotMaze__program {
+    gap: 2px;
+
+    margin-bottom: 3px;
+  }
+
+  .RobotMaze__slot {
+    height: 20px;
 
     font-size: 12px;
   }
 
-  .RobotMaze__maze {
-    padding: 0;
-
-    max-width: 100%;
-
-    overflow-x: auto;
-  }
-
-  .RobotMaze__cell {
-    width: 72px;
-    height: 72px;
-  }
-
-  .RobotMaze__exit {
-    font-size: 21px;
-  }
-
-  .RobotMaze__panel {
-    width: 100%;
-
-    padding: 12px;
-  }
-
-  .RobotMaze__program {
-    grid-template-columns: repeat(5, 1fr);
-  }
-
   .RobotMaze__command-buttons {
-    gap: 6px;
+    gap: 2px;
+
+    margin-bottom: 3px;
   }
 
   .RobotMaze__command {
-    width: 100px;
+    min-height: 31px;
 
-    min-height: 58px;
+    font-size: 7px;
+  }
+
+  .RobotMaze__command-icon {
+    font-size: 15px;
   }
 
   .RobotMaze__buttons {
-    flex-wrap: wrap;
+    gap: 2px;
+
+    margin-bottom: 2px;
   }
 
   .RobotMaze__button {
-    min-width: 100px;
+    min-height: 24px;
+
+    padding: 2px;
+
+    font-size: 7px;
   }
 
   .RobotMaze__stats {
-    gap: 15px;
+    gap: 1px;
 
-    flex-direction: column;
+    margin-top: 2px;
 
-    align-items: center;
+    padding-top: 3px;
+
+    font-size: 7px;
+  }
+}
+
+/* =========================================================
+   СОВСЕМ МАЛЕНЬКИЙ ЭКРАН
+   ========================================================= */
+
+@media (max-width: 500px), (max-height: 500px) {
+  .RobotMaze {
+    --robot-cell-size: min(34px, calc((100dvh - 150px) / 9), calc((100vw - 20px) / 12));
   }
 
-  .RobotMaze__summary {
-    min-height: 80vh;
+  .RobotMaze__title {
+    font-size: 15px;
+  }
 
-    padding: 20px;
-    box-sizing: border-box;
+  .RobotMaze__sidebar {
+    display: none;
+  }
+
+  .RobotMaze__content {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr);
+
+    height: calc(100dvh - 32px);
+    max-height: calc(100dvh - 32px);
+  }
+
+  .RobotMaze__maze {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .RobotMaze__panel {
+    display: none;
+  }
+}
+
+/* =========================================================
+   ЭКРАН ПОБЕДЫ НА ТЕЛЕФОНЕ
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .RobotMaze__summary {
+    gap: 14px;
+
+    padding: 15px;
   }
 
   .RobotMaze__summary-title {
-    font-size: 34px;
+    font-size: 32px;
   }
 
   .RobotMaze__summary-text {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .RobotMaze__summary-coins {
-    padding: 18px 25px;
+    padding: 15px 22px;
 
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .RobotMaze__summary-coins strong {
@@ -838,7 +1307,6 @@
 
   .RobotMaze__summary-button {
     width: 100%;
-
     max-width: 280px;
   }
 }

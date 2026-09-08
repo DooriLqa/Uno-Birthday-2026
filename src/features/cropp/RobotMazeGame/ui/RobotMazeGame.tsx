@@ -1,5 +1,19 @@
 import treasureOpen from '@/shared/assets/robot/treasure-open.png'
 import treasurePile from '@/shared/assets/robot/treasure-pile.png'
+
+import wall1 from '@/shared/assets/robot/wall.png'
+import wall2 from '@/shared/assets/robot/wall2.png'
+import wall3 from '@/shared/assets/robot/wall3.png'
+import wall4 from '@/shared/assets/robot/wall4.png'
+import wall5 from '@/shared/assets/robot/wall5.png'
+
+import corgiUp from '@/shared/assets/robot/corgi-pirate-up.png'
+import corgiRight from '@/shared/assets/robot/corgi-pirate-right.png'
+import corgiDown from '@/shared/assets/robot/corgi-pirate-down.png'
+import corgiLeft from '@/shared/assets/robot/corgi-pirate-left.png'
+import cartTracks from '@/shared/assets/robot/cart-tracks.png'
+import cartTracksTurn from '@/shared/assets/robot/cart-tracks-turn.png'
+
 import { useEffect, useState } from 'react'
 import './RobotMazeGame.css'
 
@@ -12,9 +26,26 @@ const EXIT = 3
 const CHEST = 4
 
 const STORAGE_KEY = 'robotMazeProgress'
-const CELL_SIZE = 72
+
+const CELL_SIZE = 'var(--robot-cell-size)'
+
+const wallImages = [wall1, wall2, wall3, wall4, wall5]
 
 type Direction = 'up' | 'right' | 'down' | 'left'
+
+type CartTrack = {
+  row: number
+  col: number
+  direction: Direction
+}
+
+type TurnTrack = {
+  row: number
+  col: number
+  from: Direction
+  turn: 'left' | 'right'
+}
+
 type CommandType = 'forward' | 'left' | 'right'
 
 type Command = {
@@ -250,6 +281,23 @@ const levels: Level[] = [
   },
 ]
 
+/*
+ * Выбор случайного уровня.
+ *
+ * Функция находится ВНЕ компонента,
+ * чтобы React ESLint не считал Math.random()
+ * вызовом нечистой функции во время render.
+ */
+const getRandomLevel = (availableLevels: number[]) => {
+  if (availableLevels.length === 0) {
+    return -1
+  }
+
+  const randomIndex = Math.floor(Math.random() * availableLevels.length)
+
+  return availableLevels[randomIndex]
+}
+
 export function RobotMazeGame({ onComplete }: Props) {
   const [playedLevels, setPlayedLevels] = useState<number[]>(() => {
     try {
@@ -283,16 +331,6 @@ export function RobotMazeGame({ onComplete }: Props) {
     }
   })
 
-  const getRandomLevel = (availableLevels: number[]) => {
-    if (availableLevels.length === 0) {
-      return -1
-    }
-
-    const randomIndex = Math.floor(Math.random() * availableLevels.length)
-
-    return availableLevels[randomIndex]
-  }
-
   const initialAvailableLevels = levels
     .map((_, index) => index)
     .filter((index) => !playedLevels.includes(index))
@@ -318,10 +356,25 @@ export function RobotMazeGame({ onComplete }: Props) {
   const [direction, setDirection] = useState<Direction>(levels[initialLevel].startDirection)
 
   const [commands, setCommands] = useState<Command[]>([])
+
   const [isRunning, setIsRunning] = useState(false)
+
   const [currentCommand, setCurrentCommand] = useState(-1)
+
   const [moves, setMoves] = useState(0)
+
   const [openedChests, setOpenedChests] = useState<string[]>([])
+
+  const [cartTracksState, setCartTracksState] = useState<CartTrack[]>(() => [
+    {
+      row: levels[initialLevel].startRow,
+      col: levels[initialLevel].startCol,
+      direction: levels[initialLevel].startDirection,
+    },
+  ])
+
+  const [turnTracksState, setTurnTracksState] = useState<TurnTrack[]>([])
+
   const [message, setMessage] = useState('Составьте программу для робота')
 
   const maze = levels[levelIndex].maze
@@ -341,6 +394,35 @@ export function RobotMazeGame({ onComplete }: Props) {
   )
 
   const collectedCoins = Object.values(levelCoins).reduce((sum, count) => sum + count, 0)
+
+  const addCartTrack = (row: number, col: number, trackDirection: Direction) => {
+    setCartTracksState((prev) => [
+      ...prev,
+      {
+        row,
+        col,
+        direction: trackDirection,
+      },
+    ])
+  }
+
+  const removeCartTrack = (row: number, col: number) => {
+    setCartTracksState((prev) => prev.filter((track) => track.row !== row || track.col !== col))
+  }
+
+  const addTurnTrack = (row: number, col: number, from: Direction, turn: 'left' | 'right') => {
+    removeCartTrack(row, col)
+
+    setTurnTracksState((prev) => [
+      ...prev,
+      {
+        row,
+        col,
+        from,
+        turn,
+      },
+    ])
+  }
 
   const addCommand = (type: CommandType) => {
     if (isRunning) {
@@ -383,12 +465,23 @@ export function RobotMazeGame({ onComplete }: Props) {
     })
 
     setDirection(currentLevel.startDirection)
+
     setCommands([])
     setCurrentCommand(-1)
     setMoves(0)
     setOpenedChests([])
     setMessage('Составьте программу для робота')
     setIsRunning(false)
+
+    setCartTracksState([
+      {
+        row: currentLevel.startRow,
+        col: currentLevel.startCol,
+        direction: currentLevel.startDirection,
+      },
+    ])
+
+    setTurnTracksState([])
   }
 
   const startLevel = (index: number, text = 'Новый уровень') => {
@@ -406,12 +499,23 @@ export function RobotMazeGame({ onComplete }: Props) {
     })
 
     setDirection(nextLevel.startDirection)
+
     setCommands([])
     setCurrentCommand(-1)
     setMoves(0)
     setOpenedChests([])
     setMessage(text)
     setIsRunning(false)
+
+    setCartTracksState([
+      {
+        row: nextLevel.startRow,
+        col: nextLevel.startCol,
+        direction: nextLevel.startDirection,
+      },
+    ])
+
+    setTurnTracksState([])
   }
 
   const resetProgress = () => {
@@ -430,12 +534,23 @@ export function RobotMazeGame({ onComplete }: Props) {
     })
 
     setDirection(firstLevel.startDirection)
+
     setCommands([])
     setCurrentCommand(-1)
     setMoves(0)
     setOpenedChests([])
     setMessage('Прогресс сброшен')
     setIsRunning(false)
+
+    setCartTracksState([
+      {
+        row: firstLevel.startRow,
+        col: firstLevel.startCol,
+        direction: firstLevel.startDirection,
+      },
+    ])
+
+    setTurnTracksState([])
   }
 
   const finishCurrentLevel = (collectedOnLevel: number) => {
@@ -453,6 +568,7 @@ export function RobotMazeGame({ onComplete }: Props) {
     }
 
     setPlayedLevels(updatedPlayedLevels)
+
     setLevelCoins(updatedCoins)
 
     const newTotalCoins = Object.values(updatedCoins).reduce((sum, count) => sum + count, 0)
@@ -527,16 +643,28 @@ export function RobotMazeGame({ onComplete }: Props) {
   const getDirectionVector = (current: Direction) => {
     switch (current) {
       case 'up':
-        return { row: -1, col: 0 }
+        return {
+          row: -1,
+          col: 0,
+        }
 
       case 'right':
-        return { row: 0, col: 1 }
+        return {
+          row: 0,
+          col: 1,
+        }
 
       case 'down':
-        return { row: 1, col: 0 }
+        return {
+          row: 1,
+          col: 0,
+        }
 
       case 'left':
-        return { row: 0, col: -1 }
+        return {
+          row: 0,
+          col: -1,
+        }
     }
   }
 
@@ -560,10 +688,15 @@ export function RobotMazeGame({ onComplete }: Props) {
     }
 
     setIsRunning(true)
+
     setMessage('Робот выполняет программу...')
+
     setMoves(0)
 
-    let currentRobot = { ...robot }
+    let currentRobot = {
+      ...robot,
+    }
+
     let currentDirection = direction
 
     const collectedChestKeys = new Set(openedChests)
@@ -574,18 +707,32 @@ export function RobotMazeGame({ onComplete }: Props) {
       const command = commands[i]
 
       if (command.type === 'left') {
+        const previousDirection = currentDirection
+
         currentDirection = turnLeft(currentDirection)
 
+        addTurnTrack(currentRobot.row, currentRobot.col, previousDirection, 'left')
+
+        await wait(120)
+
         setDirection(currentDirection)
+
         setMoves((prev) => prev + 1)
 
         await wait(350)
       }
 
       if (command.type === 'right') {
+        const previousDirection = currentDirection
+
         currentDirection = turnRight(currentDirection)
 
+        addTurnTrack(currentRobot.row, currentRobot.col, previousDirection, 'right')
+
+        await wait(120)
+
         setDirection(currentDirection)
+
         setMoves((prev) => prev + 1)
 
         await wait(350)
@@ -607,6 +754,8 @@ export function RobotMazeGame({ onComplete }: Props) {
 
           moved = true
 
+          await wait(120)
+
           currentRobot = {
             row: nextRow,
             col: nextCol,
@@ -614,7 +763,7 @@ export function RobotMazeGame({ onComplete }: Props) {
 
           setRobot(currentRobot)
 
-          await wait(120)
+          addCartTrack(nextRow, nextCol, currentDirection)
 
           const currentCell = maze[currentRobot.row][currentRobot.col]
 
@@ -632,6 +781,7 @@ export function RobotMazeGame({ onComplete }: Props) {
 
           if (currentCell === EXIT) {
             setMoves((prev) => prev + 1)
+
             setMessage('Уровень пройден!')
 
             setIsRunning(false)
@@ -663,20 +813,28 @@ export function RobotMazeGame({ onComplete }: Props) {
     setIsRunning(false)
   }
 
-  const getRobotRotation = () => {
+  const getRobotImage = () => {
     switch (direction) {
       case 'up':
-        return -90
+        return corgiUp
 
       case 'right':
-        return 0
+        return corgiRight
 
       case 'down':
-        return 90
+        return corgiDown
 
       case 'left':
-        return 180
+        return corgiLeft
     }
+  }
+
+  const getwallImage = (row: number, col: number) => {
+    const value = Math.abs(Math.sin(row * 12.9898 + col * 78.233 + levelIndex * 37.719))
+
+    const index = Math.floor(value * wallImages.length)
+
+    return wallImages[index]
   }
 
   if (gamePhase === 'finished') {
@@ -743,26 +901,23 @@ export function RobotMazeGame({ onComplete }: Props) {
 
   return (
     <div className="RobotMaze">
-      <div className="RobotMaze__header">
-        <div className="RobotMaze__levels">
+      <div className="RobotMaze__content">
+        <aside className="RobotMaze__sidebar">
           <div className="RobotMaze__level">
             Пройдено: {playedLevels.length} / {levels.length}
           </div>
 
           <div className="RobotMaze__level">
-            Монеты: {collectedCoins} / {totalCoins} 🪙
+            Монеты: {collectedCoins} / {totalCoins} 💎
           </div>
-        </div>
+        </aside>
 
-        <h1 className="RobotMaze__title">Робот-лабиринт</h1>
-      </div>
-
-      <div className="RobotMaze__content">
         <div
           className="RobotMaze__maze"
           style={{
-            gridTemplateColumns: `repeat(${maze[0].length}, ${CELL_SIZE}px)`,
-            gridTemplateRows: `repeat(${maze.length}, ${CELL_SIZE}px)`,
+            gridTemplateColumns: `repeat(${maze[0].length}, ${CELL_SIZE})`,
+
+            gridTemplateRows: `repeat(${maze.length}, ${CELL_SIZE})`,
           }}
         >
           {maze.map((row, rowIndex) =>
@@ -773,14 +928,86 @@ export function RobotMazeGame({ onComplete }: Props) {
 
               const isChestOpened = openedChests.includes(chestKey)
 
+              const tracks = cartTracksState.filter(
+                (item) => item.row === rowIndex && item.col === colIndex,
+              )
+
+              const getTrackRotation = (trackDirection: Direction) => {
+                switch (trackDirection) {
+                  case 'up':
+                    return 0
+
+                  case 'right':
+                    return 90
+
+                  case 'down':
+                    return 180
+
+                  case 'left':
+                    return 270
+                }
+              }
+
               return (
-                <div key={chestKey} className={`RobotMaze__cell RobotMaze__cell--${cell}`}>
+                <div
+                  key={chestKey}
+                  className={`RobotMaze__cell RobotMaze__cell--${cell}`}
+                  style={
+                    cell === WALL
+                      ? {
+                          backgroundImage: `url(${getwallImage(rowIndex, colIndex)})`,
+                        }
+                      : undefined
+                  }
+                >
+                  {tracks.map((track, index) => (
+                    <img
+                      key={`${track.row}-${track.col}-${index}`}
+                      className="RobotMaze__cart-track"
+                      src={cartTracks}
+                      alt=""
+                      style={
+                        {
+                          '--track-rotation': `${getTrackRotation(track.direction)}deg`,
+                        } as React.CSSProperties
+                      }
+                    />
+                  ))}
+
+                  {turnTracksState
+                    .filter((track) => track.row === rowIndex && track.col === colIndex)
+                    .map((track, index) => {
+                      const rightTurnRotations: Record<Direction, number> = {
+                        up: 0,
+                        right: 90,
+                        down: 180,
+                        left: 270,
+                      }
+
+                      const rotation = rightTurnRotations[track.from]
+
+                      return (
+                        <img
+                          key={`turn-${track.row}-${track.col}-${index}`}
+                          className="RobotMaze__cart-track RobotMaze__turn-track"
+                          src={cartTracksTurn}
+                          alt=""
+                          style={{
+                            transform: `translate(-50%, -50%) rotate(${rotation}deg) scaleX(${
+                              track.turn === 'left' ? -1 : 1
+                            })`,
+                          }}
+                        />
+                      )
+                    })}
+
                   {cell === EXIT && <div className="RobotMaze__exit">🚪</div>}
 
                   {cell === CHEST && (
                     <div
-                      className={`RobotMaze__chest ${isChestOpened ? 'RobotMaze__chest--opened' : ''
-                        }`}
+                      className={`RobotMaze__chest ${
+                        isChestOpened ? 'RobotMaze__chest--opened' : ''
+                      }`}
                     >
                       <img
                         src={isChestOpened ? treasureOpen : treasurePile}
@@ -790,16 +1017,8 @@ export function RobotMazeGame({ onComplete }: Props) {
                   )}
 
                   {isRobot && (
-                    <div
-                      className="RobotMaze__robot"
-                      style={{
-                        transform: `rotate(${getRobotRotation()}deg)`,
-                      }}
-                    >
-                      <img
-                        src="/corgi-pirate.png"
-                        alt="Корги-пират"
-                      />
+                    <div className="RobotMaze__robot">
+                      <img src={getRobotImage()} alt="Корги-пират" />
                     </div>
                   )}
                 </div>
@@ -822,8 +1041,9 @@ export function RobotMazeGame({ onComplete }: Props) {
               return (
                 <div
                   key={index}
-                  className={`RobotMaze__slot ${currentCommand === index ? 'RobotMaze__slot--active' : ''
-                    }`}
+                  className={`RobotMaze__slot ${
+                    currentCommand === index ? 'RobotMaze__slot--active' : ''
+                  }`}
                 >
                   {command?.icon ?? ''}
                 </div>
