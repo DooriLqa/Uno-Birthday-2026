@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import playerImage from '@/assets/flappy-bird/aaaa.png'
+import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import './FlappyBirdGame.css'
-import { usePawCoinStore } from '@/features/currency/model/store'
 
 type Props = { onComplete: () => void }
 
@@ -11,34 +12,56 @@ type Pipe = {
   counted: boolean
 }
 
+type GameCoin = {
+  id: number
+  x: number
+  y: number
+}
+
 type GameState = {
   birdY: number
   birdVelocity: number
   pipes: Pipe[]
+  coins: GameCoin[]
   nextPipeId: number
+  nextCoinId: number
   passedPipes: number
+  collectedCoins: number
   running: boolean
   gameOver: boolean
   completed: boolean
 }
 
+const FLAPPY_GAME_KEY = 'flappy-game'
 const GAME_WIDTH = 720
 const GAME_HEIGHT = 440
 const BIRD_X = 154
 const BIRD_SIZE = 28
 const PIPE_WIDTH = 66
-const PIPE_GAP = 170
+const PIPE_GAP = 160
 const PIPE_SPEED = 190
 const GRAVITY = 1080
-const FLAP_VELOCITY = -500
+const FLAP_VELOCITY = -470
+const GLIDE_SPEED = 55
 const FIRST_PIPE_X = 480
+const COINS_TO_COMPLETE = 20
+const COIN_SPAWN_INTERVAL = 1.1
+const COIN_SIZE = 24
+const COIN_SPEED = PIPE_SPEED
+const SCREAM_SOUND = '/audio/sfx/scream.MP3'
+const START_SOUND = '/audio/sfx/bird.MP3'
+const WIN_SOUND = '/audio/sfx/winSound.MP3'
+const COIN_SOUND = '/audio/sfx/coin.mp3'
 
 const createInitialState = (): GameState => ({
   birdY: GAME_HEIGHT / 2 - BIRD_SIZE / 2,
   birdVelocity: 0,
   pipes: [],
+  coins: [],
   nextPipeId: 1,
+  nextCoinId: 1,
   passedPipes: 0,
+  collectedCoins: 0,
   running: false,
   gameOver: false,
   completed: false,
@@ -47,21 +70,27 @@ const createInitialState = (): GameState => ({
 const createPipe = (id: number, x: number): Pipe => ({
   id,
   x,
-  gapTop: id === 1 ? (GAME_HEIGHT - PIPE_GAP) / 2 : 90 + Math.random() * 70,
+  gapTop: id === 1 ? (GAME_HEIGHT - PIPE_GAP) / 2 : 90 + Math.random() * 100,
   counted: false,
 })
 
+const createCoin = (id: number, pipe: Pipe): GameCoin => ({
+  id,
+  x: pipe.x + PIPE_WIDTH + 20,
+  y: pipe.gapTop + 18 + Math.random() * (PIPE_GAP - COIN_SIZE - 36),
+})
+
 export function FlappyBirdGame({ onComplete }: Props) {
-  const addPawCoins = usePawCoinStore((state) => state.addPawCoins)
   const [game, setGame] = useState<GameState>(createInitialState)
   const [stageScale, setStageScale] = useState(1)
   const gameRef = useRef(game)
   const stageRef = useRef<HTMLButtonElement>(null)
   const onCompleteRef = useRef(onComplete)
-  const addPawCoinsRef = useRef(addPawCoins)
   const frameRef = useRef<number | null>(null)
   const lastTimeRef = useRef<number | null>(null)
   const pipeTimerRef = useRef(0)
+  const coinTimerRef = useRef(0)
+  const holdingRef = useRef(false)
 
   useEffect(() => {
     const stage = stageRef.current
@@ -79,8 +108,7 @@ export function FlappyBirdGame({ onComplete }: Props) {
 
   useEffect(() => {
     onCompleteRef.current = onComplete
-    addPawCoinsRef.current = addPawCoins
-  }, [addPawCoins, onComplete])
+  }, [onComplete])
 
   const updateGame = useCallback((nextGame: GameState) => {
     gameRef.current = nextGame
@@ -89,14 +117,16 @@ export function FlappyBirdGame({ onComplete }: Props) {
 
   const flap = useCallback(() => {
     const current = gameRef.current
-    if (current.gameOver) {
+    if (current.gameOver || current.completed) {
       updateGame(createInitialState())
       lastTimeRef.current = null
       pipeTimerRef.current = 0
+      coinTimerRef.current = 0
       return
     }
 
     const isFirstFlap = current.pipes.length === 0
+    const isGameStart = !current.running
     updateGame({
       ...current,
       running: true,
@@ -104,18 +134,37 @@ export function FlappyBirdGame({ onComplete }: Props) {
       pipes: isFirstFlap ? [createPipe(1, FIRST_PIPE_X)] : current.pipes,
       nextPipeId: isFirstFlap ? 2 : current.nextPipeId,
     })
-  }, [updateGame])
+    if (isGameStart) playOneShotSound(START_SOUND, FLAPPY_GAME_KEY)
+  }, [playOneShotSound, updateGame])
+
+  const startHolding = useCallback(() => {
+    if (holdingRef.current) return
+    holdingRef.current = true
+    flap()
+  }, [flap])
+
+  const stopHolding = useCallback(() => {
+    holdingRef.current = false
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code !== 'Space') return
       event.preventDefault()
-      flap()
+      if (!event.repeat) startHolding()
+    }
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.code === 'Space') stopHolding()
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [flap])
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [startHolding, stopHolding])
 
   useEffect(() => {
     const tick = (time: number) => {
@@ -126,10 +175,15 @@ export function FlappyBirdGame({ onComplete }: Props) {
 
       if (current.running && !current.gameOver) {
         pipeTimerRef.current += delta
-        const birdVelocity = current.birdVelocity + GRAVITY * delta
+        coinTimerRef.current += delta
+        const birdVelocity = holdingRef.current
+          ? Math.min(current.birdVelocity + GRAVITY * delta, GLIDE_SPEED)
+          : current.birdVelocity + GRAVITY * delta
         const birdY = current.birdY + birdVelocity * delta
         let pipes = current.pipes.map((pipe) => ({ ...pipe, x: pipe.x - PIPE_SPEED * delta }))
+        let coins = current.coins.map((coin) => ({ ...coin, x: coin.x - COIN_SPEED * delta }))
         let nextPipeId = current.nextPipeId
+        let nextCoinId = current.nextCoinId
 
         if (pipeTimerRef.current >= 1.55) {
           pipes = [...pipes, createPipe(nextPipeId, GAME_WIDTH + 24)]
@@ -137,24 +191,45 @@ export function FlappyBirdGame({ onComplete }: Props) {
           pipeTimerRef.current = 0
         }
 
+        const coinSourcePipe = pipes.find((pipe) => pipe.x >= GAME_WIDTH)
+        if (coinTimerRef.current >= COIN_SPAWN_INTERVAL && coinSourcePipe) {
+          coins = [...coins, createCoin(nextCoinId, coinSourcePipe)]
+          nextCoinId += 1
+          coinTimerRef.current = 0
+        }
+
         let passedPipes = current.passedPipes
-        let reward = 0
         pipes = pipes.map((pipe) => {
           if (!pipe.counted && pipe.x + PIPE_WIDTH < BIRD_X) {
             const nextPassedPipes = passedPipes + 1
             passedPipes = nextPassedPipes
-            if (nextPassedPipes % 10 === 0) reward += 1
             return { ...pipe, counted: true }
           }
           return pipe
         }).filter((pipe) => pipe.x > -PIPE_WIDTH - 10)
 
-        if (reward > 0) addPawCoinsRef.current(reward)
-        if (passedPipes >= 10 && !current.completed) {
+        const birdBottom = birdY + BIRD_SIZE
+        const birdRight = BIRD_X + BIRD_SIZE
+        let collectedCoins = current.collectedCoins
+        coins = coins.filter((coin) => {
+          const overlapsBird =
+            birdRight > coin.x &&
+            BIRD_X < coin.x + COIN_SIZE &&
+            birdBottom > coin.y &&
+            birdY < coin.y + COIN_SIZE
+
+          if (overlapsBird) {
+            collectedCoins += 1
+            playOneShotSound(COIN_SOUND, FLAPPY_GAME_KEY, 0.1)
+            return false
+          }
+          return coin.x > -COIN_SIZE - 10
+        })
+
+        if (collectedCoins >= COINS_TO_COMPLETE && !current.completed) {
           onCompleteRef.current()
         }
 
-        const birdBottom = birdY + BIRD_SIZE
         const birdHitPipe = pipes.some((pipe) => {
           const overlapsPipe = BIRD_X + BIRD_SIZE > pipe.x && BIRD_X < pipe.x + PIPE_WIDTH
           const birdCenter = birdY + BIRD_SIZE / 2
@@ -167,15 +242,25 @@ export function FlappyBirdGame({ onComplete }: Props) {
         const hitBoundary = birdBottom >= GAME_HEIGHT
         const gameOver = hitBoundary || birdHitPipe
 
+        if (gameOver && !current.gameOver) {
+          playOneShotSound(SCREAM_SOUND, FLAPPY_GAME_KEY)
+        } else if (collectedCoins >= COINS_TO_COMPLETE && !current.completed) {
+          playOneShotSound(WIN_SOUND, FLAPPY_GAME_KEY)
+        }
+
         updateGame({
           ...current,
           birdY: Math.max(0, Math.min(GAME_HEIGHT - BIRD_SIZE, birdY)),
           birdVelocity,
           pipes,
+          coins,
           nextPipeId,
+          nextCoinId,
           passedPipes,
+          collectedCoins,
           gameOver,
-          completed: current.completed || passedPipes >= 10,
+          running: collectedCoins < COINS_TO_COMPLETE,
+          completed: current.completed || collectedCoins >= COINS_TO_COMPLETE,
         })
       }
 
@@ -186,12 +271,13 @@ export function FlappyBirdGame({ onComplete }: Props) {
     return () => {
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
     }
-  }, [updateGame])
+  }, [playOneShotSound, updateGame])
 
   const restart = () => {
     updateGame(createInitialState())
     lastTimeRef.current = null
     pipeTimerRef.current = 0
+    coinTimerRef.current = 0
   }
 
   return (
@@ -201,16 +287,22 @@ export function FlappyBirdGame({ onComplete }: Props) {
           <span className="flappy-bird-game__eyebrow">Островная аркада</span>
           <h1>Полёт над лагуной</h1>
         </div>
-        <div className="flappy-bird-game__score" aria-label={`Пройдено труб: ${game.passedPipes}`}>
-          <span>ТРУБЫ</span>
-          <strong>{game.passedPipes}</strong>
+        <div className="flappy-bird-game__score" aria-label={`Собрано монет: ${game.collectedCoins} из ${COINS_TO_COMPLETE}`}>
+          <span>МОНЕТЫ</span>
+          <strong>{game.collectedCoins}/{COINS_TO_COMPLETE}</strong>
         </div>
       </div>
 
       <button
         type="button"
         className={`flappy-bird-game__stage ${game.gameOver ? 'is-game-over' : ''}`}
-        onClick={flap}
+        onPointerDown={(event) => {
+          event.preventDefault()
+          startHolding()
+        }}
+        onPointerUp={stopHolding}
+        onPointerLeave={stopHolding}
+        onPointerCancel={stopHolding}
         aria-label="Прыгнуть или начать полёт"
         ref={stageRef}
       >
@@ -219,10 +311,19 @@ export function FlappyBirdGame({ onComplete }: Props) {
           <span
             className="flappy-bird-game__bird"
             style={{ transform: `translate(${BIRD_X}px, ${game.birdY}px) rotate(${Math.max(-18, Math.min(76, game.birdVelocity / 8))}deg)` }}
-            aria-hidden
           >
-            🐦
+            <img src={playerImage} alt="" aria-hidden />
           </span>
+          {game.coins.map((coin) => (
+            <span
+              key={coin.id}
+              className="flappy-bird-game__coin"
+              style={{ transform: `translate(${coin.x}px, ${coin.y}px)` }}
+              aria-hidden
+            >
+              🪙
+            </span>
+          ))}
           {game.pipes.map((pipe) => (
             <span key={pipe.id} className="flappy-bird-game__pipe-pair" style={{ transform: `translateX(${pipe.x}px)` }} aria-hidden>
               <span className="flappy-bird-game__pipe flappy-bird-game__pipe--top" style={{ height: pipe.gapTop }} />
@@ -236,19 +337,25 @@ export function FlappyBirdGame({ onComplete }: Props) {
               <small>Пробел или левая кнопка мыши</small>
             </span>
           )}
-          {game.gameOver && (
+          {game.gameOver && !game.completed && (
             <span className="flappy-bird-game__message">
               <strong>Бух в воду!</strong>
               <small>Нажми, чтобы попробовать ещё раз</small>
+            </span>
+          )}
+          {game.completed && (
+            <span className="flappy-bird-game__message flappy-bird-game__message--won">
+              <strong>Полёт завершён!</strong>
+              <small>Ты собрал все {COINS_TO_COMPLETE} монет</small>
             </span>
           )}
         </span>
       </button>
 
       <div className="flappy-bird-game__footer">
-        <span>Каждые 10 труб = 1 🐾 монетка</span>
+        <span>Собери {COINS_TO_COMPLETE} монет внутри игры</span>
         {game.completed && <strong>Награда получена</strong>}
-        {game.gameOver && <button type="button" onClick={restart}>Начать заново</button>}
+        {(game.gameOver || game.completed) && <button type="button" onClick={restart}>Начать заново</button>}
       </div>
     </div>
   )
