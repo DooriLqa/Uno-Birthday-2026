@@ -1,15 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
+import brickImage from '@/assets/fruit-basket/brick.png'
+import buildingImage from '@/assets/fruit-basket/building.png'
+import groundImage from '@/assets/fruit-basket/ground.png'
 import handcuffsImage from '@/assets/fruit-basket/handcuffs.png'
-import ipadImage from '@/assets/fruit-basket/ipad.png'
-import kolonkaImage from '@/assets/fruit-basket/kolonka.png'
+import cameraImage from '@/assets/fruit-basket/camera.png'
+import coinImage from '@/assets/fruit-basket/coin.png'
+import diamondImage from '@/assets/fruit-basket/diamond.png'
 import laptopImage from '@/assets/fruit-basket/laptop.png'
-import gemImage from '@/assets/fruit-basket/gem.png'
-import moneyImage from '@/assets/fruit-basket/money.png'
-import x2Image from '@/assets/fruit-basket/2x.png'
 import magnetImage from '@/assets/fruit-basket/magnet.png'
-import unuasherThiefImage from '@/assets/fruit-basket/unuasherThief.png'
+import phoneImage from '@/assets/fruit-basket/phone.png'
+import playerImage from '@/assets/fruit-basket/playerThief.png'
+import ringImage from '@/assets/fruit-basket/ring.png'
+import skyImage from '@/assets/fruit-basket/sky.png'
+import sweetsImage from '@/assets/fruit-basket/sweets-box.png'
+import watchImage from '@/assets/fruit-basket/watch.png'
+import x2Image from '@/assets/fruit-basket/x2-bonus.png'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
+import { FRUIT_BASKET_LAYOUT } from '../model/layout'
+import { BASKET_CATCH_OFFSET, isCaught, isMissed } from '../model/collision'
 import './FruitBasketGame.css'
 
 type Props = { onComplete: () => void }
@@ -23,6 +32,7 @@ type FallingItem = {
   image: string
   speed: number
   magnetized?: boolean
+  overflowed?: boolean
 }
 
 type GameState = {
@@ -41,8 +51,6 @@ type GameState = {
 const BASKET_GAME_KEY = 'basket-game'
 const TARGET_SCORE = 30
 const MAX_LIVES = 5
-const BASKET_CATCH_WIDTH = 15
-const BASKET_CATCH_OFFSET = 0
 const MAX_BASKET_LOAD = 5
 const DROP_ZONE_WIDTH = 16
 
@@ -74,17 +82,23 @@ const START_SOUND = '/audio/sfx/pognali.MP3'
 const WIN_SOUND = '/audio/sfx/winSound.MP3'
 const COIN_SOUND = '/audio/sfx/coin.mp3'
 const HANDCUFFS_SOUND = '/audio/sfx/handcuffs.mp3'
+const BRICK_SOUND = '/audio/sfx/brick.mp3'
+const FULL_BASKET_SOUND = '/audio/sfx/fullBasket.mp3'
+const BONUS_SOUND = '/audio/sfx/bonus.mp3'
 const CATCH_SOUND = '/audio/sfx/location-footsteps.ogg'
 
 const GOOD_ITEMS = [
-  gemImage,
-  moneyImage,
+  cameraImage,
+  coinImage,
   laptopImage,
-  kolonkaImage,
-  ipadImage,
+  diamondImage,
+  phoneImage,
+  ringImage,
+  sweetsImage,
+  watchImage
 ]
 
-const BAD_ITEMS = [handcuffsImage]
+const BAD_ITEMS = [handcuffsImage, brickImage]
 
 // Пока используем gemImage как временную картинку бонусов
 const BONUS_IMAGES = {
@@ -127,6 +141,21 @@ function dropProgressPercent(game: GameState, side: 'left' | 'right') {
 
 export function FruitBasketGame({ onComplete }: Props) {
   const [game, setGame] = useState(initialState)
+  const [started, setStarted] = useState(false)
+  const screenRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const screen = screenRef.current
+    if (!screen) return
+
+    // Scale the whole logical playfield together, including sprites and HUD.
+    // Gameplay coordinates and timing stay independent of the window size.
+    const observer = new ResizeObserver(([entry]) => {
+      screen.style.setProperty('--fruit-basket-scale', String(entry.contentRect.width / 976))
+    })
+    observer.observe(screen)
+    return () => observer.disconnect()
+  }, [])
 
   const addPawCoins = usePawCoinStore((state) => state.addPawCoins)
 
@@ -146,6 +175,12 @@ export function FruitBasketGame({ onComplete }: Props) {
 
   const startupSpawnCountRef = useRef(0)
 
+  const startGame = () => {
+    if (started) return
+    setStarted(true)
+    playOneShotSound(START_SOUND, BASKET_GAME_KEY)
+  }
+
   useEffect(() => {
     gameRef.current = game
   }, [game])
@@ -157,8 +192,6 @@ export function FruitBasketGame({ onComplete }: Props) {
   useEffect(() => {
     addPawCoinsRef.current = addPawCoins
   }, [addPawCoins])
-
-  const isGameStart = !gameRef.current.won && !gameRef.current.gameOver
 
   // Управление корзиной
   useEffect(() => {
@@ -225,7 +258,7 @@ export function FruitBasketGame({ onComplete }: Props) {
     const spawnItem = () => {
       const current = gameRef.current
 
-      if (!current.gameOver && !current.won) {
+      if (started && !current.gameOver && !current.won) {
         const isGood = Math.random() > 0.28
         const magnetActive =
           current.magnetUntil !== null &&
@@ -282,12 +315,10 @@ export function FruitBasketGame({ onComplete }: Props) {
       STARTUP_ITEM_SPAWN_INTERVAL,
     )
 
-    if (isGameStart) playOneShotSound(START_SOUND, BASKET_GAME_KEY)
-
     return () => {
       window.clearTimeout(spawnTimer)
     }
-  }, [playOneShotSound])
+  }, [started])
 
   // Отдельный спавн бонусов
   useEffect(() => {
@@ -296,7 +327,7 @@ export function FruitBasketGame({ onComplete }: Props) {
     const spawnBonus = () => {
       const current = gameRef.current
 
-      if (!current.gameOver && !current.won) {
+      if (started && !current.gameOver && !current.won) {
         // 50/50 между x2 и магнитом
         const bonusType: 'x2' | 'magnet' =
           Math.random() < 0.5 ? 'x2' : 'magnet'
@@ -333,13 +364,13 @@ export function FruitBasketGame({ onComplete }: Props) {
     return () => {
       window.clearTimeout(bonusTimer)
     }
-  }, [])
+  }, [started])
 
   // Игровой цикл
   useEffect(() => {
     const frameTimer = window.setInterval(() => {
       setGame((current) => {
-        if (current.gameOver || current.won) {
+        if (!started || current.gameOver || current.won) {
           return current
         }
 
@@ -398,7 +429,7 @@ export function FruitBasketGame({ onComplete }: Props) {
 
         for (const item of current.items) {
           let nextX = item.x
-          let nextY = item.y
+          let nextY: number
 
           // Если магнит активен, хороший предмет
           // должен притягиваться к корзине.
@@ -412,11 +443,11 @@ export function FruitBasketGame({ onComplete }: Props) {
               MAGNET_SPEED_MULTIPLIER
 
             const xDistance =
-              basketX - item.x
+              basketX + BASKET_CATCH_OFFSET - item.x
 
             nextX =
               Math.abs(xDistance) <= 1
-                ? basketX
+                ? basketX + BASKET_CATCH_OFFSET
                 : item.x +
                 Math.sign(xDistance) *
                 Math.min(
@@ -430,59 +461,64 @@ export function FruitBasketGame({ onComplete }: Props) {
             nextY = item.y + item.speed
           }
 
-          const reachesBasket = nextY >= 78
-
-          const basketCatchX =
-            basketX + BASKET_CATCH_OFFSET
-
-          const inBasket =
-            Math.abs(
-              nextX - basketCatchX,
-            ) <=
-            BASKET_CATCH_WIDTH / 2
-
-          if (reachesBasket) {
-            if (inBasket) {
-              // Хороший предмет
-              if (item.kind === 'good') {
-                if (
-                  basketLoad <
-                  MAX_BASKET_LOAD
-                ) {
-                  playOneShotSound(CATCH_SOUND, BASKET_GAME_KEY)
-                  basketLoad += 1
+          if (
+            !item.overflowed &&
+            isCaught(item, { x: nextX, y: nextY }, current.basketX, basketX)
+          ) {
+            // Хороший предмет
+            if (item.kind === 'good') {
+              if (basketLoad < MAX_BASKET_LOAD) {
+                playOneShotSound(CATCH_SOUND, BASKET_GAME_KEY)
+                basketLoad += 1
+                if (basketLoad === MAX_BASKET_LOAD) {
+                  playOneShotSound(FULL_BASKET_SOUND, BASKET_GAME_KEY)
                 }
-
                 continue
               }
 
-              // Бонус
-              if (item.kind === 'bonus') {
-                if (
-                  item.bonusType === 'x2'
-                ) {
-                  // x2 действует на текущую
-                  // корзину.
-                  x2Active = true
-                }
-
-                if (
-                  item.bonusType === 'magnet'
-                ) {
-                  magnetWasCaught = true
-                }
-
-                continue
-              }
-
-              // Плохой предмет
-              if (item.kind === 'bad') {
-                playOneShotSound(HANDCUFFS_SOUND, BASKET_GAME_KEY)
-                lives -= 1
-                continue
-              }
+              // A full basket cannot absorb another item. Let it visibly
+              // fall past the character; it counts as a missed item below.
+              remainingItems.push({
+                ...item,
+                x: nextX,
+                y: nextY,
+                overflowed: true,
+              })
+              continue
             }
 
+            // Бонус
+            if (item.kind === 'bonus') {
+              playOneShotSound(BONUS_SOUND, 'basket-bonus')
+              if (
+                item.bonusType === 'x2'
+              ) {
+                // x2 действует на текущую
+                // корзину.
+                x2Active = true
+              }
+
+              if (
+                item.bonusType === 'magnet'
+              ) {
+                magnetWasCaught = true
+              }
+
+              continue
+            }
+
+            // Плохой предмет
+            if (item.kind === 'bad') {
+              playOneShotSound(
+                item.image === brickImage ? BRICK_SOUND : HANDCUFFS_SOUND,
+                'basket-bad-item',
+              )
+              lives -= 1
+              continue
+            }
+          }
+
+          if (isMissed(nextY)) {
             // Хороший предмет пропущен
             if (item.kind === 'good') {
               lives -= 1
@@ -539,7 +575,7 @@ export function FruitBasketGame({ onComplete }: Props) {
           score +=
             basketLoad *
             (x2Active ? 2 : 1)
-          playOneShotSound(COIN_SOUND, BASKET_GAME_KEY, 0.1)
+          playOneShotSound(COIN_SOUND, 'basket-coin', 0.1)
           basketLoad = 0
 
           // После сдачи x2 обязательно
@@ -611,7 +647,7 @@ export function FruitBasketGame({ onComplete }: Props) {
     return () => {
       window.clearInterval(frameTimer)
     }
-  }, [])
+  }, [started])
 
   const restart = () => {
     controlsRef.current.left = false
@@ -623,73 +659,52 @@ export function FruitBasketGame({ onComplete }: Props) {
 
     setGame(initialState)
     gameRef.current = initialState
+    setStarted(false)
   }
 
   return (
-    <div className="fruit-basket-game">
-      <div
-        className="fruit-basket-game__skyline"
-        aria-hidden="true"
-      >
-        <span>☁️</span>
-        <span>☁️</span>
-      </div>
-
-      <header className="fruit-basket-game__header">
-        <div>
-          <p className="fruit-basket-game__eyebrow">
-            Операция «Ценная находка»
-          </p>
-
-          <h1>Корзинка удачи</h1>
-
-          <p>
-            Лови драгоценности и технику, затем отнеси
-            их в зону сдачи. Наручники пропускай.
-          </p>
-        </div>
-
-        <div
-          className="fruit-basket-game__score"
-          aria-label={`Сдано ${game.score} из ${TARGET_SCORE}`}
-        >
-          <strong>
-            {String(game.score).padStart(2, '0')}
-          </strong>
-
-          <span>/ {TARGET_SCORE}</span>
-        </div>
-      </header>
-
-      <div className="fruit-basket-game__status">
-        <span>
-          В корзине {game.basketLoad}/{MAX_BASKET_LOAD}
-        </span>
-
-        {game.x2Active && (
-          <span className="fruit-basket-game__bonus-active">
-            x2 активно
-          </span>
-        )}
-
-        <span>Жизни</span>
-
-        <span
-          className="fruit-basket-game__hearts"
-          aria-label={`${game.lives} из ${MAX_LIVES} жизней`}
-        >
-          {'♥'.repeat(game.lives)}
-
-          <span className="fruit-basket-game__empty-hearts">
-            {'♡'.repeat(MAX_LIVES - game.lives)}
-          </span>
-        </span>
-      </div>
-
+    <div
+      className="fruit-basket-game"
+      ref={screenRef}
+      style={{
+        '--fruit-basket-width': FRUIT_BASKET_LAYOUT.width,
+        '--fruit-basket-height': FRUIT_BASKET_LAYOUT.height,
+        '--fruit-basket-x': FRUIT_BASKET_LAYOUT.x,
+        '--fruit-basket-y': FRUIT_BASKET_LAYOUT.y,
+      } as React.CSSProperties}
+    >
       <div
         className="fruit-basket-game__field"
         aria-label="Игровое поле"
       >
+        <img className="fruit-basket-game__sky" src={skyImage} alt="" aria-hidden="true" />
+        <img className="fruit-basket-game__building" src={buildingImage} alt="" aria-hidden="true" />
+        <img className="fruit-basket-game__ground-image" src={groundImage} alt="" aria-hidden="true" />
+
+        <div className="fruit-basket-game__hud" aria-label="Состояние игры">
+          <span aria-label={`Сдано ${game.score} из ${TARGET_SCORE}`}>
+            {game.score}/{TARGET_SCORE}
+          </span>
+          <span aria-label={`В корзине ${game.basketLoad} из ${MAX_BASKET_LOAD}`}>
+            {game.basketLoad}/{MAX_BASKET_LOAD}
+          </span>
+          <span className="fruit-basket-game__hearts" aria-label={`${game.lives} из ${MAX_LIVES} жизней`}>
+            {'♥'.repeat(game.lives)}
+            <span className="fruit-basket-game__empty-hearts">
+              {'♡'.repeat(MAX_LIVES - game.lives)}
+            </span>
+          </span>
+          {game.x2Active && <span className="fruit-basket-game__bonus-active">x2</span>}
+        </div>
+
+        {!started && !game.gameOver && !game.won && (
+          <div className="fruit-basket-game__start-screen">
+            <strong>Корзинка удачи</strong>
+            <p>Управление персонажем на A и D или стрелками. Лови ценности, складывай их в корзину и сдавай груз по краям поля. Наручники и кирпичи пропускай. Бонус x2 удваивает все очки в корзине при сдаче, действует один раз.</p>
+            <button type="button" onClick={startGame}>Начать игру</button>
+          </div>
+        )}
+
         <div
           className={`fruit-basket-game__drop-zone fruit-basket-game__drop-zone--left ${basketDropZoneClass(
             game,
@@ -728,27 +743,6 @@ export function FruitBasketGame({ onComplete }: Props) {
           />
         </div>
 
-        <div
-          className="fruit-basket-game__sun"
-          aria-hidden="true"
-        >
-          ☀
-        </div>
-
-        <div
-          className="fruit-basket-game__cloud cloud-one"
-          aria-hidden="true"
-        >
-          ☁
-        </div>
-
-        <div
-          className="fruit-basket-game__cloud cloud-two"
-          aria-hidden="true"
-        >
-          ☁
-        </div>
-
         {game.items.map((item) => (
           <span
             key={item.id}
@@ -784,7 +778,7 @@ export function FruitBasketGame({ onComplete }: Props) {
           }}
           aria-hidden="true"
         >
-          <img src={unuasherThiefImage} alt="" />
+          <img src={playerImage} alt="" />
           <i>●</i>
         </div>
 

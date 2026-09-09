@@ -1,132 +1,161 @@
 .fruit-basket-game {
-  --ink: #293b31;
-  --coral: #ef765d;
-  position: relative;
-  width: min(900px, 100%);
-  min-height: min(800px, calc(100dvh - 100px));
-  margin: 0 auto;
+  --ink: #f7e7c0;
+  --accent: #ffd76a;
+  --danger: #ff806e;
+  position: fixed;
+  z-index: 1;
+  top: var(--fruit-basket-y);
+  left: var(--fruit-basket-x);
+  width: var(--fruit-basket-width);
+  height: var(--fruit-basket-height);
+  box-sizing: border-box;
+  margin: 0;
   overflow: hidden;
-  padding: clamp(18px, 3vw, 34px);
-  border: 2px solid rgba(255, 255, 255, 0.7);
-  border-radius: 30px;
-  background: #f9ead0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--ink);
-  box-shadow: 0 24px 50px rgba(74, 74, 43, 0.22);
+  box-shadow: none;
   isolation: isolate;
+  transform: translate(-50%, -50%);
 }
 
 .fruit-basket-game::before {
-  position: absolute;
-  z-index: -2;
-  inset: 0;
-  background: linear-gradient(180deg, #f6b3a4 0%, #ffe1b5 47%, #a9d9ae 47%, #74bb8d 100%);
-  content: '';
+  display: none;
 }
 
-.fruit-basket-game::after {
-  position: absolute;
-  z-index: -1;
-  right: -7%;
-  bottom: 18%;
-  width: 70%;
-  height: 25%;
-  border-radius: 50% 50% 0 0;
-  background: rgba(255, 238, 183, 0.35);
-  content: '';
-  transform: rotate(-4deg);
-}
-
-.fruit-basket-game__skyline {
-  position: absolute;
-  top: 8%;
-  right: 8%;
-  left: 8%;
-  display: flex;
-  justify-content: space-between;
-  color: rgba(255, 255, 255, 0.74);
-  font-size: clamp(2.4rem, 6vw, 4.5rem);
-  pointer-events: none;
-}
-
-.fruit-basket-game__header,
-.fruit-basket-game__status {
+.fruit-basket-game__field {
   position: relative;
-  z-index: 3;
-}
-
-.fruit-basket-game__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.fruit-basket-game__eyebrow {
-  margin: 0 0 7px;
-  color: #a74d45;
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.fruit-basket-game h1 {
+  width: 976px;
+  height: 620px;
   margin: 0;
-  color: var(--ink);
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 0.95;
-  letter-spacing: 0;
-  text-shadow: none;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: #2447a5;
+  transform: scale(var(--fruit-basket-scale, 1));
+  transform-origin: top left;
 }
 
-.fruit-basket-game__header p:last-child {
-  max-width: 360px;
-  margin: 13px 0 0;
-  color: #536254;
-  font-size: 0.98rem;
-  font-weight: 700;
+.fruit-basket-game__sky,
+.fruit-basket-game__building,
+.fruit-basket-game__ground-image {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  user-select: none;
 }
 
-.fruit-basket-game__score {
+.fruit-basket-game__sky {
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fruit-basket-game__building {
+  z-index: 1;
+  right: -4%;
+  bottom: 20%;
+  width: 108%;
+  height: 72%;
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+.fruit-basket-game__ground-image {
+  z-index: 4;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+}
+
+.fruit-basket-game__hud {
+  position: absolute;
+  z-index: 8;
+  top: 30px;
+  right: 38px;
   display: flex;
-  align-items: baseline;
-  gap: 4px;
-  padding: 10px 15px;
-  border: 2px solid rgba(41, 59, 49, 0.16);
-  border-radius: 14px;
-  background: rgba(255, 249, 231, 0.7);
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 2px solid rgba(255, 231, 155, 0.72);
+  border-radius: 8px;
+  background: rgba(12, 27, 74, 0.88);
+  box-shadow: 4px 4px 0 rgba(5, 12, 38, 0.34);
+  color: #fff4c8;
+  font-size: 0.78rem;
+  font-weight: 900;
   white-space: nowrap;
 }
 
-.fruit-basket-game__score strong {
-  font-size: 1.7rem;
+.fruit-basket-game__hud > span {
+  padding: 3px 5px;
+  border-right: 1px solid rgba(255, 231, 155, 0.34);
 }
 
-.fruit-basket-game__score span {
-  color: #748170;
-  font-weight: 800;
+.fruit-basket-game__hud > span:last-child { border-right: 0; }
+.fruit-basket-game__hearts { color: var(--danger); letter-spacing: 1px; }
+.fruit-basket-game__empty-hearts { color: rgba(255, 255, 255, 0.35); }
+.fruit-basket-game__bonus-active { color: var(--accent); }
+
+.fruit-basket-game__start-screen,
+.fruit-basket-game__result {
+  position: absolute;
+  z-index: 10;
+  top: 50%;
+  left: 50%;
+  width: min(390px, calc(100% - 48px));
+  padding: 24px;
+  border: 3px solid #ffe79b;
+  border-radius: 8px;
+  background: rgba(12, 27, 74, 0.95);
+  box-shadow: 7px 7px 0 rgba(5, 12, 38, 0.45), inset 0 0 0 2px #536cc3;
+  text-align: center;
+  transform: translate(-50%, -50%);
 }
 
-.fruit-basket-game__status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: fit-content;
-  margin: 22px auto 10px;
-  padding: 7px 13px;
-  border-radius: 99px;
-  background: rgba(255, 249, 231, 0.68);
-  color: #667262;
-  font-size: 0.8rem;
+.fruit-basket-game__start-screen strong,
+.fruit-basket-game__result h2 {
+  color: var(--accent);
+  font-size: 1.45rem;
+  text-shadow: 2px 2px 0 #6d3b52;
+}
+
+.fruit-basket-game__start-screen p,
+.fruit-basket-game__result p {
+  margin: 10px 0 0;
+  color: #e7efff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.fruit-basket-game__start-screen button,
+.fruit-basket-game__result button {
+  margin-top: 18px;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 5px;
+  background: var(--accent);
+  color: #172452;
   font-weight: 900;
-  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #bd7b45;
+}
+
+.fruit-basket-game__start-screen button:active,
+.fruit-basket-game__result button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #bd7b45;
 }
 
 .fruit-basket-game__drop-zone {
   position: absolute;
-  z-index: 4;
+  z-index: 7;
   top: 40%;
   display: flex;
   flex-direction: column;
@@ -135,29 +164,19 @@
   width: 62px;
   height: 126px;
   overflow: hidden;
-  border: 2px dashed rgba(41, 59, 49, 0.34);
-  border-radius: 14px;
-  background: rgba(255, 249, 231, 0.34);
-  color: rgba(41, 59, 49, 0.7);
+  border: 2px dashed rgba(255, 238, 178, 0.68);
+  border-radius: 10px;
+  background: rgba(13, 32, 84, 0.48);
+  color: #fff0b6;
   font-size: 0.62rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   transition: background 0.18s ease, border-color 0.18s ease;
 }
 
-.fruit-basket-game__drop-zone--left {
-  left: 9px;
-}
-
-.fruit-basket-game__drop-zone--right {
-  right: 9px;
-}
-
-.fruit-basket-game__drop-zone span {
-  margin-top: 4px;
-  font-size: 1.65rem;
-  line-height: 1;
-}
+.fruit-basket-game__drop-zone--left { left: 9px; }
+.fruit-basket-game__drop-zone--right { right: 9px; }
+.fruit-basket-game__drop-zone span { margin-top: 4px; font-size: 1.65rem; line-height: 1; }
 
 .fruit-basket-game__drop-zone i {
   position: absolute;
@@ -166,95 +185,48 @@
   left: 0;
   z-index: -1;
   display: block;
-  background: rgba(239, 118, 93, 0.38);
+  background: rgba(255, 128, 110, 0.48);
   transition: height 0.1s linear;
 }
 
 .fruit-basket-game__drop-zone.is-ready,
 .fruit-basket-game__drop-zone.is-charging {
-  border-color: var(--coral);
-  background: rgba(255, 249, 231, 0.72);
-  color: #a74d45;
+  border-color: var(--accent);
+  background: rgba(20, 43, 103, 0.8);
+  color: #fff7cd;
 }
 
-.fruit-basket-game__drop-zone.is-charging strong::after {
-  content: '...';
-}
+.fruit-basket-game__drop-zone.is-charging strong::after { content: '...'; }
 
-.fruit-basket-game__hearts {
-  color: var(--coral);
-  font-size: 1.15rem;
-  letter-spacing: 2px;
-  text-transform: none;
-}
-
-.fruit-basket-game__empty-hearts {
-  color: rgba(41, 59, 49, 0.22);
-}
-
-.fruit-basket-game__field {
-  position: relative;
-  width: min(620px, 100%);
-  height: clamp(430px, 62vh, 620px);
-  margin: 0 auto;
-  overflow: hidden;
-  border: 2px solid rgba(41, 59, 49, 0.15);
-  border-radius: 22px;
-  background: rgba(255, 249, 231, 0.16);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
-}
-
-.fruit-basket-game__sun {
-  position: absolute;
-  top: 8%;
-  right: 12%;
-  color: #ffd35c;
-  font-size: 3.5rem;
-  text-shadow: 0 3px 0 rgba(195, 117, 63, 0.18);
-}
-
-.fruit-basket-game__cloud {
-  position: absolute;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 3.2rem;
-}
-
-.cloud-one {
-  top: 17%;
-  left: 12%;
-}
-
-.cloud-two {
-  top: 30%;
-  right: 30%;
-  font-size: 2rem;
-}
+.fruit-basket-game__sun,
+.fruit-basket-game__cloud { position: absolute; z-index: 2; pointer-events: none; }
+.fruit-basket-game__sun { top: 8%; right: 12%; color: #ffd35c; font-size: 3.5rem; }
+.fruit-basket-game__cloud { color: rgba(255, 255, 255, 0.5); font-size: 3.2rem; }
+.cloud-one { top: 17%; left: 12%; }
+.cloud-two { top: 30%; right: 30%; font-size: 2rem; }
 
 .fruit-basket-game__item {
   position: absolute;
-  z-index: 2;
+  z-index: 5;
   display: grid;
   width: 44px;
   height: 44px;
   place-items: center;
-  filter: drop-shadow(0 4px 2px rgba(47, 70, 47, 0.17));
+  filter: drop-shadow(0 4px 2px rgba(8, 17, 50, 0.42));
   transform: translateX(-50%);
 }
 
-.fruit-basket-game__item img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.fruit-basket-game__item--bad {
-  filter: drop-shadow(0 4px 2px rgba(87, 45, 40, 0.28));
-}
+.fruit-basket-game__item img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.fruit-basket-game__item--bad { filter: drop-shadow(0 4px 2px rgba(87, 20, 35, 0.5)); }
+.fruit-basket-game__item--bonus { z-index: 6; overflow: visible; }
+.fruit-basket-game__item--bonus img { filter: drop-shadow(0 0 7px rgba(255, 215, 0, 0.9)); transform: scale(1.05); }
+.fruit-basket-game__item--bonus-x2 img { animation: bonus-x2-pulse 0.8s ease-in-out infinite; }
+.fruit-basket-game__item--bonus-magnet img { animation: bonus-magnet-pulse 0.8s ease-in-out infinite; }
+.fruit-basket-game__item--magnetized img { filter: drop-shadow(0 0 5px rgba(100, 180, 255, 0.9)) drop-shadow(0 0 10px rgba(100, 180, 255, 0.5)); }
 
 .fruit-basket-game__basket {
   position: absolute;
-  z-index: 3;
+  z-index: 6;
   bottom: 9%;
   display: grid;
   width: 15%;
@@ -265,230 +237,19 @@
   transform: translateX(-50%);
 }
 
-.fruit-basket-game__basket.is-full {
-  filter: drop-shadow(0 0 9px rgba(217, 56, 56, 0.95));
-}
-
-.fruit-basket-game__basket.is-full span {
-  animation: full-basket-pulse 0.8s ease-in-out infinite alternate;
-}
-
-.fruit-basket-game__basket span {
-  display: block;
-  width: 100%;
-  height: clamp(72px, 11vw, 112px);
-  filter: drop-shadow(0 7px 2px rgba(66, 99, 68, 0.25));
-}
-
-.fruit-basket-game__basket img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.fruit-basket-game__basket i {
-  width: 70%;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(52, 91, 59, 0.28);
-  font-size: 0;
-}
-
-@keyframes full-basket-pulse {
-  from {
-    filter: saturate(1) drop-shadow(0 0 2px rgba(217, 56, 56, 0.55));
-  }
-
-  to {
-    filter: saturate(1.4) drop-shadow(0 0 10px rgba(217, 56, 56, 0.95));
-  }
-}
-
-.fruit-basket-game__ground {
-  position: absolute;
-  right: -5%;
-  bottom: -9%;
-  left: -5%;
-  height: 20%;
-  border-radius: 50% 50% 0 0;
-  background: rgba(52, 131, 79, 0.32);
-}
-
-.fruit-basket-game__result {
-  position: absolute;
-  z-index: 5;
-  top: 50%;
-  left: 50%;
-  width: min(340px, calc(100% - 32px));
-  padding: 26px 24px 23px;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  border-radius: 21px;
-  background: rgba(255, 249, 231, 0.96);
-  box-shadow: 0 16px 40px rgba(65, 70, 43, 0.22);
-  text-align: center;
-  transform: translate(-50%, -50%);
-}
-
-.fruit-basket-game__result-icon {
-  font-size: 2.7rem;
-}
-
-.fruit-basket-game__result h2 {
-  margin: 9px 0 6px;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.75rem;
-}
-
-.fruit-basket-game__result p {
-  margin: 0;
-  color: #667262;
-  font-weight: 700;
-}
-
-.fruit-basket-game__result button {
-  margin-top: 18px;
-  padding: 11px 17px;
-  border: 0;
-  border-radius: 11px;
-  background: var(--coral);
-  color: #fff;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 4px 0 #c95449;
-}
-
-.fruit-basket-game__result button:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #c95449;
-}
-
-@media (max-width: 620px) {
-  .fruit-basket-game {
-    width: 100%;
-    min-height: calc(100dvh - 100px);
-    padding: 16px 12px 18px;
-    border-radius: 22px;
-  }
-
-  .fruit-basket-game__header {
-    gap: 10px;
-  }
-
-  .fruit-basket-game__header p:last-child {
-    margin-top: 9px;
-    font-size: 0.86rem;
-  }
-
-  .fruit-basket-game__score {
-    padding: 7px 10px;
-  }
-
-  .fruit-basket-game__score strong {
-    font-size: 1.35rem;
-  }
-
-  .fruit-basket-game__status {
-    margin-top: 15px;
-  }
-
-  .fruit-basket-game__field {
-    height: calc(100dvh - 290px);
-    min-height: 360px;
-  }
-
-  .fruit-basket-game__drop-zone {
-    width: 54px;
-    height: 108px;
-  }
-
-  .fruit-basket-game__drop-zone--left {
-    left: 6px;
-  }
-
-  .fruit-basket-game__drop-zone--right {
-    right: 6px;
-  }
-/* Активный x2 в статусной панели */
-
-.fruit-basket-game__bonus-active {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 9px;
-  border-radius: 8px;
-  font-weight: 800;
-  font-size: 13px;
-  background: rgba(255, 215, 64, 0.25);
-  border: 1px solid rgba(255, 193, 7, 0.7);
-  animation: bonus-pulse 1s ease-in-out infinite;
-}
-
-/* Общий стиль бонуса */
-
-.fruit-basket-game__item--bonus {
-  z-index: 5;
-  overflow: visible;
-}
-
-/* Чтобы бонус визуально отличался от обычных предметов */
-
-.fruit-basket-game__item--bonus img {
-  filter: drop-shadow(0 0 7px rgba(255, 215, 0, 0.9));
-  transform: scale(1.05);
-}
-
-.fruit-basket-game__item--bonus-x2 img {
-  animation: bonus-x2-pulse 0.8s ease-in-out infinite;
-}
-
-.fruit-basket-game__item--bonus-magnet img {
-  animation: bonus-magnet-pulse 0.8s ease-in-out infinite;
-}
-
-/*
- * Предмет, который сейчас притягивается магнитом.
- * Можно оставить небольшое свечение.
- */
-
-.fruit-basket-game__item--magnetized img {
-  filter:
-    drop-shadow(0 0 5px rgba(100, 180, 255, 0.9))
-    drop-shadow(0 0 10px rgba(100, 180, 255, 0.5));
-}
-
-/* Анимации */
-
-@keyframes bonus-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.06);
-  }
-}
+.fruit-basket-game__basket.is-full { filter: drop-shadow(0 0 9px rgba(217, 56, 56, 0.95)); }
+.fruit-basket-game__basket img { display: block; width: 100%; height: 112px; object-fit: contain; filter: drop-shadow(0 7px 2px rgba(7, 17, 47, 0.42)); }
+.fruit-basket-game__basket i { width: 70%; height: 8px; border-radius: 50%; background: rgba(4, 12, 36, 0.42); font-size: 0; }
+.fruit-basket-game__ground { display: none; }
+.fruit-basket-game__result-icon { font-size: 2.7rem; }
+.fruit-basket-game__result h2 { margin: 9px 0 6px; }
 
 @keyframes bonus-x2-pulse {
-  0%,
-  100% {
-    transform: scale(1.05);
-  }
-
-  50% {
-    transform: scale(1.18);
-  }
+  0%, 100% { transform: scale(1.05); }
+  50% { transform: scale(1.18); }
 }
 
 @keyframes bonus-magnet-pulse {
-  0%,
-  100% {
-    transform: scale(1.05) rotate(0deg);
-  }
-
-  50% {
-    transform: scale(1.18) rotate(-8deg);
-  }
-}
+  0%, 100% { transform: scale(1.05) rotate(0deg); }
+  50% { transform: scale(1.18) rotate(-8deg); }
 }
