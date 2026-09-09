@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import playerImage from '@/assets/flappy-bird/character-dachshund-bird.png'
+import playerImage from '@/assets/flappy-bird/dachshund-wings-up.png'
+import playerWingsDownImage from '@/assets/flappy-bird/dachshund-wings-down.png'
 import coinImage from '@/assets/flappy-bird/coin-bone.png'
 import backgroundImage1 from '@/assets/flappy-bird/bg1.png'
 import backgroundImage2 from '@/assets/flappy-bird/bg2.png'
@@ -103,6 +104,7 @@ export function FlappyBirdGame({ onComplete }: Props) {
   const [game, setGame] = useState<GameState>(createInitialState)
   const [backgroundIndex, setBackgroundIndex] = useState(0)
   const [stageScale, setStageScale] = useState(1)
+  const [isHolding, setIsHolding] = useState(false)
   const gameRef = useRef(game)
   const stageRef = useRef<HTMLButtonElement>(null)
   const onCompleteRef = useRef(onComplete)
@@ -168,11 +170,13 @@ export function FlappyBirdGame({ onComplete }: Props) {
   const startHolding = useCallback(() => {
     if (holdingRef.current) return
     holdingRef.current = true
+    setIsHolding(true)
     flap()
   }, [flap])
 
   const stopHolding = useCallback(() => {
     holdingRef.current = false
+    setIsHolding(false)
   }, [])
 
   useEffect(() => {
@@ -349,7 +353,7 @@ export function FlappyBirdGame({ onComplete }: Props) {
             className="flappy-bird-game__bird"
             style={{ transform: `translate(${BIRD_X}px, ${game.birdY}px) rotate(${Math.max(-18, Math.min(76, game.birdVelocity / 8))}deg)` }}
           >
-            <img src={playerImage} alt="" aria-hidden />
+            <img src={isHolding ? playerImage : playerWingsDownImage} alt="" aria-hidden />
           </span>
           {game.coins.map((coin) => (
             <span
