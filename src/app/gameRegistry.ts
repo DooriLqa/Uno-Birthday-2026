@@ -18,10 +18,13 @@ import { RobotMazeGame } from '@/features/RobotMazeGame'
 import type { GameDefinition } from '@/entities/game/model/types'
 import arcadeFrameImage from '@/shared/assets/flappy-bird/arcade-frame-transparent.png'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
-import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 import robotMazeGameBackground from '@/shared/assets/robot/background.png'
 import findAPairBackground from '@/shared/assets/find-a-pair/findapairbackground.png'
 import fishingScene from '@/shared/assets/locations/fishing.png'
+import raccoonArcadeBackground from '@/shared/assets/arkanoid/raccoon-arcade-background.png'
+import libraryBackground from '@/shared/assets/locations/tourist/library.png'
+import wildTotemCamp from '@/shared/assets/locations/wild/totem-camp.png'
+import wildPirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
 
 const locationTransition = {
   transitionSound: '/audio/sfx/location-footsteps.ogg',
@@ -67,6 +70,7 @@ export const games: GameDefinition[] = [
     mapPosition: { left: '42%', top: '32%' },
     pageClassName: 'book-shelf-page',
     ...islandGame,
+    backgroundImage: libraryBackground,
     Screen: BookShelfGame,
   },
   {
@@ -91,7 +95,7 @@ export const games: GameDefinition[] = [
     target: 'код тотемов',
     mapPosition: { left: '27%', top: '38%' },
     pageClassName: 'totem-code-page',
-    backgroundImage: totemBeachScene,
+    backgroundImage: wildTotemCamp,
     ...locationTransition,
     Screen: TotemCodeGame,
   },
@@ -205,7 +209,9 @@ export const games: GameDefinition[] = [
     color: '#b9d7f0',
     target: 'все кирпичи',
     mapPosition: { left: '50%', top: '30%' },
-    ...islandGame,
+    pageClassName: 'arkanoid-page',
+    backgroundImage: raccoonArcadeBackground,
+    ...locationTransition,
     Screen: Arkanoid,
   },
   {
@@ -242,6 +248,19 @@ export const games: GameDefinition[] = [
     backgroundImage: fishingScene,
     ...locationTransition,
     Screen: FishingGame,
+  },
+  {
+    id: 'robot-maze',
+    title: 'Робот-лабиринт',
+    description: 'Собери маршрут из записок и проведи робота к сокровищам.',
+    emoji: '🤖',
+    color: '#a2c9f0',
+    target: 'скрытое сокровище',
+    mapPosition: { left: '22%', top: '34%' },
+    pageClassName: 'robot-maze-page',
+    backgroundImage: wildPirateShore,
+    ...locationTransition,
+    Screen: RobotMazeGame,
   },
   {
     id: 'japonsk',

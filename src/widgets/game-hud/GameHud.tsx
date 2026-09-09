@@ -11,9 +11,10 @@ const CORRECT_STATION_ID = 'station-06'
 type Props = {
   onOpenRadio?: () => void
   onOpenMap?: () => void
+  mapOpen?: boolean
 }
 
-export function GameHud({ onOpenRadio, onOpenMap }: Props) {
+export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
   const pawCoins = usePawCoinStore((state) => state.pawCoins)
   const inventory = useInventoryStore((state) => state.items)
   const isPowered = useRadioStore((state) => state.isPowered)
@@ -29,10 +30,10 @@ export function GameHud({ onOpenRadio, onOpenMap }: Props) {
         {onOpenMap && (
           <button
             type="button"
-            className="game-hud__map-button"
+            className={`game-hud__map-button ${mapOpen ? 'is-open' : ''}`}
             onClick={onOpenMap}
-            aria-label="Открыть карту"
-            title="Карта"
+            aria-label={mapOpen ? 'Закрыть карту' : 'Открыть карту'}
+            title={mapOpen ? 'Закрыть карту' : 'Открыть карту'}
           >
             <MapIcon size={20} />
           </button>

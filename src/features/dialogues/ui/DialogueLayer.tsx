@@ -12,11 +12,13 @@ export function DialogueLayer() {
     state.activeDialogueId ? state.dialogues[state.activeDialogueId] : undefined,
   )
   const nextMessage = useDialogueStore((state) => state.nextMessage)
+  const selectChoice = useDialogueStore((state) => state.selectChoice)
   const closeDialogue = useDialogueStore((state) => state.closeDialogue)
   const historyRef = useRef<HTMLDivElement>(null)
   const playedMessageKeyRef = useRef<string | null>(null)
 
   const message = dialogue?.messages[activeMessageIndex]
+  const hasChoices = Boolean(message?.choices?.length)
 
   useEffect(() => {
     if (!activeDialogueId) return
@@ -26,7 +28,7 @@ export function DialogueLayer() {
         closeDialogue()
         return
       }
-      if (event.key === 'Enter' || event.key === ' ') {
+      if (!hasChoices && (event.key === 'Enter' || event.key === ' ')) {
         event.preventDefault()
         nextMessage()
       }
@@ -34,7 +36,7 @@ export function DialogueLayer() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [activeDialogueId, closeDialogue, nextMessage])
+  }, [activeDialogueId, closeDialogue, hasChoices, nextMessage])
 
   useEffect(() => {
     const history = historyRef.current
@@ -66,11 +68,11 @@ export function DialogueLayer() {
 
   return (
     <section
-      className="dialogue-layer"
+      className={`dialogue-layer ${hasChoices ? 'dialogue-layer--has-choices' : ''}`}
       role="dialog"
       aria-modal="true"
       aria-label={`Диалог: ${dialogue.id}`}
-      onClick={nextMessage}
+      onClick={() => { if (!hasChoices) nextMessage() }}
     >
       <button
         type="button"
@@ -100,6 +102,23 @@ export function DialogueLayer() {
               <div className="dialogue-layer__bubble">
                 <strong>{dialogueMessage.speaker.name}</strong>
                 <p>{dialogueMessage.text}</p>
+                {isActiveMessage && dialogueMessage.choices?.length ? (
+                  <div className="dialogue-layer__choices" aria-label="Варианты ответа">
+                    {dialogueMessage.choices.map((choice) => (
+                      <button
+                        key={choice.id}
+                        type="button"
+                        className="dialogue-layer__choice"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          selectChoice(choice.id)
+                        }}
+                      >
+                        {choice.label}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             </div>
           )

@@ -1,8 +1,5 @@
-import { useState } from 'react'
-import { MessageCircle } from 'lucide-react'
-import { games, getGame } from '@/app/gameRegistry'
-import { dialogueTestSamples, openDialogue } from '@/features/dialogues'
-import { useProgressStore } from '@/features/game-progress/model/store'
+import { useEffect, useState } from 'react'
+import { getGame } from '@/app/gameRegistry'
 import { GamePage } from '@/pages/game'
 import { GameIslandMap } from '@/widgets/game-island-map'
 import { DevCoinControls } from '@/widgets/dev-coin-controls/DevCoinControls'
@@ -10,75 +7,73 @@ import { GameHud } from '@/widgets/game-hud/GameHud'
 import { RadioModal } from '@/features/beach-radio'
 import { LocationNavigator } from '@/features/location-navigation'
 import { locations } from '@/features/location-navigation/model/locations'
+import {
+  hasIslandMap,
+  openMapWarning,
+  talkToMerchant,
+  tryEnterJungleCave,
+} from '@/features/location-navigation/model/merchantDialogues'
+import { useWorldStore } from '@/features/location-navigation/model/worldStore'
+import { useBeachAmbience } from '@/features/location-navigation/model/useBeachAmbience'
+import {
+  openFishermanIntroduction,
+  openPirateIntroduction,
+} from '@/features/location-navigation/model/wildBeachDialogues'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
+import { useDialogueStore } from '@/features/dialogues'
 
 export function GameFlow() {
   const [activeGameId, setActiveGameId] = useState<string | null>(null)
-  const [isBeachLocationOpen, setIsBeachLocationOpen] = useState(false)
+  const [mapOpen, setMapOpen] = useState(false)
   const [radioOpen, setRadioOpen] = useState(false)
-  const completedIds = useProgressStore((state) => state.completedGameIds)
+  const { scene, setScene, setHistory } = useWorldStore()
   const activeGame = getGame(activeGameId)
+  const ambienceVolume = locations[scene.locationId]?.ambienceVolume ?? 0
+  useBeachAmbience(mapOpen ? 0 : activeGame ? ambienceVolume * 0.15 : ambienceVolume)
 
-  const moveToLocation = (gameId: string | null, transitionSound?: string) => {
-    playOneShotSound(transitionSound)
+  useEffect(() => {
+    if (mapOpen || activeGame || radioOpen) return
+    if (scene.locationId === 'fisher-hut') openFishermanIntroduction()
+    if (scene.locationId === 'pirate-shore') openPirateIntroduction()
+  }, [activeGame, mapOpen, radioOpen, scene.locationId])
+
+  const openGame = (gameId: string) => {
+    playOneShotSound(getGame(gameId)?.transitionSound)
     setActiveGameId(gameId)
   }
-
+  const openMap = () => {
+    if (useDialogueStore.getState().activeDialogueId) return
+    if (mapOpen) {
+      setMapOpen(false)
+      return
+    }
+    if (!hasIslandMap()) { openMapWarning(); return }
+    playOneShotSound(locations.pier.transitionSound)
+    setActiveGameId(null)
+    setMapOpen(true)
+  }
   return (
     <main className="island-map-page">
-      <GameIslandMap
-        games={games}
-        completedIds={completedIds}
-        onPlay={(gameId) => moveToLocation(gameId, getGame(gameId)?.transitionSound)}
-        onOpenBeach={() => {
-          playOneShotSound(locations['beach-panorama'].transitionSound)
-          setIsBeachLocationOpen(true)
+      {mapOpen && <GameIslandMap
+        onOpenRegion={(entry) => {
+          playOneShotSound(locations[entry].transitionSound)
+          setScene({ locationId: entry, pan: 0.5 })
+          setHistory([])
+          setMapOpen(false)
         }}
-      />
-      <GameHud
-        onOpenRadio={() => setRadioOpen(true)}
-        onOpenMap={() => {
-          if (isBeachLocationOpen) playOneShotSound(locations['beach-panorama'].transitionSound)
+      />}
+      <GameHud mapOpen={mapOpen} onOpenRadio={() => setRadioOpen(true)} onOpenMap={openMap} />
+      <LocationNavigator
+        active={!mapOpen && !activeGame && !radioOpen}
+        visible={!activeGame && !radioOpen}
+        onOpenMap={openMap} onOpenGame={openGame}
+        onMerchant={() => talkToMerchant(() => openGame('beach-radio'))}
+        onEnterJungleCave={() => tryEnterJungleCave(() => openGame('japonsk'))} />
+      {activeGame && <GamePage game={activeGame}
+        onBack={() => {
+          playOneShotSound(activeGame.transitionSound)
           setActiveGameId(null)
-          setIsBeachLocationOpen(false)
-        }}
-      />
-      {!activeGameId && !isBeachLocationOpen && (
-        <button
-          type="button"
-          className="main-dialogue-button"
-          onClick={() => openDialogue(dialogueTestSamples[0])}
-        >
-          <MessageCircle size={20} /> Поговорить с Пончиком
-        </button>
-      )}
-      {!activeGameId && !isBeachLocationOpen && (
-        <button
-          type="button"
-          className="location-demo-entry"
-          onClick={() => setIsBeachLocationOpen(true)}
-        >
-          🏖️ Прогуляться по пляжу
-        </button>
-      )}
-      {isBeachLocationOpen && (
-        <LocationNavigator
-          initialLocationId="beach-panorama"
-          onExit={(transitionSound) => {
-            playOneShotSound(transitionSound)
-            setIsBeachLocationOpen(false)
-          }}
-          onOpenGame={(gameId) => moveToLocation(gameId, getGame(gameId)?.transitionSound)}
-          onOpenDialogue={() => openDialogue(dialogueTestSamples[0])}
-        />
-      )}
-      {activeGame && (
-        <GamePage
-          game={activeGame}
-          onBack={() => moveToLocation(null, activeGame.transitionSound)}
-          onOpenRadio={() => setRadioOpen(true)}
-        />
-      )}
+        }} onOpenRadio={() => setRadioOpen(true)} />}
       <RadioModal open={radioOpen} onClose={() => setRadioOpen(false)} />
       <DevCoinControls />
     </main>

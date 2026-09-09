@@ -1,24 +1,16 @@
 .game-island-map {
   position: fixed;
+  z-index: 25;
   inset: 0;
   overflow: hidden;
-  background: #0b9ed1;
-}
-.game-island-map__backdrop {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: blur(3px) saturate(1.1);
-  scale: 1.05;
+  background: transparent;
 }
 .game-island-map__active-area {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: min(100vw, 177.7778dvh);
-  height: min(100dvh, 56.25vw);
+  width: min(94vw, 167.1111dvh);
+  height: min(94dvh, 52.875vw);
   translate: -50% -50%;
 }
 .game-island-map__image {
@@ -26,6 +18,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(20, 28, 24, 0.38));
   user-select: none;
 }
 .game-island-map__marker {
@@ -116,20 +109,26 @@
   opacity: 1;
   transform: translate(-50%, 0);
 }
-@media (min-aspect-ratio: 16 / 9) {
-  .game-island-map__active-area {
-    width: 100vw;
-    height: 56.25vw;
-  }
-}
-@media (max-aspect-ratio: 16 / 9) {
-  .game-island-map__active-area {
-    width: 177.7778dvh;
-    height: 100dvh;
-  }
-}
 @media (max-width: 600px) {
   .game-island-map__tooltip {
     display: none;
   }
 }
+.game-island-map__region {
+  position: absolute;
+  border: 0;
+  background: transparent;
+  --cursor-image: url('../../shared/assets/cursors/projected-forward.png') 53 30, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
+  color: #fff9df;
+}
+.game-island-map__region span {
+  display: inline-block;
+  padding: 9px 14px;
+  border-radius: 14px;
+  background: #234c49e6;
+  font-weight: 800;
+}
+.game-island-map__region small { display: block; margin-top: 5px; font-weight: 400; }
+.game-island-map__region[aria-disabled="true"] { opacity: 0.7; cursor: not-allowed; }
+.game-island-map__region:focus-visible { outline: 2px solid #ffeab5; }

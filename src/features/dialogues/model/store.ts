@@ -12,6 +12,7 @@ type DialogueState = {
   openDialogue: (dialogue: Dialogue) => void
   openDialogueById: (dialogueId: string) => void
   nextMessage: () => void
+  selectChoice: (choiceId: string) => void
   closeDialogue: () => void
   getReadState: (dialogueId: string) => DialogueReadState
 }
@@ -76,6 +77,18 @@ export const useDialogueStore = create<DialogueState>()(
           },
         })
         message.onComplete?.()
+      },
+      selectChoice: (choiceId) => {
+        const state = get()
+        const dialogue = state.activeDialogueId
+          ? state.dialogues[state.activeDialogueId]
+          : undefined
+        const message = dialogue?.messages[state.activeMessageIndex]
+        const choice = message?.choices?.find((item) => item.id === choiceId)
+        if (!choice) return
+
+        get().nextMessage()
+        choice.onSelect()
       },
       closeDialogue: () => set({ activeDialogueId: null, activeMessageIndex: 0 }),
       getReadState: (dialogueId) => {
