@@ -6,32 +6,73 @@
   gap: 14px;
 }
 
-.arkanoid__hud {
-  width: min(720px, 100%);
+.arkanoid__header {
+  width: min(900px, 100%);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
 
-.arkanoid__hud > div {
+.arkanoid__header > div:first-child {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 13px;
-  border-radius: 12px;
-  background: #f4efe8;
+  gap: 14px;
 }
 
-.arkanoid__hud span {
+.arkanoid__header span {
   font-size: 14px;
 }
 
-.arkanoid__hud strong {
-  font-size: 20px;
+.arkanoid__header strong {
+  font-size: 18px;
+}
+
+.arkanoid__levels {
+  display: flex;
+  gap: 6px;
+}
+
+.arkanoid__level {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: #e5e7eb;
+  color: #374151;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.arkanoid__level--active {
+  background: #eb6c9a;
+  color: #ffffff;
+}
+
+.arkanoid__level:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.arkanoid__powerups {
+  min-height: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.arkanoid__powerup-active {
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #f4efe8;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .arkanoid__canvas-wrap {
-  width: 720px;
+  position: relative;
+  width: 900px;
   max-width: 100%;
   overflow: hidden;
   border-radius: 16px;
@@ -46,54 +87,90 @@
   user-select: none;
 }
 
-.arkanoid__controls {
-  min-height: 44px;
+.arkanoid__overlay {
+  position: absolute;
+  inset: 0;
+
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
+
+  gap: 12px;
+
+  background: rgba(5, 8, 13, 0.78);
+
+  color: #ffffff;
+  text-align: center;
 }
 
-.arkanoid__button {
+.arkanoid__overlay h2 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.arkanoid__overlay p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.arkanoid__overlay button {
   padding: 11px 24px;
+
   border: 0;
   border-radius: 10px;
+
   background: #eb6c9a;
-  color: #fff;
+  color: #ffffff;
+
   font-size: 16px;
   font-weight: 700;
+
   cursor: pointer;
 }
 
-.arkanoid__message {
-  font-size: 22px;
-  font-weight: 800;
+.arkanoid__overlay button:hover {
+  filter: brightness(1.05);
 }
 
-.arkanoid__message--win {
-  color: #2e9b55;
-}
+.arkanoid__legend {
+  width: min(900px, 100%);
 
-.arkanoid__message--lose {
-  color: #d9534f;
-}
+  display: flex;
+  justify-content: center;
 
-.arkanoid__hint {
-  font-size: 14px;
+  gap: 18px;
+  flex-wrap: wrap;
+
   color: #6b7280;
+  font-size: 13px;
+}
+
+.arkanoid__legend b {
+  color: #374151;
 }
 
 @media (max-width: 740px) {
-  .arkanoid__hud {
-    width: 100%;
+  .arkanoid__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .arkanoid__header > div:first-child {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .arkanoid__levels {
+    justify-content: center;
   }
 
   .arkanoid__canvas-wrap {
     border-radius: 12px;
   }
 
-  .arkanoid__hud > div {
-    padding: 7px 10px;
+  .arkanoid__legend {
+    padding: 0 10px;
+    gap: 10px;
   }
 }
