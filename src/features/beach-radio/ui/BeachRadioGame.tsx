@@ -5,7 +5,6 @@ import {
   Coins,
   Pause,
   Play,
-  Power,
   Radio as RadioIcon,
   Volume2,
   VolumeX,
@@ -17,6 +16,8 @@ import { syncRadioAudio, useRadioStore } from '@/features/beach-radio/model/radi
 import { pickQuestion } from '@/features/beach-radio/model/quiz'
 import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
 import type { QuizQuestion } from '@/features/beach-radio/model/types'
+import { VolumeKnob } from './VolumeKnob/VolumeKnob'
+import radio from '@/shared/assets/radio/radio.png'
 import './BeachRadioGame.css'
 
 type Props = { onComplete: () => void; onOpenRadio?: () => void }
@@ -396,7 +397,9 @@ export function RadioModal({ open, onClose }: { open: boolean; onClose: () => vo
   return (
     <div className="radio-modal" role="dialog" aria-modal="true" aria-label="Радиоприёмник">
       <div className="radio-modal__backdrop" />
-      <div className="radio-modal__content">
+      <div className="radio-content">
+        <img className="radio-image" src={radio} alt="" />
+
         <button
           type="button"
           className="radio-modal__close"
@@ -406,76 +409,49 @@ export function RadioModal({ open, onClose }: { open: boolean; onClose: () => vo
           <X size={22} />
         </button>
 
-        <div className="radio-device" aria-label="Радиоприёмник Beach Waves">
-          <div className="radio-device__antenna" />
-          <div className="radio-device__handle" />
-          <div className="radio-device__brand">
-            BEACH
-            <br />
-            WAVES
-          </div>
-          <div className="radio-device__screen" aria-live="polite">
-            <span>FM</span>
-            <strong>{frequency.toFixed(1)}</strong>
-            <small>MHz</small>
-          </div>
-          <div className="radio-device__speaker">
-            {Array.from({ length: 35 }, (_, index) => (
-              <i key={index} />
-            ))}
-          </div>
-          <div className="radio-device__tuning">
-            <div className="radio-device__tuning-labels">
-              <span>87</span>
-              <span>FM</span>
-              <span>108</span>
-            </div>
-            <input
-              className="radio-device__frequency-range"
-              type="range"
-              min="87"
-              max="108"
-              step="0.1"
-              value={frequency}
-              onChange={(event) => setFrequency(Number(event.target.value))}
-              aria-label="Настройка частоты"
-            />
-            <div className="radio-device__frequency-markers">
-              <span>88</span>
-              <span>92</span>
-              <span>96</span>
-              <span>100</span>
-              <span>104</span>
-              <span>108</span>
-            </div>
-          </div>
+        <input
+          className="radio-frequency"
+          type="range"
+          min="87"
+          max="108"
+          step="0.1"
+          value={frequency}
+          onChange={(event) => setFrequency(Number(event.target.value))}
+          aria-label="Настройка частоты"
+        />
 
-          <div className="radio-device__controls">
-            <button
-              type="button"
-              className={`radio-device__power ${isPowered ? 'is-on' : ''}`}
-              onClick={() => setPowered(!isPowered)}
-              aria-label={isPowered ? 'Выключить радио' : 'Включить радио'}
-            >
-              <Power size={22} />
-            </button>
-            <label className="radio-device__volume">
-              <Volume2 size={18} />
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onChange={(event) => setVolume(Number(event.target.value))}
-                aria-label="Громкость радио"
-              />
-            </label>
-            <span className={`radio-device__status ${isPowered ? 'is-on' : ''}`}>
-              {isPowered ? 'ON AIR' : 'OFF'}
-            </span>
-          </div>
+        <div className="radio-knob-volume">
+          <VolumeKnob
+            value={volume}
+            onChange={setVolume}
+            size={90}
+            min={0}
+            max={1}
+            step={0.01}
+            ariaLabel="Громкость радио"
+          />
         </div>
+
+        <div className="radio-knob-frequency">
+          <VolumeKnob
+            value={frequency}
+            onChange={setFrequency}
+            size={93}
+            min={87.5}
+            max={108}
+            step={0.1}
+            ariaLabel="Настройка частоты радио"
+          />
+        </div>
+
+        <button
+          className={`radio-power-button ${isPowered ? 'is-on' : ''}`}
+          type="button"
+          aria-label={isPowered ? 'Выключить радио' : 'Включить радио'}
+          onClick={() => setPowered(!isPowered)}
+        >
+          <span className="power-icon"></span>
+        </button>
       </div>
     </div>
   )
