@@ -19,7 +19,8 @@
   border: 0;
   background: transparent;
   --cursor-back: url('../../../shared/assets/cursors/projected-back.png') 32 50, pointer;
-  cursor: var(--cursor-back);
+  --cursor-image: var(--cursor-back);
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .fishing-navigator__back-zone:hover,
 .fishing-navigator__back-zone:focus-visible {
@@ -33,8 +34,9 @@
   z-index: 11;
   user-select: none;
   touch-action: none;
-  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 32 50, pointer;
-  cursor: var(--cursor-pointer);
+  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 25 6, pointer;
+  --cursor-image: var(--cursor-pointer);
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .fishing-title {
   position: absolute;
@@ -208,6 +210,7 @@
     transform: rotate(-3deg) translateY(-4px);
   }
 }
+
 .fishing-bobber {
   position: absolute;
   z-index: 20;
@@ -217,6 +220,8 @@
   transition:
     left 0.65s cubic-bezier(0.18, 0.75, 0.28, 1),
     top 0.65s cubic-bezier(0.18, 0.75, 0.28, 1);
+  /* Перспектива для 3D эффекта */
+  perspective: 400px;
 }
 
 .fishing-bobber img {
@@ -224,7 +229,98 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  /* Базовая анимация для всех состояний (опционально) */
+}
+
+/* Вода вокруг поплавка - базовое состояние (ожидание) */
+.fishing-bobber::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120px;
+  height: 70px;
+  transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(0.8);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(64, 224, 208, 0) 20%,
+    rgba(64, 224, 208, 0.2) 35%,
+    rgba(64, 224, 208, 0.4) 50%,
+    rgba(64, 224, 208, 0.2) 65%,
+    rgba(64, 224, 208, 0) 80%
+  );
+  animation: water-ripple-idle 2.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+  /* Эффект размытия для реалистичности */
+  filter: blur(2px);
+}
+
+/* Вторичный слой воды */
+.fishing-bobber::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 160px;
+  height: 90px;
+  transform: translate(-50%, calc(-50% + 8px)) rotateX(60deg) scale(0.8);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(64, 224, 208, 0) 30%,
+    rgba(100, 200, 255, 0.15) 45%,
+    rgba(64, 224, 208, 0.3) 60%,
+    rgba(64, 224, 208, 0.1) 75%,
+    rgba(64, 224, 208, 0) 90%
+  );
+  animation: water-ripple-idle 3s ease-in-out infinite 0.5s;
+  pointer-events: none;
+  z-index: -2;
+  filter: blur(3px);
+}
+
+/* Вода во время борьбы - более интенсивная */
+.fishing-bobber.is-fighting::before {
+  animation: water-ripple-fight 0.5s ease-in-out infinite;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(64, 224, 208, 0) 10%,
+    rgba(255, 200, 100, 0.25) 25%,
+    rgba(64, 224, 208, 0.5) 40%,
+    rgba(64, 224, 208, 0.3) 55%,
+    rgba(255, 200, 100, 0.15) 70%,
+    rgba(64, 224, 208, 0) 85%
+  );
+  filter: blur(2px);
+  width: 140px;
+  height: 80px;
+}
+
+.fishing-bobber.is-fighting::after {
+  animation: water-ripple-fight 0.35s ease-in-out infinite 0.15s;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(64, 224, 208, 0) 20%,
+    rgba(255, 200, 100, 0.2) 35%,
+    rgba(64, 224, 208, 0.35) 50%,
+    rgba(64, 224, 208, 0.15) 65%,
+    rgba(64, 224, 208, 0) 80%
+  );
+  filter: blur(4px);
+  width: 190px;
+  height: 100px;
+}
+
+/* Третий слой воды для борьбы - пена/брызги */
+.fishing-bobber.is-fighting {
+  filter: drop-shadow(0 0 30px rgba(255, 200, 100, 0.4));
+}
+
+.fishing-bobber.is-fighting::before {
+  box-shadow:
+    0 0 60px rgba(64, 224, 208, 0.3),
+    inset 0 0 40px rgba(255, 200, 100, 0.2);
 }
 
 .fishing-bobber img.is-biting {
@@ -244,6 +340,7 @@
   color: #fff1a9;
   text-shadow: 3px 3px 0 #683d2b;
   animation: fishing-alert-pop 0.25s ease-out;
+  z-index: 10;
 }
 
 /* Анимация поклёвки - быстрые короткие движения */
@@ -259,16 +356,16 @@
 /* Анимация борьбы - более хаотичные движения */
 @keyframes fishing-bobber-fight {
   0% {
-    transform: translateY(0px);
+    transform: translateY(0px) rotate(0deg);
   }
   25% {
-    transform: translateY(-8px);
+    transform: translateY(-8px) rotate(-3deg);
   }
   75% {
-    transform: translateY(5px);
+    transform: translateY(5px) rotate(3deg);
   }
   100% {
-    transform: translateY(-2px);
+    transform: translateY(-2px) rotate(0deg);
   }
 }
 
@@ -286,6 +383,190 @@
     opacity: 1;
   }
 }
+
+/* Анимация воды в состоянии ожидания - эллиптические волны под углом */
+@keyframes water-ripple-idle {
+  0% {
+    transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(0.7);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(1.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(0.7);
+    opacity: 0.4;
+  }
+}
+
+/* Анимация воды в состоянии борьбы - хаотичные движения под углом */
+@keyframes water-ripple-fight {
+  0% {
+    transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(0.6) rotateY(0deg);
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(1) rotateY(8deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(0.8) rotateY(-5deg);
+    opacity: 0.7;
+  }
+  75% {
+    transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(1.2) rotateY(12deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(0.6) rotateY(0deg);
+    opacity: 0.9;
+  }
+}
+
+/* Специальная анимация для поклёвки - небольшие волны */
+.fishing-bobber.is-biting::before {
+  animation: water-ripple-bite 0.4s ease-in-out infinite;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(30, 144, 154, 0) 15%,
+    rgba(30, 144, 154, 0.35) 35%,
+    rgba(30, 144, 154, 0.2) 55%,
+    rgba(30, 144, 154, 0) 75%
+  );
+  width: 100px;
+  height: 60px;
+}
+
+.fishing-bobber.is-biting::after {
+  animation: water-ripple-bite 0.3s ease-in-out infinite 0.15s;
+  width: 140px;
+  height: 75px;
+}
+
+@keyframes water-ripple-bite {
+  0% {
+    transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, calc(-50% + 5px)) rotateX(60deg) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* Анимация поклёвки - быстрые короткие движения */
+@keyframes fishing-bobber-bite {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Анимация борьбы - более хаотичные движения */
+@keyframes fishing-bobber-fight {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(-3deg);
+  }
+  75% {
+    transform: translateY(5px) rotate(3deg);
+  }
+  100% {
+    transform: translateY(-2px) rotate(0deg);
+  }
+}
+
+/* Анимация появления восклицательного знака */
+@keyframes fishing-alert-pop {
+  0% {
+    transform: translateX(-50%) scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(-50%) scale(1.3);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Анимация воды в состоянии ожидания - эллиптические волны под углом */
+@keyframes water-ripple-idle {
+  0% {
+    transform: translate(-50%, -50%) rotateX(60deg) scale(0.7);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(-50%, -50%) rotateX(60deg) scale(1.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotateX(60deg) scale(0.7);
+    opacity: 0.4;
+  }
+}
+
+/* Анимация воды в состоянии борьбы - хаотичные движения под углом */
+@keyframes water-ripple-fight {
+  0% {
+    transform: translate(-50%, -50%) rotateX(60deg) scale(0.6) rotateY(0deg);
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate(-50%, -50%) rotateX(60deg) scale(1) rotateY(8deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) rotateX(60deg) scale(0.8) rotateY(-5deg);
+    opacity: 0.7;
+  }
+  75% {
+    transform: translate(-50%, -50%) rotateX(60deg) scale(1.2) rotateY(12deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotateX(60deg) scale(0.6) rotateY(0deg);
+    opacity: 0.9;
+  }
+}
+
+/* Специальная анимация для поклёвки - небольшие волны */
+.fishing-bobber.is-biting::before {
+  animation: water-ripple-bite 0.4s ease-in-out infinite;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(64, 224, 208, 0) 15%,
+    rgba(64, 224, 208, 0.3) 35%,
+    rgba(64, 224, 208, 0.15) 55%,
+    rgba(64, 224, 208, 0) 75%
+  );
+  width: 100px;
+  height: 60px;
+}
+
+.fishing-bobber.is-biting::after {
+  animation: water-ripple-bite 0.3s ease-in-out infinite 0.15s;
+  width: 140px;
+  height: 75px;
+}
+
+@keyframes water-ripple-bite {
+  0% {
+    transform: translate(-50%, -50%) rotateX(60deg) scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotateX(60deg) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
 .fishing-bite-alert {
   position: absolute;
   z-index: 25;

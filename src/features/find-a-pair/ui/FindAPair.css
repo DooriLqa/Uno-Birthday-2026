@@ -1,95 +1,256 @@
+@charset "UTF-8";
+
 .find-a-pair {
+  position: relative;
   width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 8px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #fff;
+}
+
+.find-a-pair__game {
+  --find-a-pair-scale: 1;
+
+  flex: 0 0 auto;
+  width: 760px;
+  max-width: none;
+  box-sizing: border-box;
+
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 18px;
-  padding: 18px 0 10px;
+
+  transform: scale(var(--find-a-pair-scale));
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .find-a-pair__hud {
-  width: min(720px, 100%);
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
+  width: 760px;
+  display: grid;
+  grid-template-columns: 1fr 190px 1fr;
+  align-items: center;
+  gap: 18px;
 }
 
 .find-a-pair__timer,
 .find-a-pair__pairs {
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-width: 150px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: #f4efe8;
-}
-
-.find-a-pair__timer strong {
-  font-size: 22px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  background: rgba(35, 25, 45, 0.58);
+  backdrop-filter: blur(5px);
+  box-sizing: border-box;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
 }
 
 .find-a-pair__timer span,
 .find-a-pair__pairs span {
-  color: #756b63;
+  font-weight: 700;
+}
+
+.find-a-pair__timer strong,
+.find-a-pair__pairs strong {
+  font-size: 22px;
+}
+
+.find-a-pair__start,
+.find-a-pair__start-spacer {
+  width: 190px;
+  min-width: 190px;
+  height: 46px;
+  box-sizing: border-box;
+}
+
+.find-a-pair__start {
+  padding: 11px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  background: #eb6c9a;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 8 6, auto;
+  cursor: var(--cursor-pointer);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.find-a-pair__start:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.find-a-pair__start-spacer {
+  visibility: hidden;
 }
 
 .find-a-pair__result {
   margin: 0;
   font-size: 22px;
   font-weight: 800;
+  text-align: center;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
 }
 
-.find-a-pair__result--win {
-  color: #2e9b55;
+.find-a-pair__board-wrapper {
+  position: relative;
+  width: 760px;
 }
 
-.find-a-pair__result--lose {
-  color: #d9534f;
-}
+.find-a-pair__timeout {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
 
-.find-a-pair__start {
-  min-width: 170px;
-  padding: 11px 22px;
-  border: 0;
-  border-radius: 10px;
-  background: #eb6c9a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+  box-sizing: border-box;
+  pointer-events: none;
+
   color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
+  font-size: 56px;
+  line-height: 1.1;
+  font-weight: 900;
+  text-align: center;
+
+  text-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.75),
+    0 0 24px rgba(255, 120, 120, 0.55);
+
+
+  animation: find-a-pair-timeout-fade 2s ease-in-out forwards;
+}
+
+@keyframes find-a-pair-timeout-fade {
+  0% {
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.find-a-pair__win-overlay,
+.find-a-pair__timeout {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+  box-sizing: border-box;
+  pointer-events: none;
+
+  color: #fff;
+  font-size: 42px;
+  line-height: 1.1;
+  font-weight: 900;
+  text-align: center;
+
+  text-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.75),
+    0 0 24px rgba(255, 255, 255, 0.35);
+
+}
+
+.find-a-pair__win-overlay {
+  animation: find-a-pair-win-appear 350ms ease-out forwards;
+}
+
+.find-a-pair__timeout {
+  animation: find-a-pair-timeout-fade 2s ease-in-out forwards;
+}
+
+@keyframes find-a-pair-win-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes find-a-pair-timeout-fade {
+  0% {
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 .find-a-pair__board {
-  width: min(720px, 100%);
+  width: 570px;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
-  padding: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0;
   box-sizing: border-box;
-  border-radius: 20px;
-  background: #f4efe8;
+  background: transparent;
 }
 
 .find-a-pair__card {
-  aspect-ratio: 2 / 3;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 7 / 8;
   min-width: 0;
   padding: 0;
   border: 0;
   border-radius: 8px;
   overflow: hidden;
-  background: #d9d1c9;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-  cursor: pointer;
-  transition:
-    transform 120ms ease,
-    box-shadow 120ms ease;
+  background: transparent;
+  box-shadow: none;
+  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 8 6, auto;
+  cursor: var(--cursor-pointer);
+  transition: transform 120ms ease, filter 120ms ease;
 }
 
 .find-a-pair__card:not(:disabled):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.16);
+  transform: translateY(-3px);
+  filter: brightness(1.08);
 }
 
 .find-a-pair__card img {
@@ -97,43 +258,16 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-.find-a-pair__back {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  border: 5px solid #c5bbb2;
-  color: #8d8177;
-  font-size: 24px;
-  font-weight: 800;
+.find-a-pair__back-image {
+  object-fit: cover;
 }
 
 .find-a-pair__card--matched {
-  box-shadow: 0 0 0 2px #72b989;
-  cursor: default;
-}
-
-@media (max-width: 600px) {
-  .find-a-pair__board {
-    gap: 5px;
-    padding: 8px;
-  }
-
-  .find-a-pair__hud {
-    gap: 8px;
-  }
-
-  .find-a-pair__timer,
-  .find-a-pair__pairs {
-    min-width: 0;
-    flex: 1;
-    padding: 8px 10px;
-  }
-
-  .find-a-pair__timer strong {
-    font-size: 18px;
-  }
+  box-shadow: 0 0 0 3px rgba(114, 185, 137, 0.9);
+  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 8 6, auto;
+  cursor: var(--cursor-pointer);
 }
