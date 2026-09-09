@@ -2,6 +2,7 @@ export { openDialogue, useDialogueStore } from './model/store'
 export { dialogueTestSamples } from './model/testDialogues'
 export type {
   Dialogue,
+  DialogueChoice,
   DialogueEmotion,
   DialogueMessage,
   DialogueReadState,

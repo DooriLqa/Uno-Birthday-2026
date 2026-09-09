@@ -9,6 +9,10 @@
   cursor: pointer;
 }
 
+.dialogue-layer--has-choices {
+  cursor: default;
+}
+
 .dialogue-layer__close {
   position: absolute;
   z-index: 2;
@@ -119,6 +123,40 @@
   font-size: clamp(1.05rem, 2.2vw, 1.55rem);
   font-weight: 800;
   line-height: 1.35;
+}
+
+.dialogue-layer__choices {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.dialogue-layer__choice {
+  width: 100%;
+  padding: 11px 15px;
+  border: 2px solid #b17a35;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff3bd, #f3cb78);
+  box-shadow: 0 4px 0 #84501f;
+  color: #593216;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+  font-weight: 850;
+  text-align: left;
+  transition: filter 0.15s ease, translate 0.15s ease;
+}
+
+.dialogue-layer__choice:hover,
+.dialogue-layer__choice:focus-visible {
+  filter: brightness(1.08);
+  outline: 3px solid #fff4c9;
+  translate: 0 -1px;
+}
+
+.dialogue-layer__choice:active {
+  box-shadow: 0 2px 0 #84501f;
+  translate: 0 2px;
 }
 
 .dialogue-layer__bubble small {

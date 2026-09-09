@@ -13,12 +13,17 @@ import { ShellGameScreen } from '@/features/shell-game'
 import { TotemCodeGame } from '@/features/totem-code'
 import { WackAMole } from '@/features/wack-a-mole'
 import { Arkanoid } from '@/features/arkanoid'
+import { RobotMazeGame } from '@/features/cropp/RobotMazeGame'
+import { Japonsk } from '@/features/cropp/Japonsk'
 import type { GameDefinition } from '@/entities/game/model/types'
 import arcadeFrameImage from '@/shared/assets/flappy-bird/arcade-frame-transparent.png'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
-import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
 import findAPairBackground from '@/shared/assets/find-a-pair/findapairbackground.png'
 import fishingScene from '@/shared/assets/locations/fishing.png'
+import raccoonArcadeBackground from '@/shared/assets/arkanoid/raccoon-arcade-background.png'
+import libraryBackground from '@/shared/assets/locations/tourist/library.png'
+import wildTotemCamp from '@/shared/assets/locations/wild/totem-camp.png'
+import wildPirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
 
 const locationTransition = {
   transitionSound: '/audio/sfx/location-footsteps.ogg',
@@ -64,6 +69,7 @@ export const games: GameDefinition[] = [
     mapPosition: { left: '42%', top: '32%' },
     pageClassName: 'book-shelf-page',
     ...islandGame,
+    backgroundImage: libraryBackground,
     Screen: BookShelfGame,
   },
   {
@@ -88,7 +94,7 @@ export const games: GameDefinition[] = [
     target: 'код тотемов',
     mapPosition: { left: '27%', top: '38%' },
     pageClassName: 'totem-code-page',
-    backgroundImage: totemBeachScene,
+    backgroundImage: wildTotemCamp,
     ...locationTransition,
     Screen: TotemCodeGame,
   },
@@ -202,7 +208,9 @@ export const games: GameDefinition[] = [
     color: '#b9d7f0',
     target: 'все кирпичи',
     mapPosition: { left: '50%', top: '30%' },
-    ...islandGame,
+    pageClassName: 'arkanoid-page',
+    backgroundImage: raccoonArcadeBackground,
+    ...locationTransition,
     Screen: Arkanoid,
   },
   {
@@ -240,22 +248,31 @@ export const games: GameDefinition[] = [
     ...locationTransition,
     Screen: FishingGame,
   },
-  /* {
+  {
+    id: 'robot-maze',
+    title: 'Робот-лабиринт',
+    description: 'Собери маршрут из записок и проведи робота к сокровищам.',
+    emoji: '🤖',
+    color: '#a2c9f0',
+    target: 'скрытое сокровище',
+    mapPosition: { left: '22%', top: '34%' },
+    pageClassName: 'robot-maze-page',
+    backgroundImage: wildPirateShore,
+    ...locationTransition,
+    Screen: RobotMazeGame,
+  },
+  {
     id: 'japonsk',
     title: 'Японский кроссворд',
     description: 'Реши японский кроссворд.',
     emoji: '⛰️',
     color: '#f0a2a2',
     target: 'японский кроссворд',
+    mapPosition: { left: '54%', top: '20%' },
+    pageClassName: 'japonsk-page',
+    ...locationTransition,
+    Screen: Japonsk,
   },
-  {
-    id: 'robot-maze',
-    title: 'Робот-лабиринт',
-    description: 'Помоги роботу найти выход из лабиринта.',
-    emoji: '🤖',
-    color: '#a2c9f0',
-    target: 'выход из лабиринта',
-  } */
 ]
 
 export const getGame = (gameId: string | null) => games.find((game) => game.id === gameId)

@@ -27,6 +27,7 @@ import './FishingGame.css'
 type Phase = 'idle' | 'charging' | 'casting' | 'returning' | 'waiting' | 'bite' | 'fight' | 'result'
 type Props = { onClose?: () => void }
 type CatchResult = { fish: Fish; rarity: FishRarity; message: string }
+type FishingProgress = { towardCoin: number; totalCaught: number }
 
 const BITE_MIN = 5000
 const BITE_MAX = 10000
@@ -42,20 +43,21 @@ const MIN_DT = 0.001
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
 // Загрузка сохранённых данных
-const loadCatches = (): { common: number; uncommon: number } => {
+const loadCatches = (): FishingProgress => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       const parsed = JSON.parse(saved)
+      const legacyCaught = (parsed.common ?? 0) + (parsed.uncommon ?? 0)
       return {
-        common: parsed.common ?? 0,
-        uncommon: parsed.uncommon ?? 0,
+        towardCoin: parsed.towardCoin ?? legacyCaught % 3,
+        totalCaught: parsed.totalCaught ?? legacyCaught,
       }
     }
   } catch {
     // игнорируем ошибки парсинга
   }
-  return { common: 0, uncommon: 0 }
+  return { towardCoin: 0, totalCaught: 0 }
 }
 
 export function FishingGame({ onClose }: Props) {
@@ -140,14 +142,6 @@ export function FishingGame({ onClose }: Props) {
     setPhase('idle')
   }, [clearRoundTimers, setPhase])
 
-  // Функция для обновления счётчиков рыбок
-  const addCatch = useCallback((rarity: FishRarity) => {
-    setCatches((prev) => ({
-      ...prev,
-      [rarity]: (prev[rarity as 'common' | 'uncommon'] || 0) + 1,
-    }))
-  }, [])
-
   const awardCatch = useCallback(() => {
     const fish = fishRef.current
     const rarity = rarityRef.current
@@ -156,32 +150,16 @@ export function FishingGame({ onClose }: Props) {
       return
     }
 
-    const rarityInfo = getRarity(rarity)
-    // eslint-disable-next-line no-useless-assignment
-    let message = ''
-    let coins = 0
+    const next = catches.towardCoin + 1
+    const coins = next >= 3 ? 1 : 0
+    const message = coins
+      ? '3/3 поймано — 1 монетка'
+      : `${next}/3 — ещё ${3 - next} до 1 монетки`
 
-    if (rarity === 'common' || rarity === 'uncommon') {
-      const needed = rarity === 'common' ? 3 : 2
-      const current = catches[rarity] || 0
-      const next = current + 1
-
-      if (next >= needed) {
-        coins = 1
-        message = `${needed}/${needed} поймано — 1 монетка`
-        // Сбрасываем счётчик для этой редкости
-        setCatches((prev) => ({
-          ...prev,
-          [rarity]: 0,
-        }))
-      } else {
-        addCatch(rarity)
-        message = `${next}/${needed} — ещё ${needed - next} до 1 монетки`
-      }
-    } else {
-      coins = rarityInfo.reward
-      message = `+${coins} ${coins === 1 ? 'монетка' : coins > 5 ? 'монеток' : 'монетки'}`
-    }
+    setCatches((previous) => ({
+      towardCoin: coins ? 0 : previous.towardCoin + 1,
+      totalCaught: previous.totalCaught + 1,
+    }))
 
     if (coins > 0) {
       addCoins(coins)
@@ -191,7 +169,7 @@ export function FishingGame({ onClose }: Props) {
 
     setResult({ fish, rarity, message })
     setPhase('result')
-  }, [addCoins, addCatch, catches, resetToIdle, setPhase])
+  }, [addCoins, catches.towardCoin, resetToIdle, setPhase])
 
   const returnRod = useCallback(() => {
     clearRoundTimers()
@@ -495,10 +473,10 @@ export function FishingGame({ onClose }: Props) {
         <div className="fishing-inventory">
           <div>
             <b>Улов</b>
-            <span className="rarity-dot rarity-dot--common" /> Common {catches.common}/3
+            <span className="rarity-dot rarity-dot--common" /> До монетки {catches.towardCoin}/3
           </div>
           <div>
-            <span className="rarity-dot rarity-dot--uncommon" /> Uncommon {catches.uncommon}/2
+            Всего поймано: {catches.totalCaught}
           </div>
           <div className="fishing-distance-chip">{DISTANCE_LABELS[castDistance]}</div>
         </div>

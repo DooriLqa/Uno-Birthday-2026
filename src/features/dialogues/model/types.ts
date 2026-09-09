@@ -8,6 +8,12 @@ export type DialogueSpeaker = {
   spritesByEmotion?: Partial<Record<DialogueEmotion, string>>
 }
 
+export type DialogueChoice = {
+  id: string
+  label: string
+  onSelect: () => void
+}
+
 export type DialogueMessage = {
   id: string
   speaker: DialogueSpeaker
@@ -15,6 +21,7 @@ export type DialogueMessage = {
   text: string
   sound?: string
   onComplete?: () => void
+  choices?: DialogueChoice[]
 }
 
 export const getDialogueMessageSprite = (message: DialogueMessage) =>

@@ -208,13 +208,11 @@ export function Arkanoid({ onComplete }: ArkanoidProps) {
   }, [])
 
   useEffect(() => {
-    const ctx = canvasRef.current?.getContext('2d')
-    if (ctx) draw(ctx)
     return () => {
       runningRef.current = false
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
     }
-  }, [draw])
+  }, [])
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -241,16 +239,18 @@ export function Arkanoid({ onComplete }: ArkanoidProps) {
 
   return (
     <div className="arkanoid">
-      <div className="arkanoid__hud">
-        <div>
-          <span>Счёт</span>
-          <strong>{score}</strong>
+      {(started || gameOver || won) && (
+        <div className="arkanoid__hud">
+          <div>
+            <span>Счёт</span>
+            <strong>{score}</strong>
+          </div>
+          <div>
+            <span>Жизни</span>
+            <strong>{'❤️'.repeat(lives)}</strong>
+          </div>
         </div>
-        <div>
-          <span>Жизни</span>
-          <strong>{'❤️'.repeat(lives)}</strong>
-        </div>
-      </div>
+      )}
       <div
         className="arkanoid__canvas-wrap"
         onMouseMove={(e) => movePaddle(e.clientX)}
