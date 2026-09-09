@@ -33,9 +33,24 @@ export type LocationAction =
   | { type: 'location'; locationId: LocationId }
   | { type: 'game'; gameId: string }
   | { type: 'merchant' }
+  | { type: 'sailor' }
   | { type: 'map' }
   | { type: 'jungle-cave' }
-export type LocationCursor = 'pointer' | 'magnify' | 'arrow-up' | 'arrow-down' | 'arrow-left' | 'arrow-right' | 'turn-left' | 'turn-right' | 'projected-back' | 'projected-forward' | 'dialogue' | 'hand-point' | 'hand-grab' | 'hand-open'
+export type LocationCursor =
+  | 'pointer'
+  | 'magnify'
+  | 'arrow-up'
+  | 'arrow-down'
+  | 'arrow-left'
+  | 'arrow-right'
+  | 'turn-left'
+  | 'turn-right'
+  | 'projected-back'
+  | 'projected-forward'
+  | 'dialogue'
+  | 'hand-point'
+  | 'hand-grab'
+  | 'hand-open'
 export type LocationHotspot = {
   id: string
   label: string
@@ -53,7 +68,12 @@ export type LocationDefinition = {
   ambienceVolume?: number
   hotspots: LocationHotspot[]
 }
-const area = (left: number, top: number, width: number, height: number) => ({ left: left + '%', top: top + '%', width: width + '%', height: height + '%' })
+const area = (left: number, top: number, width: number, height: number) => ({
+  left: left + '%',
+  top: top + '%',
+  width: width + '%',
+  height: height + '%',
+})
 const base = {
   regionId: 'tourist-beach',
   transitionSound: '/audio/sfx/location-footsteps.ogg',
@@ -69,56 +89,281 @@ const jungleBase = {
   transitionSound: '/audio/sfx/location-footsteps.ogg',
 } as const
 export const locations: Record<LocationId, LocationDefinition> = {
-  pier: { ...base, id: 'pier', title: 'Причал', image: pier, isWide: true, hotspots: [
-    { id: 'left', label: 'Налево — в Бухту спокойствия', area: area(0, 9, 31, 55), cursor: 'arrow-left', action: { type: 'location', locationId: 'quiet-cove' } },
-    { id: 'right', label: 'Направо — на пляж с лавкой', area: area(84, 9, 16, 55), cursor: 'arrow-right', action: { type: 'location', locationId: 'tourist-beach' } },
-    { id: 'inland', label: 'Вглубь острова — нужна карта', area: area(58, 4, 25, 49), cursor: 'projected-forward', action: { type: 'map' } },
-  ] },
-  'quiet-cove': { ...base, id: 'quiet-cove', title: 'Бухта спокойствия', image: cove, hotspots: [
-    { id: 'library', label: 'Войти в библиотеку', area: area(63, 17, 36, 49), cursor: 'projected-forward', action: { type: 'location', locationId: 'library' } },
-    { id: 'rest', label: 'Отдохнуть на лежаке', area: area(21, 32, 28, 32), cursor: 'magnify', action: { type: 'location', locationId: 'lounger' } },
-  ] },
-  library: { ...base, id: 'library', title: 'Пляжная библиотека', image: library, ambienceVolume: 0.3, hotspots: [
-    { id: 'books', label: 'Расставить книги по полкам', area: area(20, 16, 60, 69), cursor: 'hand-grab', action: { type: 'game', gameId: 'book-shelf' } },
-  ] },
+  pier: {
+    ...base,
+    id: 'pier',
+    title: 'Причал',
+    image: pier,
+    isWide: true,
+    hotspots: [
+      {
+        id: 'left',
+        label: 'Налево — в Бухту спокойствия',
+        area: area(0, 9, 31, 55),
+        cursor: 'arrow-left',
+        action: { type: 'location', locationId: 'quiet-cove' },
+      },
+      {
+        id: 'sailor',
+        label: 'Поговорить со старым моряком',
+        area: area(34, 24, 17, 43),
+        cursor: 'dialogue',
+        action: { type: 'sailor' },
+      },
+      {
+        id: 'right',
+        label: 'Направо — на пляж с лавкой',
+        area: area(84, 9, 16, 55),
+        cursor: 'arrow-right',
+        action: { type: 'location', locationId: 'tourist-beach' },
+      },
+      {
+        id: 'inland',
+        label: 'Вглубь острова — нужна карта',
+        area: area(58, 4, 25, 49),
+        cursor: 'projected-forward',
+        action: { type: 'map' },
+      },
+    ],
+  },
+  'quiet-cove': {
+    ...base,
+    id: 'quiet-cove',
+    title: 'Бухта спокойствия',
+    image: cove,
+    hotspots: [
+      {
+        id: 'library',
+        label: 'Войти в библиотеку',
+        area: area(63, 17, 36, 49),
+        cursor: 'projected-forward',
+        action: { type: 'location', locationId: 'library' },
+      },
+      {
+        id: 'rest',
+        label: 'Отдохнуть на лежаке',
+        area: area(21, 32, 28, 32),
+        cursor: 'magnify',
+        action: { type: 'location', locationId: 'lounger' },
+      },
+    ],
+  },
+  library: {
+    ...base,
+    id: 'library',
+    title: 'Пляжная библиотека',
+    image: library,
+    ambienceVolume: 0.3,
+    hotspots: [
+      {
+        id: 'books',
+        label: 'Расставить книги по полкам',
+        area: area(20, 16, 60, 69),
+        cursor: 'hand-grab',
+        action: { type: 'game', gameId: 'book-shelf' },
+      },
+    ],
+  },
   lounger: { ...base, id: 'lounger', title: 'Вид с лежака', image: lounger, hotspots: [] },
-  'tourist-beach': { ...base, id: 'tourist-beach', title: 'Туристический пляж', image: beach, hotspots: [
-    { id: 'canopy', label: 'Подойти к лавке и автоматам', area: area(2, 8, 65, 65), cursor: 'projected-forward', action: { type: 'location', locationId: 'shop' } },
-  ] },
-  shop: { ...base, id: 'shop', title: 'Лавка Пончика', image: shop, hotspots: [
-    { id: 'merchant', label: 'Поговорить с Пончиком', area: area(6, 25, 45, 57), cursor: 'dialogue', action: { type: 'merchant' } },
-    { id: 'machines', label: 'Подойти к игровым автоматам', area: area(51, 27, 37, 55), cursor: 'magnify', action: { type: 'location', locationId: 'arcades' } },
-  ] },
-  arcades: { ...base, id: 'arcades', title: 'Игровые автоматы', image: arcades, hotspots: [
-    { id: 'flight', label: 'Полёт над лагуной', area: area(18, 15, 20, 73), cursor: 'projected-forward', action: { type: 'game', gameId: 'flappy-bird' } },
-    { id: 'catch', label: 'Ловля предметов', area: area(40, 15, 19, 73), cursor: 'projected-forward', action: { type: 'game', gameId: 'fruit-basket' } },
-    { id: 'arkanoid', label: 'Арканоид', area: area(60, 15, 21, 73), cursor: 'projected-forward', action: { type: 'game', gameId: 'arkanoid' } },
-  ] },
-  'wild-beach': { ...wildBase, id: 'wild-beach', title: 'Дикий пляж', image: wildBeach, isWide: true, hotspots: [
-    { id: 'fisher-hut', label: 'Рыбацкий домик', area: area(0, 8, 30, 57), cursor: 'projected-forward', action: { type: 'location', locationId: 'fisher-hut' } },
-    { id: 'totem-camp', label: 'Кострище с тотемами', area: area(31, 19, 38, 52), cursor: 'magnify', action: { type: 'location', locationId: 'totem-camp' } },
-    { id: 'pirate-shore', label: 'Пиратский берег', area: area(69, 8, 31, 66), cursor: 'projected-forward', action: { type: 'location', locationId: 'pirate-shore' } },
-  ] },
-  'fisher-hut': { ...wildBase, id: 'fisher-hut', title: 'Домик рыбака', image: fisherHut, hotspots: [
-    { id: 'fishing-pier', label: 'Порыбачить с причала', area: area(34, 27, 43, 36), cursor: 'projected-forward', action: { type: 'game', gameId: 'fishing' } },
-  ] },
-  'totem-camp': { ...wildBase, id: 'totem-camp', title: 'Кострище четырёх тотемов', image: totemCamp, hotspots: [
-    { id: 'totems', label: 'Разгадать код тотемов', area: area(9, 10, 82, 55), cursor: 'hand-point', action: { type: 'game', gameId: 'totem-code' } },
-  ] },
-  'pirate-shore': { ...wildBase, id: 'pirate-shore', title: 'Берег посланий', image: pirateShore, hotspots: [
-    { id: 'bottles', label: 'Разобрать записки из бутылок', area: area(3, 43, 85, 52), cursor: 'hand-grab', action: { type: 'game', gameId: 'robot-maze' } },
-  ] },
-  jungle: { ...jungleBase, id: 'jungle', title: 'Джунгли', image: jungleOverview, isWide: true, hotspots: [
-    { id: 'cave', label: 'Подойти к пещере', area: area(1, 3, 43, 70), cursor: 'projected-forward', action: { type: 'location', locationId: 'jungle-cave' } },
-    { id: 'waterfall', label: 'Подойти к водопаду', area: area(71, 7, 29, 70), cursor: 'projected-forward', action: { type: 'location', locationId: 'jungle-waterfall' } },
-  ] },
-  'jungle-cave': { ...jungleBase, id: 'jungle-cave', title: 'Пещера одноглазых охотников', image: jungleCave, hotspots: [
-    { id: 'entrance', label: 'Войти в тёмную пещеру', area: area(22, 1, 50, 74), cursor: 'projected-forward', action: { type: 'jungle-cave' } },
-  ] },
-  'jungle-waterfall': { ...jungleBase, id: 'jungle-waterfall', title: 'Водопад в джунглях', image: jungleWaterfall, hotspots: [] },
+  'tourist-beach': {
+    ...base,
+    id: 'tourist-beach',
+    title: 'Туристический пляж',
+    image: beach,
+    hotspots: [
+      {
+        id: 'canopy',
+        label: 'Подойти к лавке и автоматам',
+        area: area(2, 8, 65, 65),
+        cursor: 'projected-forward',
+        action: { type: 'location', locationId: 'shop' },
+      },
+    ],
+  },
+  shop: {
+    ...base,
+    id: 'shop',
+    title: 'Лавка Пончика',
+    image: shop,
+    hotspots: [
+      {
+        id: 'merchant',
+        label: 'Поговорить с Пончиком',
+        area: area(6, 25, 45, 57),
+        cursor: 'dialogue',
+        action: { type: 'merchant' },
+      },
+      {
+        id: 'machines',
+        label: 'Подойти к игровым автоматам',
+        area: area(51, 27, 37, 55),
+        cursor: 'magnify',
+        action: { type: 'location', locationId: 'arcades' },
+      },
+    ],
+  },
+  arcades: {
+    ...base,
+    id: 'arcades',
+    title: 'Игровые автоматы',
+    image: arcades,
+    hotspots: [
+      {
+        id: 'flight',
+        label: 'Полёт над лагуной',
+        area: area(18, 15, 20, 73),
+        cursor: 'projected-forward',
+        action: { type: 'game', gameId: 'flappy-bird' },
+      },
+      {
+        id: 'catch',
+        label: 'Ловля предметов',
+        area: area(40, 15, 19, 73),
+        cursor: 'projected-forward',
+        action: { type: 'game', gameId: 'fruit-basket' },
+      },
+      {
+        id: 'arkanoid',
+        label: 'Арканоид',
+        area: area(60, 15, 21, 73),
+        cursor: 'projected-forward',
+        action: { type: 'game', gameId: 'arkanoid' },
+      },
+    ],
+  },
+  'wild-beach': {
+    ...wildBase,
+    id: 'wild-beach',
+    title: 'Дикий пляж',
+    image: wildBeach,
+    isWide: true,
+    hotspots: [
+      {
+        id: 'fisher-hut',
+        label: 'Рыбацкий домик',
+        area: area(0, 8, 30, 57),
+        cursor: 'projected-forward',
+        action: { type: 'location', locationId: 'fisher-hut' },
+      },
+      {
+        id: 'totem-camp',
+        label: 'Кострище с тотемами',
+        area: area(31, 19, 38, 52),
+        cursor: 'magnify',
+        action: { type: 'location', locationId: 'totem-camp' },
+      },
+      {
+        id: 'pirate-shore',
+        label: 'Пиратский берег',
+        area: area(69, 8, 31, 66),
+        cursor: 'projected-forward',
+        action: { type: 'location', locationId: 'pirate-shore' },
+      },
+    ],
+  },
+  'fisher-hut': {
+    ...wildBase,
+    id: 'fisher-hut',
+    title: 'Домик рыбака',
+    image: fisherHut,
+    hotspots: [
+      {
+        id: 'fishing-pier',
+        label: 'Порыбачить с причала',
+        area: area(34, 27, 43, 36),
+        cursor: 'projected-forward',
+        action: { type: 'game', gameId: 'fishing' },
+      },
+    ],
+  },
+  'totem-camp': {
+    ...wildBase,
+    id: 'totem-camp',
+    title: 'Кострище четырёх тотемов',
+    image: totemCamp,
+    hotspots: [
+      {
+        id: 'totems',
+        label: 'Разгадать код тотемов',
+        area: area(9, 10, 82, 55),
+        cursor: 'hand-point',
+        action: { type: 'game', gameId: 'totem-code' },
+      },
+    ],
+  },
+  'pirate-shore': {
+    ...wildBase,
+    id: 'pirate-shore',
+    title: 'Берег посланий',
+    image: pirateShore,
+    hotspots: [
+      {
+        id: 'bottles',
+        label: 'Разобрать записки из бутылок',
+        area: area(3, 43, 85, 52),
+        cursor: 'hand-grab',
+        action: { type: 'game', gameId: 'robot-maze' },
+      },
+    ],
+  },
+  jungle: {
+    ...jungleBase,
+    id: 'jungle',
+    title: 'Джунгли',
+    image: jungleOverview,
+    isWide: true,
+    hotspots: [
+      {
+        id: 'cave',
+        label: 'Подойти к пещере',
+        area: area(1, 3, 43, 70),
+        cursor: 'projected-forward',
+        action: { type: 'location', locationId: 'jungle-cave' },
+      },
+      {
+        id: 'waterfall',
+        label: 'Подойти к водопаду',
+        area: area(71, 7, 29, 70),
+        cursor: 'projected-forward',
+        action: { type: 'location', locationId: 'jungle-waterfall' },
+      },
+    ],
+  },
+  'jungle-cave': {
+    ...jungleBase,
+    id: 'jungle-cave',
+    title: 'Пещера одноглазых охотников',
+    image: jungleCave,
+    hotspots: [
+      {
+        id: 'entrance',
+        label: 'Войти в тёмную пещеру',
+        area: area(22, 1, 50, 74),
+        cursor: 'projected-forward',
+        action: { type: 'jungle-cave' },
+      },
+    ],
+  },
+  'jungle-waterfall': {
+    ...jungleBase,
+    id: 'jungle-waterfall',
+    title: 'Водопад в джунглях',
+    image: jungleWaterfall,
+    hotspots: [],
+  },
 }
 export const worldRegions = [
-  { id: 'tourist-beach', title: 'Туристический пляж', entry: 'pier' as LocationId, area: area(61, 58, 24, 27) },
-  { id: 'wild-beach', title: 'Дикий пляж', entry: 'wild-beach' as LocationId, area: area(7, 12, 27, 24) },
+  {
+    id: 'tourist-beach',
+    title: 'Туристический пляж',
+    entry: 'pier' as LocationId,
+    area: area(61, 58, 24, 27),
+  },
+  {
+    id: 'wild-beach',
+    title: 'Дикий пляж',
+    entry: 'wild-beach' as LocationId,
+    area: area(7, 12, 27, 24),
+  },
   { id: 'jungle', title: 'Джунгли', entry: 'jungle' as LocationId, area: area(43, 12, 23, 23) },
 ]

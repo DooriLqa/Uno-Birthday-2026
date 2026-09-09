@@ -19,6 +19,7 @@ import {
   openFishermanIntroduction,
   openPirateIntroduction,
 } from '@/features/location-navigation/model/wildBeachDialogues'
+import { talkToPierSailor } from '@/features/location-navigation/model/pierDialogues'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import { useDialogueStore } from '@/features/dialogues'
 
@@ -47,33 +48,46 @@ export function GameFlow() {
       setMapOpen(false)
       return
     }
-    if (!hasIslandMap()) { openMapWarning(); return }
+    if (!hasIslandMap()) {
+      openMapWarning()
+      return
+    }
     playOneShotSound(locations.pier.transitionSound)
     setActiveGameId(null)
     setMapOpen(true)
   }
   return (
     <main className="island-map-page">
-      {mapOpen && <GameIslandMap
-        onOpenRegion={(entry) => {
-          playOneShotSound(locations[entry].transitionSound)
-          setScene({ locationId: entry, pan: 0.5 })
-          setHistory([])
-          setMapOpen(false)
-        }}
-      />}
+      {mapOpen && (
+        <GameIslandMap
+          onOpenRegion={(entry) => {
+            playOneShotSound(locations[entry].transitionSound)
+            setScene({ locationId: entry, pan: 0.5 })
+            setHistory([])
+            setMapOpen(false)
+          }}
+        />
+      )}
       <GameHud mapOpen={mapOpen} onOpenRadio={() => setRadioOpen(true)} onOpenMap={openMap} />
       <LocationNavigator
         active={!mapOpen && !activeGame && !radioOpen}
         visible={!activeGame && !radioOpen}
-        onOpenMap={openMap} onOpenGame={openGame}
+        onOpenMap={openMap}
+        onOpenGame={openGame}
         onMerchant={() => talkToMerchant(() => openGame('beach-radio'))}
-        onEnterJungleCave={() => tryEnterJungleCave(() => openGame('japonsk'))} />
-      {activeGame && <GamePage game={activeGame}
-        onBack={() => {
-          playOneShotSound(activeGame.transitionSound)
-          setActiveGameId(null)
-        }} onOpenRadio={() => setRadioOpen(true)} />}
+        onSailor={() => talkToPierSailor(() => openGame('find-a-pair'))}
+        onEnterJungleCave={() => tryEnterJungleCave(() => openGame('japonsk'))}
+      />
+      {activeGame && (
+        <GamePage
+          game={activeGame}
+          onBack={() => {
+            playOneShotSound(activeGame.transitionSound)
+            setActiveGameId(null)
+          }}
+          onOpenRadio={() => setRadioOpen(true)}
+        />
+      )}
       <RadioModal open={radioOpen} onClose={() => setRadioOpen(false)} />
       <DevCoinControls />
     </main>
