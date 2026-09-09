@@ -6,7 +6,10 @@ import { useInventoryStore, type InventoryItem } from '@/features/inventory/mode
 import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
 import './DevCoinControls.css'
 
-const DEV_ITEMS: InventoryItem[] = [{ id: 'beach-radio', name: 'Радиоприёмник', icon: '📻' }]
+const DEV_ITEMS: InventoryItem[] = [
+  { id: 'beach-radio', name: 'Радиоприёмник', icon: '📻' },
+  { id: 'oil-lantern', name: 'Масляный фонарь', icon: '🏮' },
+]
 
 export function DevCoinControls() {
   const pawCoins = usePawCoinStore((state) => state.pawCoins)

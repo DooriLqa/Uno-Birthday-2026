@@ -8,12 +8,20 @@
   inset: 0;
   overflow: hidden;
   background: #168cc3;
-  cursor: var(--cursor-default);
+  --cursor-image: var(--cursor-default);
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__scene {
   position: absolute;
   inset: 0;
   overflow: hidden;
+}
+.location-navigator:not(.is-active) .location-navigator__hotspot-layer,
+.location-navigator:not(.is-active) .location-navigator__pan-zone,
+.location-navigator:not(.is-active) .location-navigator__caption,
+.location-navigator:not(.is-active) .location-navigator__back-zone,
+.location-navigator:not(.is-active) .location-navigator__error {
+  visibility: hidden;
 }
 .location-navigator__canvas {
   position: absolute;
@@ -67,53 +75,69 @@
   border: 0;
   border-radius: 22px;
   background: transparent;
-  cursor: var(--cursor-forward);
+  --cursor-image: var(--cursor-forward);
+  cursor: var(--cursor-rendering, var(--cursor-image));
   pointer-events: auto;
 }
 .location-navigator__hotspot.is-interactive {
-  cursor: url('../../../shared/assets/cursors/hand-point.png') 28 8, pointer;
+  --cursor-image: url('../../../shared/assets/cursors/hand-point.png') 25 6, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-arrow-left {
-  cursor: url('../../../shared/assets/cursors/arrow-left.png') 13 32, w-resize;
+  --cursor-image: url('../../../shared/assets/cursors/arrow-left.png') 13 32, w-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-pointer {
-  cursor: url('../../../shared/assets/cursors/pointer.png') 8 6, pointer;
+  --cursor-image: url('../../../shared/assets/cursors/pointer.png') 8 6, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-magnify {
-  cursor: url('../../../shared/assets/cursors/magnify.png') 21 21, zoom-in;
+  --cursor-image: url('../../../shared/assets/cursors/magnify.png') 21 21, zoom-in;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-arrow-up {
-  cursor: url('../../../shared/assets/cursors/arrow-up.png') 32 12, n-resize;
+  --cursor-image: url('../../../shared/assets/cursors/arrow-up.png') 32 12, n-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-arrow-down {
-  cursor: url('../../../shared/assets/cursors/arrow-down.png') 32 52, s-resize;
+  --cursor-image: url('../../../shared/assets/cursors/arrow-down.png') 32 52, s-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-arrow-right {
-  cursor: url('../../../shared/assets/cursors/arrow-right.png') 51 32, e-resize;
+  --cursor-image: url('../../../shared/assets/cursors/arrow-right.png') 51 32, e-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-turn-left {
-  cursor: url('../../../shared/assets/cursors/turn-left.png') 18 18, pointer;
+  --cursor-image: url('../../../shared/assets/cursors/turn-left.png') 18 18, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-turn-right {
-  cursor: url('../../../shared/assets/cursors/turn-right.png') 46 18, pointer;
+  --cursor-image: url('../../../shared/assets/cursors/turn-right.png') 46 18, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-projected-back {
-  cursor: url('../../../shared/assets/cursors/projected-back.png') 32 50, pointer;
+  --cursor-image: url('../../../shared/assets/cursors/projected-back.png') 32 50, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-projected-forward {
-  cursor: url('../../../shared/assets/cursors/projected-forward.png') 53 30, pointer;
+  --cursor-image: url('../../../shared/assets/cursors/projected-forward.png') 53 30, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-dialogue {
-  cursor: url('../../../shared/assets/cursors/dialogue.png') 30 48, help;
+  --cursor-image: url('../../../shared/assets/cursors/dialogue.png') 30 48, help;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-hand-point {
-  cursor: url('../../../shared/assets/cursors/hand-point.png') 28 8, pointer;
+  --cursor-image: url('../../../shared/assets/cursors/hand-point.png') 25 6, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-hand-grab {
-  cursor: url('../../../shared/assets/cursors/hand-grab.png') 29 29, grab;
+  --cursor-image: url('../../../shared/assets/cursors/hand-grab.png') 32 32, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-hand-open {
-  cursor: url('../../../shared/assets/cursors/hand-open.png') 30 30, move;
+  --cursor-image: url('../../../shared/assets/cursors/hand-open.png') 32 34, move;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot span {
   max-width: 190px;
@@ -145,15 +169,18 @@
   width: min(11vw, 130px);
   border: 0;
   background: transparent;
-  cursor: var(--cursor-default);
+  --cursor-image: var(--cursor-default);
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__pan-zone--left {
   left: 0;
-  cursor: var(--cursor-pan-left);
+  --cursor-image: var(--cursor-pan-left);
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__pan-zone--right {
   right: 0;
-  cursor: var(--cursor-forward);
+  --cursor-image: var(--cursor-forward);
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__pan-zone:hover,
 .location-navigator__pan-zone:focus-visible {
@@ -181,7 +208,8 @@
   height: 11%;
   border: 0;
   background: transparent;
-  cursor: var(--cursor-back);
+  --cursor-image: var(--cursor-back);
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__back-zone:hover,
 .location-navigator__back-zone:focus-visible {
@@ -200,4 +228,8 @@
     font-size: 0.72rem;
     translate: 0 0;
   }
+}
+.location-navigator__error {
+  position: absolute; bottom: 15%; left: 50%; translate: -50% 0;
+  padding: 12px; background: #fff4d4; color: #713c26; border-radius: 12px; z-index: 6;
 }

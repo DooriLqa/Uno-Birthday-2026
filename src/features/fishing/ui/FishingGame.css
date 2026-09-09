@@ -19,7 +19,8 @@
   border: 0;
   background: transparent;
   --cursor-back: url('../../../shared/assets/cursors/projected-back.png') 32 50, pointer;
-  cursor: var(--cursor-back);
+  --cursor-image: var(--cursor-back);
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .fishing-navigator__back-zone:hover,
 .fishing-navigator__back-zone:focus-visible {
@@ -33,8 +34,9 @@
   z-index: 11;
   user-select: none;
   touch-action: none;
-  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 32 50, pointer;
-  cursor: var(--cursor-pointer);
+  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 25 6, pointer;
+  --cursor-image: var(--cursor-pointer);
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .fishing-title {
   position: absolute;
