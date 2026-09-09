@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import playerImage from '@/assets/flappy-bird/aaaa.png'
+import playerImage from '@/assets/flappy-bird/character-dachshund-bird.png'
+import coinImage from '@/assets/flappy-bird/coin-bone.png'
+import backgroundImage1 from '@/assets/flappy-bird/bg1.png'
+import backgroundImage2 from '@/assets/flappy-bird/bg2.png'
+import pipeImage1 from '@/assets/flappy-bird/pipe1.png'
+import pipeImage2 from '@/assets/flappy-bird/pipe2.png'
+import { FLAPPY_BIRD_LAYOUT } from '../model/layout'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import './FlappyBirdGame.css'
 
@@ -10,6 +16,7 @@ type Pipe = {
   x: number
   gapTop: number
   counted: boolean
+  image: string
 }
 
 type GameCoin = {
@@ -39,6 +46,7 @@ const BIRD_X = 154
 const BIRD_SIZE = 28
 const PIPE_WIDTH = 66
 const PIPE_GAP = 160
+const PIPE_VISUAL_EXTENSION = 44
 const PIPE_SPEED = 190
 const GRAVITY = 1080
 const FLAP_VELOCITY = -470
@@ -48,6 +56,9 @@ const COINS_TO_COMPLETE = 20
 const COIN_SPAWN_INTERVAL = 1.1
 const COIN_SIZE = 24
 const COIN_SPEED = PIPE_SPEED
+const BACKGROUND_SWITCH_INTERVAL_MS = 1000
+const GAME_BACKGROUND_IMAGES = [backgroundImage1, backgroundImage2]
+const PIPE_IMAGES = [pipeImage1, pipeImage2]
 const SCREAM_SOUND = '/audio/sfx/scream.MP3'
 const START_SOUND = '/audio/sfx/bird.MP3'
 const WIN_SOUND = '/audio/sfx/winSound.MP3'
@@ -72,6 +83,7 @@ const createPipe = (id: number, x: number): Pipe => ({
   x,
   gapTop: id === 1 ? (GAME_HEIGHT - PIPE_GAP) / 2 : 90 + Math.random() * 100,
   counted: false,
+  image: PIPE_IMAGES[Math.floor(Math.random() * PIPE_IMAGES.length)],
 })
 
 const createCoin = (id: number, pipe: Pipe): GameCoin => ({
@@ -82,6 +94,7 @@ const createCoin = (id: number, pipe: Pipe): GameCoin => ({
 
 export function FlappyBirdGame({ onComplete }: Props) {
   const [game, setGame] = useState<GameState>(createInitialState)
+  const [backgroundIndex, setBackgroundIndex] = useState(0)
   const [stageScale, setStageScale] = useState(1)
   const gameRef = useRef(game)
   const stageRef = useRef<HTMLButtonElement>(null)
@@ -109,6 +122,14 @@ export function FlappyBirdGame({ onComplete }: Props) {
   useEffect(() => {
     onCompleteRef.current = onComplete
   }, [onComplete])
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setBackgroundIndex((currentIndex) => (currentIndex + 1) % GAME_BACKGROUND_IMAGES.length)
+    }, BACKGROUND_SWITCH_INTERVAL_MS)
+
+    return () => window.clearInterval(interval)
+  }, [])
 
   const updateGame = useCallback((nextGame: GameState) => {
     gameRef.current = nextGame
@@ -273,26 +294,16 @@ export function FlappyBirdGame({ onComplete }: Props) {
     }
   }, [playOneShotSound, updateGame])
 
-  const restart = () => {
-    updateGame(createInitialState())
-    lastTimeRef.current = null
-    pipeTimerRef.current = 0
-    coinTimerRef.current = 0
-  }
-
   return (
-    <div className="flappy-bird-game">
-      <div className="flappy-bird-game__header">
-        <div>
-          <span className="flappy-bird-game__eyebrow">Островная аркада</span>
-          <h1>Полёт над лагуной</h1>
-        </div>
-        <div className="flappy-bird-game__score" aria-label={`Собрано монет: ${game.collectedCoins} из ${COINS_TO_COMPLETE}`}>
-          <span>МОНЕТЫ</span>
-          <strong>{game.collectedCoins}/{COINS_TO_COMPLETE}</strong>
-        </div>
-      </div>
-
+    <div
+      className="flappy-bird-game"
+      style={{
+        '--flappy-width': FLAPPY_BIRD_LAYOUT.width,
+        '--flappy-height': FLAPPY_BIRD_LAYOUT.height,
+        '--flappy-x': FLAPPY_BIRD_LAYOUT.x,
+        '--flappy-y': FLAPPY_BIRD_LAYOUT.y,
+      } as React.CSSProperties}
+    >
       <button
         type="button"
         className={`flappy-bird-game__stage ${game.gameOver ? 'is-game-over' : ''}`}
@@ -306,6 +317,15 @@ export function FlappyBirdGame({ onComplete }: Props) {
         aria-label="Прыгнуть или начать полёт"
         ref={stageRef}
       >
+        <span className="flappy-bird-game__score" aria-label={`Собрано монет: ${game.collectedCoins} из ${COINS_TO_COMPLETE}`}>
+          {game.collectedCoins}/{COINS_TO_COMPLETE}
+        </span>
+        <img
+          className="flappy-bird-game__background"
+          src={GAME_BACKGROUND_IMAGES[backgroundIndex]}
+          alt=""
+          aria-hidden="true"
+        />
         <span className="flappy-bird-game__world" style={{ transform: `scale(${stageScale})` }}>
           <span className="flappy-bird-game__sun" aria-hidden />
           <span
@@ -321,20 +341,25 @@ export function FlappyBirdGame({ onComplete }: Props) {
               style={{ transform: `translate(${coin.x}px, ${coin.y}px)` }}
               aria-hidden
             >
-              🪙
+              <img src={coinImage} alt="" aria-hidden="true" />
             </span>
           ))}
           {game.pipes.map((pipe) => (
             <span key={pipe.id} className="flappy-bird-game__pipe-pair" style={{ transform: `translateX(${pipe.x}px)` }} aria-hidden>
-              <span className="flappy-bird-game__pipe flappy-bird-game__pipe--top" style={{ height: pipe.gapTop }} />
-              <span className="flappy-bird-game__pipe flappy-bird-game__pipe--bottom" style={{ height: GAME_HEIGHT - pipe.gapTop - PIPE_GAP }} />
+              <img className="flappy-bird-game__pipe flappy-bird-game__pipe--top" src={pipe.image} alt="" style={{ height: pipe.gapTop }} />
+              <img
+                className="flappy-bird-game__pipe flappy-bird-game__pipe--bottom"
+                src={pipe.image}
+                alt=""
+                style={{ height: GAME_HEIGHT - pipe.gapTop - PIPE_GAP + PIPE_VISUAL_EXTENSION }}
+              />
             </span>
           ))}
           <span className="flappy-bird-game__ground" aria-hidden />
           {!game.running && !game.gameOver && (
             <span className="flappy-bird-game__message">
               <strong>Прыг!</strong>
-              <small>Пробел или левая кнопка мыши</small>
+              <small>Пробел или левая кнопка мыши. Чтобы парить, продолжай удерживать кнопку после прыжка</small>
             </span>
           )}
           {game.gameOver && !game.completed && (
@@ -351,12 +376,6 @@ export function FlappyBirdGame({ onComplete }: Props) {
           )}
         </span>
       </button>
-
-      <div className="flappy-bird-game__footer">
-        <span>Собери {COINS_TO_COMPLETE} монет внутри игры</span>
-        {game.completed && <strong>Награда получена</strong>}
-        {(game.gameOver || game.completed) && <button type="button" onClick={restart}>Начать заново</button>}
-      </div>
     </div>
   )
 }

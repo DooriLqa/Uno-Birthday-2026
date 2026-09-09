@@ -207,4 +207,4 @@ export function pickFish(distance: FishingDistance) {
 }
 
 export const rarityDifficulty = (rarity: FishRarity) =>
-  ({ common: 0.8, uncommon: 1.2, rare: 1.6, epic: 2.1, legendary: 2.7 })[rarity]
+  ({ common: 1.2, uncommon: 1.6, rare: 2, epic: 2.5, legendary: 3 })[rarity]

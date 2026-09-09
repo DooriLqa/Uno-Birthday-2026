@@ -16,8 +16,9 @@ import { Arkanoid } from '@/features/arkanoid'
 import { RobotMazeGame } from '@/features/cropp/RobotMazeGame'
 import { Japonsk } from '@/features/cropp/Japonsk'
 import type { GameDefinition } from '@/entities/game/model/types'
-import flappyBirdLagoonBackground from '@/shared/assets/flappy-bird/lagoon-cliff-vista-background.png'
+import arcadeFrameImage from '@/shared/assets/flappy-bird/arcade-frame-transparent.png'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
+import findAPairBackground from '@/shared/assets/find-a-pair/findapairbackground.png'
 import fishingScene from '@/shared/assets/locations/fishing.png'
 import raccoonArcadeBackground from '@/shared/assets/arkanoid/raccoon-arcade-background.png'
 import libraryBackground from '@/shared/assets/locations/tourist/library.png'
@@ -80,7 +81,7 @@ export const games: GameDefinition[] = [
     target: '10 труб',
     mapPosition: { left: '60%', top: '23%' },
     pageClassName: 'flappy-bird-page',
-    backgroundImage: flappyBirdLagoonBackground,
+    backgroundImage: arcadeFrameImage,
     ...locationTransition,
     Screen: FlappyBirdGame,
   },
@@ -183,7 +184,9 @@ export const games: GameDefinition[] = [
     color: '#d8c5e8',
     target: 'все пары',
     mapPosition: { left: '42%', top: '30%' },
-    ...islandGame,
+    pageClassName: 'find-a-pair-page',
+    backgroundImage: findAPairBackground,
+    ...locationTransition,
     Screen: FindAPair,
   },
   {
