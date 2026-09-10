@@ -84,10 +84,12 @@
   color: #fff;
   font-size: 16px;
   font-weight: 800;
-  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 8 6, auto;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 8 6, auto;
   cursor: var(--cursor-pointer);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
-  transition: transform 120ms ease, filter 120ms ease;
+  transition:
+    transform 120ms ease,
+    filter 120ms ease;
 }
 
 .find-a-pair__start:hover {
@@ -135,7 +137,6 @@
     0 4px 10px rgba(0, 0, 0, 0.75),
     0 0 24px rgba(255, 120, 120, 0.55);
 
-
   animation: find-a-pair-timeout-fade 2s ease-in-out forwards;
 }
 
@@ -180,7 +181,6 @@
   text-shadow:
     0 4px 10px rgba(0, 0, 0, 0.75),
     0 0 24px rgba(255, 255, 255, 0.35);
-
 }
 
 .find-a-pair__win-overlay {
@@ -243,9 +243,11 @@
   overflow: hidden;
   background: transparent;
   box-shadow: none;
-  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 8 6, auto;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 8 6, auto;
   cursor: var(--cursor-pointer);
-  transition: transform 120ms ease, filter 120ms ease;
+  transition:
+    transform 120ms ease,
+    filter 120ms ease;
 }
 
 .find-a-pair__card:not(:disabled):hover {
@@ -268,6 +270,6 @@
 
 .find-a-pair__card--matched {
   box-shadow: 0 0 0 3px rgba(114, 185, 137, 0.9);
-  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 8 6, auto;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 8 6, auto;
   cursor: var(--cursor-pointer);
 }

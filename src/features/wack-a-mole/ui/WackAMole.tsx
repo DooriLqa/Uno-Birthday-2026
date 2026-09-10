@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import './WackAMole.css'
-import backgroundImage from '@/assets/WackAMole/background.png'
-import bushImage from '@/assets/WackAMole/bush.png'
-import moleImage from '@/assets/WackAMole/mole.png'
+import backgroundImage from '@/shared/assets/games/wack-a-mole/background.png'
+import bushImage from '@/shared/assets/games/wack-a-mole/bush.png'
+import moleImage from '@/shared/assets/games/wack-a-mole/mole.png'
 
 export type WackAMoleProps = {
   onComplete: () => void

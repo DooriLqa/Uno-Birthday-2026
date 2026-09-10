@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import './GameCursor.css'
 
-const assets = import.meta.glob<string>('../../shared/assets/cursors/*.png', {
+const assets = import.meta.glob<string>('/src/shared/assets/common/cursors/*.png', {
   eager: true,
   query: '?url',
   import: 'default',

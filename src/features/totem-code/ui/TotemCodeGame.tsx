@@ -1,12 +1,12 @@
 import { BookOpen, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { playSegmentTurnSound } from '@/features/totem-code/model/segmentSound'
-import totemCorgi from '@/shared/assets/totem-code/totem-corgi-aligned.png'
-import totemDachshund from '@/shared/assets/totem-code/totem-dachshund-aligned.png'
-import totemHusky from '@/shared/assets/totem-code/totem-husky-aligned.png'
-import totemTerrier from '@/shared/assets/totem-code/totem-terrier-aligned.png'
-import totemStoneBase from '@/shared/assets/totem-code/totem-stone-base-low-angle.png'
-import totemCampfire from '@/shared/assets/totem-code/totem-campfire.png'
+import totemCorgi from '@/shared/assets/games/totem-code/totem-corgi-aligned.png'
+import totemDachshund from '@/shared/assets/games/totem-code/totem-dachshund-aligned.png'
+import totemHusky from '@/shared/assets/games/totem-code/totem-husky-aligned.png'
+import totemTerrier from '@/shared/assets/games/totem-code/totem-terrier-aligned.png'
+import totemStoneBase from '@/shared/assets/games/totem-code/totem-stone-base-low-angle.png'
+import totemCampfire from '@/shared/assets/games/totem-code/totem-campfire.png'
 import './TotemCodeGame.css'
 
 type Props = { onComplete: () => void }

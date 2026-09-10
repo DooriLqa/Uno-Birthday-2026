@@ -1,5 +1,6 @@
-import shibaMerchantSprite from '@/shared/assets/dialogues/shiba-merchant.png'
-import shibaMerchantGigglingSprite from '@/shared/assets/dialogues/shiba-merchant-giggling.png'
+import shibaMerchantSprite from '@/shared/assets/features/dialogues/shiba-merchant.png'
+import shibaMerchantGigglingSprite from '@/shared/assets/features/dialogues/shiba-merchant-giggling.png'
+import shibaGiggleSound from '@/shared/assets/features/dialogues/audio/shiba-giggle.wav'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore } from '@/features/inventory/model/store'
 import type { Dialogue, DialogueSpeaker } from './types'
@@ -45,7 +46,7 @@ export const dialogueTestSamples: Dialogue[] = [
         speaker: shibaMerchant,
         emotion: 'giggling',
         text: 'Хи-хи! Особенно редкие — те, что я сам только что намыл.',
-        sound: '/audio/sfx/shiba-giggle.wav',
+        sound: shibaGiggleSound,
       },
       {
         id: 'greeting-yuni-answer',

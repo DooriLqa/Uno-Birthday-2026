@@ -1,9 +1,9 @@
-import beachPanorama from '@/shared/assets/beach-search/beach-panorama.png'
-import coconut from '@/shared/assets/beach-search/coconut.png'
-import messageBottle from '@/shared/assets/beach-search/message-bottle.png'
-import shell from '@/shared/assets/beach-search/shell.png'
-import starfish from '@/shared/assets/beach-search/starfish.png'
-import sunglasses from '@/shared/assets/beach-search/sunglasses.png'
+import beachPanorama from '@/shared/assets/games/beach-search/beach-panorama.png'
+import coconut from '@/shared/assets/games/beach-search/coconut.png'
+import messageBottle from '@/shared/assets/games/beach-search/message-bottle.png'
+import shell from '@/shared/assets/games/beach-search/shell.png'
+import starfish from '@/shared/assets/games/beach-search/starfish.png'
+import sunglasses from '@/shared/assets/games/beach-search/sunglasses.png'
 
 export type SearchItem = {
   id: string
