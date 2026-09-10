@@ -8,7 +8,7 @@ import {
 } from 'react'
 import { Fish as FishIcon } from 'lucide-react'
 import { usePawCoinStore } from '@/features/currency/model/store'
-import fishSheet from '../../../assets/fishing/fish-sheet.png'
+import fishSheet from '@/shared/assets/games/fishing/fish-sheet.png'
 import {
   DISTANCE_LABELS,
   getRarity,
@@ -20,8 +20,8 @@ import {
   type FishingDistance,
 } from '../model/fish'
 import { audioController } from '@/shared/lib/audio/audioController'
-import rod from '@/shared/assets/fishing/rod.png'
-import bobber from '@/shared/assets/fishing/bobber.png'
+import rod from '@/shared/assets/games/fishing/rod.png'
+import bobber from '@/shared/assets/games/fishing/bobber.png'
 import './FishingGame.css'
 
 type Phase = 'idle' | 'charging' | 'casting' | 'returning' | 'waiting' | 'bite' | 'fight' | 'result'
@@ -152,9 +152,7 @@ export function FishingGame({ onClose }: Props) {
 
     const next = catches.towardCoin + 1
     const coins = next >= 3 ? 1 : 0
-    const message = coins
-      ? '3/3 поймано — 1 монетка'
-      : `${next}/3 — ещё ${3 - next} до 1 монетки`
+    const message = coins ? '3/3 поймано — 1 монетка' : `${next}/3 — ещё ${3 - next} до 1 монетки`
 
     setCatches((previous) => ({
       towardCoin: coins ? 0 : previous.towardCoin + 1,
@@ -475,9 +473,7 @@ export function FishingGame({ onClose }: Props) {
             <b>Улов</b>
             <span className="rarity-dot rarity-dot--common" /> До монетки {catches.towardCoin}/3
           </div>
-          <div>
-            Всего поймано: {catches.totalCaught}
-          </div>
+          <div>Всего поймано: {catches.totalCaught}</div>
           <div className="fishing-distance-chip">{DISTANCE_LABELS[castDistance]}</div>
         </div>
 

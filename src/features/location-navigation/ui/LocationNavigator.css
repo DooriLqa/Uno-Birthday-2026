@@ -1,8 +1,8 @@
 .location-navigator {
-  --cursor-default: url('../../../shared/assets/cursors/pointer.png') 8 6, auto;
-  --cursor-forward: url('../../../shared/assets/cursors/arrow-right.png') 52 32, e-resize;
-  --cursor-pan-left: url('../../../shared/assets/cursors/arrow-left.png') 12 32, w-resize;
-  --cursor-back: url('../../../shared/assets/cursors/projected-back.png') 32 50, pointer;
+  --cursor-default: url('@/shared/assets/common/cursors/pointer.png') 8 6, auto;
+  --cursor-forward: url('@/shared/assets/common/cursors/arrow-right.png') 52 32, e-resize;
+  --cursor-pan-left: url('@/shared/assets/common/cursors/arrow-left.png') 12 32, w-resize;
+  --cursor-back: url('@/shared/assets/common/cursors/projected-back.png') 32 50, pointer;
   position: fixed;
   z-index: 15;
   inset: 0;
@@ -80,63 +80,63 @@
   pointer-events: auto;
 }
 .location-navigator__hotspot.is-interactive {
-  --cursor-image: url('../../../shared/assets/cursors/hand-point.png') 25 6, pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 25 6, pointer;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-arrow-left {
-  --cursor-image: url('../../../shared/assets/cursors/arrow-left.png') 13 32, w-resize;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-left.png') 13 32, w-resize;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-pointer {
-  --cursor-image: url('../../../shared/assets/cursors/pointer.png') 8 6, pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/pointer.png') 8 6, pointer;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-magnify {
-  --cursor-image: url('../../../shared/assets/cursors/magnify.png') 21 21, zoom-in;
+  --cursor-image: url('@/shared/assets/common/cursors/magnify.png') 21 21, zoom-in;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-arrow-up {
-  --cursor-image: url('../../../shared/assets/cursors/arrow-up.png') 32 12, n-resize;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-up.png') 32 12, n-resize;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-arrow-down {
-  --cursor-image: url('../../../shared/assets/cursors/arrow-down.png') 32 52, s-resize;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-down.png') 32 52, s-resize;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-arrow-right {
-  --cursor-image: url('../../../shared/assets/cursors/arrow-right.png') 51 32, e-resize;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-right.png') 51 32, e-resize;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-turn-left {
-  --cursor-image: url('../../../shared/assets/cursors/turn-left.png') 18 18, pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/turn-left.png') 18 18, pointer;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-turn-right {
-  --cursor-image: url('../../../shared/assets/cursors/turn-right.png') 46 18, pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/turn-right.png') 46 18, pointer;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-projected-back {
-  --cursor-image: url('../../../shared/assets/cursors/projected-back.png') 32 50, pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/projected-back.png') 32 50, pointer;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-projected-forward {
-  --cursor-image: url('../../../shared/assets/cursors/projected-forward.png') 53 30, pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/projected-forward.png') 53 30, pointer;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-dialogue {
-  --cursor-image: url('../../../shared/assets/cursors/dialogue.png') 30 48, help;
+  --cursor-image: url('@/shared/assets/common/cursors/dialogue.png') 30 48, help;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-hand-point {
-  --cursor-image: url('../../../shared/assets/cursors/hand-point.png') 25 6, pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 25 6, pointer;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-hand-grab {
-  --cursor-image: url('../../../shared/assets/cursors/hand-grab.png') 32 32, grab;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-grab.png') 32 32, grab;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot.cursor-hand-open {
-  --cursor-image: url('../../../shared/assets/cursors/hand-open.png') 32 34, move;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-open.png') 32 34, move;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .location-navigator__hotspot span {
@@ -230,6 +230,13 @@
   }
 }
 .location-navigator__error {
-  position: absolute; bottom: 15%; left: 50%; translate: -50% 0;
-  padding: 12px; background: #fff4d4; color: #713c26; border-radius: 12px; z-index: 6;
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  translate: -50% 0;
+  padding: 12px;
+  background: #fff4d4;
+  color: #713c26;
+  border-radius: 12px;
+  z-index: 6;
 }

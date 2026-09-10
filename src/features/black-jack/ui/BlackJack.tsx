@@ -4,11 +4,14 @@ import './BlackJack.css'
 type Card = { id: string; rank: number; image: string; value: number }
 export type BlackJackProps = { onComplete: () => void }
 
-const CARD_IMAGES = import.meta.glob('/src/assets/cards/*.{png,jpg,jpeg,webp}', {
-  eager: true,
-  import: 'default',
-  query: '?url',
-}) as Record<string, string>
+const CARD_IMAGES = import.meta.glob(
+  '/src/shared/assets/games/black-jack/cards/*.{png,jpg,jpeg,webp}',
+  {
+    eager: true,
+    import: 'default',
+    query: '?url',
+  },
+) as Record<string, string>
 const SUITS = ['бубен_', 'пик_', 'черв_', 'треф_']
 const RANKS = Array.from({ length: 9 }, (_, i) => i + 6)
 

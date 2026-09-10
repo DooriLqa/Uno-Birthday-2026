@@ -98,8 +98,10 @@ const getNoisePercent = (stationId: string, distance: number) => {
 const getStationAudio = (stationId: string, trackSrcs: string[]) => {
   const existing = stationAudio.get(stationId)
   if (existing) return existing
+  const firstTrack = trackSrcs[0]
+  if (!firstTrack) return null
 
-  const sound = audioController.createSound(trackSrcs[0], { volume: 0 })
+  const sound = audioController.createSound(firstTrack, { volume: 0 })
   const audio = sound.element
   audio.addEventListener('loadedmetadata', () => {
     const seekTo = pendingInitialSeek.get(stationId)
@@ -122,6 +124,7 @@ const ensureStationPlayback = (stationId: string, startAt?: number) => {
   const station = radioStations.find((item) => item.id === stationId)
   if (!station) return
   const sound = getStationAudio(station.id, station.trackSrcs)
+  if (!sound) return
   const audio = sound.element
   if (startAt !== undefined) {
     if (Number.isFinite(audio.duration) && audio.duration > 0) {
@@ -147,6 +150,7 @@ const syncAudio = (state: Pick<RadioState, 'isPowered' | 'volume' | 'frequency'>
     noise ??= audioController.createNoiseLoop()
     radioStations.forEach((station) => {
       const sound = getStationAudio(station.id, station.trackSrcs)
+      if (!sound) return
       sound.setVolume(
         state.volume * RADIO_MIX.station * getStationSignal(station.frequency, state.frequency),
       )
