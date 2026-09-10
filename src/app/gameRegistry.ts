@@ -24,7 +24,7 @@ import fishingScene from '@/shared/assets/locations/fishing.png'
 import raccoonArcadeBackground from '@/shared/assets/arkanoid/raccoon-arcade-background.png'
 import libraryBackground from '@/shared/assets/locations/tourist/library.png'
 import wildTotemCamp from '@/shared/assets/locations/wild/totem-camp.png'
-import wildPirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
+/* import wildPirateShore from '@/shared/assets/locations/wild/pirate-shore.png' */
 
 const locationTransition = {
   transitionSound: '/audio/sfx/location-footsteps.ogg',
@@ -258,7 +258,7 @@ export const games: GameDefinition[] = [
     target: 'скрытое сокровище',
     mapPosition: { left: '22%', top: '34%' },
     pageClassName: 'robot-maze-page',
-    backgroundImage: wildPirateShore,
+    backgroundImage: robotMazeGameBackground,
     ...locationTransition,
     Screen: RobotMazeGame,
   },
