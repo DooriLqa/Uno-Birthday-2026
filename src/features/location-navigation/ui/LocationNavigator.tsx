@@ -11,6 +11,7 @@ type Props = {
   onOpenMap: () => void
   onOpenGame: (gameId: string) => void
   onMerchant: () => void
+  onSailor: () => void
   onEnterJungleCave: () => void
 }
 type Size = { width: number; height: number }
@@ -30,7 +31,15 @@ function preload(source: string) {
   return promise
 }
 
-export function LocationNavigator({ active, visible = active, onOpenMap, onOpenGame, onMerchant, onEnterJungleCave }: Props) {
+export function LocationNavigator({
+  active,
+  visible = active,
+  onOpenMap,
+  onOpenGame,
+  onMerchant,
+  onSailor,
+  onEnterJungleCave,
+}: Props) {
   const { scene, history, setScene, setHistory } = useWorldStore()
   const location = locations[scene.locationId] ?? locations.pier
   const dialogueOpen = useDialogueStore((state) => state.activeDialogueId !== null)
@@ -55,14 +64,21 @@ export function LocationNavigator({ active, visible = active, onOpenMap, onOpenG
 
   useEffect(() => {
     let cancelled = false
-    void preload(location.image).then((next) => {
-      if (!cancelled) setSize(next)
-    }).catch(() => { if (!cancelled) setError('Не удалось загрузить сцену. Попробуйте ещё раз.') })
+    void preload(location.image)
+      .then((next) => {
+        if (!cancelled) setSize(next)
+      })
+      .catch(() => {
+        if (!cancelled) setError('Не удалось загрузить сцену. Попробуйте ещё раз.')
+      })
     // Prefetch only direct neighbours; failures never hide the current scene.
     for (const hotspot of location.hotspots) {
-      if (hotspot.action.type === 'location') void preload(locations[hotspot.action.locationId].image).catch(() => {})
+      if (hotspot.action.type === 'location')
+        void preload(locations[hotspot.action.locationId].image).catch(() => {})
     }
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [location])
 
   useEffect(() => {
@@ -77,10 +93,16 @@ export function LocationNavigator({ active, visible = active, onOpenMap, onOpenG
   const height = width / aspect
   const overflow = width - viewport.width
   const layout = {
-    width, height, left: 0, top: (viewport.height - height) / 2,
-    transform: 'translate3d(' + (-overflow * (location.isWide ? scene.pan : 0.5)) + 'px,0,0)',
+    width,
+    height,
+    left: 0,
+    top: (viewport.height - height) / 2,
+    transform: 'translate3d(' + -overflow * (location.isWide ? scene.pan : 0.5) + 'px,0,0)',
   }
-  const stop = () => { direction.current = 0; cancelAnimationFrame(frame.current) }
+  const stop = () => {
+    direction.current = 0
+    cancelAnimationFrame(frame.current)
+  }
   const change = async (next: SceneSnapshot, nextHistory: SceneSnapshot[]) => {
     if (lock.current) return
     lock.current = true
@@ -95,14 +117,18 @@ export function LocationNavigator({ active, visible = active, onOpenMap, onOpenG
       setHistory(nextHistory)
     } catch {
       setError('Не удалось загрузить сцену. Нажмите на переход ещё раз.')
-    } finally { lock.current = false }
+    } finally {
+      lock.current = false
+    }
   }
-  const navigate = (id: LocationId) => void change({ locationId: id, pan: 0.5 }, [...history, scene])
+  const navigate = (id: LocationId) =>
+    void change({ locationId: id, pan: 0.5 }, [...history, scene])
   const action = (item: LocationAction) => {
     if (lock.current || dialogueOpen) return
     if (item.type === 'location') navigate(item.locationId)
     if (item.type === 'game') onOpenGame(item.gameId)
     if (item.type === 'merchant') onMerchant()
+    if (item.type === 'sailor') onSailor()
     if (item.type === 'map') onOpenMap()
     if (item.type === 'jungle-cave') onEnterJungleCave()
   }
@@ -119,40 +145,79 @@ export function LocationNavigator({ active, visible = active, onOpenMap, onOpenG
       const dt = Math.min(now - previous, 50)
       previous = now
       const current = useWorldStore.getState().scene
-      setScene({ ...current, pan: Math.min(1, Math.max(0, current.pan + direction.current * dt * 0.22 / Math.max(1, overflow))) })
+      setScene({
+        ...current,
+        pan: Math.min(
+          1,
+          Math.max(0, current.pan + (direction.current * dt * 0.33) / Math.max(1, overflow)),
+        ),
+      })
       if (direction.current) frame.current = requestAnimationFrame(tick)
     }
     frame.current = requestAnimationFrame(tick)
   }
 
   return (
-    <section className={`location-navigator ${active ? 'is-active' : ''}`} aria-label={location.title}
-      style={{ visibility: visible ? 'visible' : 'hidden' }} inert={!active || dialogueOpen}>
+    <section
+      className={`location-navigator ${active ? 'is-active' : ''}`}
+      aria-label={location.title}
+      style={{ visibility: visible ? 'visible' : 'hidden' }}
+      inert={!active || dialogueOpen}
+    >
       <div className="location-navigator__scene">
         <img className="location-navigator__image" style={layout} src={location.image} alt="" />
         <div className="location-navigator__hotspot-layer">
           <div className="location-navigator__hotspot-canvas is-wide" style={layout}>
             {location.hotspots.map((hotspot) => (
-              <button key={hotspot.id} type="button"
-                className={'location-navigator__hotspot cursor-' + (hotspot.cursor ?? 'projected-forward')}
-                style={hotspot.area} onClick={() => action(hotspot.action)} aria-label={hotspot.label}>
+              <button
+                key={hotspot.id}
+                type="button"
+                className={
+                  'location-navigator__hotspot cursor-' + (hotspot.cursor ?? 'projected-forward')
+                }
+                style={hotspot.area}
+                onClick={() => action(hotspot.action)}
+                aria-label={hotspot.label}
+              >
                 <span>{hotspot.label}</span>
               </button>
             ))}
           </div>
         </div>
-        {location.isWide && overflow > 1 && ([-1, 1] as const).map((side) => (
-          <button key={side} type="button"
-            className={'location-navigator__pan-zone location-navigator__pan-zone--' + (side < 0 ? 'left' : 'right')}
-            onMouseEnter={() => pan(side)} onMouseLeave={stop} onBlur={stop}
-            onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') pan(side) }}
-            onKeyUp={stop} aria-label={side < 0 ? 'Посмотреть влево' : 'Посмотреть вправо'} />
-        ))}
+        {location.isWide &&
+          overflow > 1 &&
+          ([-1, 1] as const).map((side) => (
+            <button
+              key={side}
+              type="button"
+              className={
+                'location-navigator__pan-zone location-navigator__pan-zone--' +
+                (side < 0 ? 'left' : 'right')
+              }
+              onMouseEnter={() => pan(side)}
+              onMouseLeave={stop}
+              onBlur={stop}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') pan(side)
+              }}
+              onKeyUp={stop}
+              aria-label={side < 0 ? 'Посмотреть влево' : 'Посмотреть вправо'}
+            />
+          ))}
       </div>
       <div className="location-navigator__caption">{location.title}</div>
-      {error && <div className="location-navigator__error" role="alert">{error}</div>}
+      {error && (
+        <div className="location-navigator__error" role="alert">
+          {error}
+        </div>
+      )}
       {(history.length > 0 || scene.locationId !== 'pier') && (
-        <button type="button" className="location-navigator__back-zone" onClick={back} aria-label="Вернуться назад" />
+        <button
+          type="button"
+          className="location-navigator__back-zone"
+          onClick={back}
+          aria-label="Вернуться назад"
+        />
       )}
     </section>
   )
