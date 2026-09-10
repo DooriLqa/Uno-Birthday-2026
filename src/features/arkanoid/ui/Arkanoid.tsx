@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { ARKANOID_LAYOUT } from '../model/layout'
-import arkanoidSound1 from '@/shared/assets/arkanoid/Arkanoid_1.wav'
-import arkanoidSound2 from '@/shared/assets/arkanoid/Arkanoid_2.wav'
-import arkanoidSound3 from '@/shared/assets/arkanoid/Arkanoid_3.wav'
-import arkanoidSound4 from '@/shared/assets/arkanoid/Arkanoid_4.wav'
-import arkanoidSound5 from '@/shared/assets/arkanoid/Arkanoid_5.wav'
-import arkanoidSound6 from '@/shared/assets/arkanoid/Arkanoid_6.wav'
-import arkanoidSound7 from '@/shared/assets/arkanoid/Arkanoid_7.wav'
-import arkanoidSound8 from '@/shared/assets/arkanoid/Arkanoid_8.wav'
+import arkanoidSound1 from '@/shared/assets/games/arkanoid/Arkanoid_1.wav'
+import arkanoidSound2 from '@/shared/assets/games/arkanoid/Arkanoid_2.wav'
+import arkanoidSound3 from '@/shared/assets/games/arkanoid/Arkanoid_3.wav'
+import arkanoidSound4 from '@/shared/assets/games/arkanoid/Arkanoid_4.wav'
+import arkanoidSound5 from '@/shared/assets/games/arkanoid/Arkanoid_5.wav'
+import arkanoidSound6 from '@/shared/assets/games/arkanoid/Arkanoid_6.wav'
+import arkanoidSound7 from '@/shared/assets/games/arkanoid/Arkanoid_7.wav'
+import arkanoidSound8 from '@/shared/assets/games/arkanoid/Arkanoid_8.wav'
 import './Arkanoid.css'
 
 type Props = {
@@ -725,9 +725,7 @@ export function Arkanoid({ onComplete }: Props) {
       const lifeGap = 13
       const lifeCenterY = game.paddle.y + game.paddle.height / 2
       const lifeStartX =
-        game.paddle.x +
-        game.paddle.width / 2 -
-        ((remainingLives - 1) * lifeGap) / 2
+        game.paddle.x + game.paddle.width / 2 - ((remainingLives - 1) * lifeGap) / 2
 
       if (remainingLives > 0) {
         ctx.save()
@@ -814,168 +812,208 @@ export function Arkanoid({ onComplete }: Props) {
     })
   }, [])
 
-  const activatePowerUp = useCallback((game: GameState, type: PowerUpType) => {
-    playSound('powerUp')
+  const activatePowerUp = useCallback(
+    (game: GameState, type: PowerUpType) => {
+      playSound('powerUp')
 
-    if (type === 'wide') {
-      game.wideTimer = WIDE_DURATION
+      if (type === 'wide') {
+        game.wideTimer = WIDE_DURATION
 
-      game.paddle.width = game.paddle.baseWidth * 1.65
+        game.paddle.width = game.paddle.baseWidth * 1.65
 
-      return
-    }
-
-    if (type === 'triple') {
-      if (game.balls.length >= 6) {
         return
       }
 
-      if (game.balls.length === 0) {
+      if (type === 'triple') {
+        if (game.balls.length >= 6) {
+          return
+        }
+
+        if (game.balls.length === 0) {
+          return
+        }
+
+        const source = game.balls[Math.floor(Math.random() * game.balls.length)]
+
+        if (!source) {
+          return
+        }
+
+        const speed = Math.sqrt(source.vx * source.vx + source.vy * source.vy)
+
+        const fire = source.fire === true
+
+        game.balls.push(
+          {
+            x: source.x,
+            y: source.y,
+            radius: BALL_RADIUS,
+            vx: -speed * 0.75,
+            vy: -speed * 0.66,
+            fire,
+          },
+          {
+            x: source.x,
+            y: source.y,
+            radius: BALL_RADIUS,
+            vx: 0,
+            vy: -speed,
+            fire,
+          },
+        )
+
         return
       }
 
-      const source = game.balls[Math.floor(Math.random() * game.balls.length)]
+      if (type === 'shot') {
+        const speed = getBallSpeed(game.level)
 
-      if (!source) {
+        const centerX = game.paddle.x + game.paddle.width / 2
+
+        const startY = game.paddle.y - BALL_RADIUS - 4
+
+        game.balls.push(
+          {
+            x: centerX - 22,
+            y: startY,
+            radius: BALL_RADIUS,
+            vx: -speed * 0.75,
+            vy: -speed,
+            fire: false,
+          },
+          {
+            x: centerX,
+            y: startY,
+            radius: BALL_RADIUS,
+            vx: 0,
+            vy: -speed,
+            fire: false,
+          },
+          {
+            x: centerX + 22,
+            y: startY,
+            radius: BALL_RADIUS,
+            vx: speed * 0.75,
+            vy: -speed,
+            fire: false,
+          },
+        )
+
         return
       }
 
-      const speed = Math.sqrt(source.vx * source.vx + source.vy * source.vy)
+      if (type === 'fire') {
+        game.fireShotsRemaining = FIRE_SHOT_COUNT
 
-      const fire = source.fire === true
+        game.fireShotTimer = FIRE_SHOT_INTERVAL
+      }
+    },
+    [playSound],
+  )
 
-      game.balls.push(
-        {
-          x: source.x,
-          y: source.y,
-          radius: BALL_RADIUS,
-          vx: -speed * 0.75,
-          vy: -speed * 0.66,
-          fire,
-        },
-        {
-          x: source.x,
-          y: source.y,
-          radius: BALL_RADIUS,
-          vx: 0,
-          vy: -speed,
-          fire,
-        },
-      )
+  const loseLife = useCallback(
+    (game: GameState) => {
+      game.lives -= 1
 
-      return
-    }
+      setLives(game.lives)
 
-    if (type === 'shot') {
+      game.fireShotsRemaining = 0
+      game.fireShotTimer = 0
+
+      if (game.lives <= 0) {
+        const passedLevels = Math.max(0, game.level - 1)
+
+        game.running = false
+        game.gameOver = true
+
+        setCompletedLevels(passedLevels)
+        playSound('gameOver')
+        setGameOver(true)
+
+        // После потери всех жизней прогресс полностью сбрасывается.
+        saveProgress(1, 1, false)
+        setUnlockedLevel(1)
+        setSelectedLevel(1)
+        setLevel(1)
+
+        return
+      }
+
+      playSound('lifeLost')
+
       const speed = getBallSpeed(game.level)
 
-      const centerX = game.paddle.x + game.paddle.width / 2
+      game.paddle.x = CANVAS_WIDTH / 2 - game.paddle.width / 2
 
-      const startY = game.paddle.y - BALL_RADIUS - 4
+      game.balls = [
+        {
+          x: CANVAS_WIDTH / 2,
 
-      game.balls.push(
-        {
-          x: centerX - 22,
-          y: startY,
+          y: game.paddle.y - BALL_RADIUS - 3,
+
           radius: BALL_RADIUS,
-          vx: -speed * 0.75,
-          vy: -speed,
-          fire: false,
-        },
-        {
-          x: centerX,
-          y: startY,
-          radius: BALL_RADIUS,
+
           vx: 0,
+
           vy: -speed,
+
           fire: false,
         },
-        {
-          x: centerX + 22,
-          y: startY,
-          radius: BALL_RADIUS,
-          vx: speed * 0.75,
-          vy: -speed,
-          fire: false,
-        },
-      )
-
-      return
-    }
-
-    if (type === 'fire') {
-      game.fireShotsRemaining = FIRE_SHOT_COUNT
-
-      game.fireShotTimer = FIRE_SHOT_INTERVAL
-    }
-  }, [playSound])
-
-  const loseLife = useCallback((game: GameState) => {
-    game.lives -= 1
-
-    setLives(game.lives)
-
-    game.fireShotsRemaining = 0
-    game.fireShotTimer = 0
-
-    if (game.lives <= 0) {
-      const passedLevels = Math.max(0, game.level - 1)
+      ]
 
       game.running = false
-      game.gameOver = true
+      game.started = false
+      setStarted(false)
 
-      setCompletedLevels(passedLevels)
-      playSound('gameOver')
-      setGameOver(true)
+      game.powerUps = []
+    },
+    [playSound],
+  )
 
-      // После потери всех жизней прогресс полностью сбрасывается.
-      saveProgress(1, 1, false)
-      setUnlockedLevel(1)
-      setSelectedLevel(1)
-      setLevel(1)
+  const hitBrick = useCallback(
+    (game: GameState, brick: Brick, fireBall: boolean) => {
+      if (brick.type === 'indestructible') {
+        if (fireBall) {
+          return false
+        }
 
-      return
-    }
-
-    playSound('lifeLost')
-
-    const speed = getBallSpeed(game.level)
-
-    game.paddle.x = CANVAS_WIDTH / 2 - game.paddle.width / 2
-
-    game.balls = [
-      {
-        x: CANVAS_WIDTH / 2,
-
-        y: game.paddle.y - BALL_RADIUS - 3,
-
-        radius: BALL_RADIUS,
-
-        vx: 0,
-
-        vy: -speed,
-
-        fire: false,
-      },
-    ]
-
-    game.running = false
-    game.started = false
-    setStarted(false)
-
-    game.powerUps = []
-  }, [playSound])
-
-  const hitBrick = useCallback((game: GameState, brick: Brick, fireBall: boolean) => {
-    if (brick.type === 'indestructible') {
-      if (fireBall) {
-        return false
+        return true
       }
 
-      return true
-    }
+      if (fireBall) {
+        playSound('destroy')
+        game.score += brick.type === 'strong' ? 30 : brick.type === 'hard' ? 20 : 10
 
-    if (fireBall) {
+        if (brick.powerUp) {
+          game.powerUps.push({
+            x: brick.x + brick.width / 2 - POWERUP_SIZE / 2,
+
+            y: brick.y + brick.height,
+
+            width: POWERUP_SIZE,
+
+            height: POWERUP_SIZE,
+
+            type: brick.powerUp,
+
+            speed: POWERUP_SPEED,
+          })
+        }
+
+        brick.hp = 0
+
+        return true
+      }
+
+      brick.hp -= 1
+
+      if (brick.hp > 0) {
+        playSound('hit')
+        game.score += 5
+
+        return true
+      }
+
       playSound('destroy')
       game.score += brick.type === 'strong' ? 30 : brick.type === 'hard' ? 20 : 10
 
@@ -998,40 +1036,9 @@ export function Arkanoid({ onComplete }: Props) {
       brick.hp = 0
 
       return true
-    }
-
-    brick.hp -= 1
-
-    if (brick.hp > 0) {
-      playSound('hit')
-      game.score += 5
-
-      return true
-    }
-
-    playSound('destroy')
-    game.score += brick.type === 'strong' ? 30 : brick.type === 'hard' ? 20 : 10
-
-    if (brick.powerUp) {
-      game.powerUps.push({
-        x: brick.x + brick.width / 2 - POWERUP_SIZE / 2,
-
-        y: brick.y + brick.height,
-
-        width: POWERUP_SIZE,
-
-        height: POWERUP_SIZE,
-
-        type: brick.powerUp,
-
-        speed: POWERUP_SPEED,
-      })
-    }
-
-    brick.hp = 0
-
-    return true
-  }, [playSound])
+    },
+    [playSound],
+  )
 
   const checkLevelComplete = useCallback(
     (game: GameState) => {
@@ -1380,7 +1387,6 @@ export function Arkanoid({ onComplete }: Props) {
     setStarted(true)
   }, [playSound])
 
-
   const nextLevel = useCallback(() => {
     if (level >= TOTAL_LEVELS) {
       onComplete()
@@ -1503,12 +1509,14 @@ export function Arkanoid({ onComplete }: Props) {
   return (
     <div
       className="arkanoid"
-      style={{
-        '--arkanoid-width': ARKANOID_LAYOUT.width,
-        '--arkanoid-height': ARKANOID_LAYOUT.height,
-        '--arkanoid-x': ARKANOID_LAYOUT.x,
-        '--arkanoid-y': ARKANOID_LAYOUT.y,
-      } as CSSProperties}
+      style={
+        {
+          '--arkanoid-width': ARKANOID_LAYOUT.width,
+          '--arkanoid-height': ARKANOID_LAYOUT.height,
+          '--arkanoid-x': ARKANOID_LAYOUT.x,
+          '--arkanoid-y': ARKANOID_LAYOUT.y,
+        } as CSSProperties
+      }
     >
       <div className="arkanoid__header">
         <div>
@@ -1629,7 +1637,9 @@ export function Arkanoid({ onComplete }: Props) {
             <h2>Игра окончена</h2>
 
             <p>Очки: {score}</p>
-            <p>Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}</p>
+            <p>
+              Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}
+            </p>
 
             <button type="button" onClick={() => startGame(1)}>
               Попробовать снова
@@ -1642,7 +1652,9 @@ export function Arkanoid({ onComplete }: Props) {
             <h2>{level >= TOTAL_LEVELS ? 'Все уровни пройдены!' : `Уровень ${level} пройден!`}</h2>
 
             <p>Очки: {score}</p>
-            <p>Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}</p>
+            <p>
+              Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}
+            </p>
 
             {level < TOTAL_LEVELS ? (
               <button type="button" onClick={nextLevel}>
