@@ -118,6 +118,7 @@ export const games: GameDefinition[] = [
     target: '20 ценностей',
     mapPosition: { left: '83%', top: '45%' },
     pageClassName: 'fruit-basket-page',
+    backgroundImage: arcadeFrameImage,
     ...locationTransition,
     Screen: FruitBasketGame,
   },

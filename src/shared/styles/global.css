@@ -671,17 +671,33 @@ h1 {
   object-fit: cover;
 }
 .game-overlay.fruit-basket-page {
+  /* Cover wide windows, but keep the entire screen visible in narrow ones. */
+  --fruit-arcade-width: min(max(100vw, calc(100dvh * 1672 / 941)), 210vw);
   padding: 84px 16px 24px;
   background: linear-gradient(145deg, #ef9b8b 0%, #f9d49b 48%, #95c894 100%);
-  overflow-y: auto;
+  overflow: hidden;
 }
-.fruit-basket-page .page-top,
-.fruit-basket-page .fruit-basket-game {
+.fruit-basket-page .game-overlay__content {
+  z-index: auto;
+}
+.fruit-basket-page .page-top {
+  position: relative;
+  z-index: 3;
   width: min(1120px, 100%);
   margin: 0 auto;
 }
 .fruit-basket-page .page-top {
   margin-bottom: 14px;
+}
+.fruit-basket-page .game-overlay__background {
+  z-index: 2;
+  inset: auto;
+  top: 50dvh;
+  left: 50vw;
+  width: var(--fruit-arcade-width);
+  height: calc(var(--fruit-arcade-width) * 941 / 1672);
+  transform: translate(-50%, -50%);
+  object-fit: contain;
 }
 @media (max-width: 760px) {
   .game-overlay.flappy-bird-page {
