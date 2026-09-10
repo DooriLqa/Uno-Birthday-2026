@@ -1,105 +1,42 @@
 .arkanoid {
-  width: 100%;
+  position: fixed;
+  top: var(--arkanoid-y);
+  left: var(--arkanoid-x);
+  width: var(--arkanoid-width);
+  height: var(--arkanoid-height);
+  margin: 0;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-}
-
-.arkanoid__header {
-  width: min(900px, 100%);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-}
-
-.arkanoid__header > div:first-child {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.arkanoid__header span {
-  font-size: 14px;
-}
-
-.arkanoid__header strong {
-  font-size: 18px;
-}
-
-.arkanoid__levels {
-  display: flex;
-  gap: 6px;
-}
-
-.arkanoid__level {
-  width: 34px;
-  height: 34px;
-  border: 0;
-  border-radius: 8px;
-  background: #e5e7eb;
-  color: #374151;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.arkanoid__level--active {
-  background: #eb6c9a;
-  color: #ffffff;
-}
-
-.arkanoid__level:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.arkanoid__powerups {
-  min-height: 24px;
-  display: flex;
   justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.arkanoid__powerup-active {
-  padding: 5px 10px;
-  border-radius: 8px;
-  background: #f4efe8;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.arkanoid__canvas-wrap {
-  position: relative;
-  width: 900px;
-  max-width: 100%;
+  gap: 0;
+  box-sizing: border-box;
   overflow: hidden;
-  border-radius: 16px;
-  touch-action: none;
-  box-shadow: 0 8px 28px rgba(38, 59, 87, 0.12);
+}
+
+.arkanoid__header,
+.arkanoid__powerups,
+.arkanoid__legend {
+  display: none;
 }
 
 .arkanoid__canvas {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   user-select: none;
 }
 
 .arkanoid__overlay {
   position: absolute;
   inset: 0;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   gap: 12px;
-
   background: rgba(5, 8, 13, 0.78);
-
   color: #ffffff;
   text-align: center;
 }
@@ -116,61 +53,28 @@
 
 .arkanoid__overlay button {
   padding: 11px 24px;
-
   border: 0;
   border-radius: 10px;
-
   background: #eb6c9a;
   color: #ffffff;
-
   font-size: 16px;
   font-weight: 700;
-
   cursor: pointer;
+  /*   --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 8 6, auto;
+  cursor: var(--cursor-pointer); */
 }
 
 .arkanoid__overlay button:hover {
   filter: brightness(1.05);
 }
 
-.arkanoid__legend {
-  width: min(900px, 100%);
-
-  display: flex;
-  justify-content: center;
-
-  gap: 18px;
-  flex-wrap: wrap;
-
-  color: #6b7280;
-  font-size: 13px;
-}
-
-.arkanoid__legend b {
-  color: #374151;
-}
-
 @media (max-width: 740px) {
-  .arkanoid__header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .arkanoid__header > div:first-child {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .arkanoid__levels {
-    justify-content: center;
-  }
-
-  .arkanoid__canvas-wrap {
-    border-radius: 12px;
-  }
-
-  .arkanoid__legend {
-    padding: 0 10px;
-    gap: 10px;
+  .arkanoid {
+    width: calc(100vw - 24px);
+    height: calc(100dvh - 24px);
+    max-width: none;
+    max-height: none;
+    top: 50%;
+    left: 50%;
   }
 }

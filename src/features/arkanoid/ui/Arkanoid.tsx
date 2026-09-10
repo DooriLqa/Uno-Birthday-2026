@@ -1,4 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
+import { ARKANOID_LAYOUT } from '../model/layout'
+import arkanoidSound1 from '@/shared/assets/arkanoid/Arkanoid_1.wav'
+import arkanoidSound2 from '@/shared/assets/arkanoid/Arkanoid_2.wav'
+import arkanoidSound3 from '@/shared/assets/arkanoid/Arkanoid_3.wav'
+import arkanoidSound4 from '@/shared/assets/arkanoid/Arkanoid_4.wav'
+import arkanoidSound5 from '@/shared/assets/arkanoid/Arkanoid_5.wav'
+import arkanoidSound6 from '@/shared/assets/arkanoid/Arkanoid_6.wav'
+import arkanoidSound7 from '@/shared/assets/arkanoid/Arkanoid_7.wav'
+import arkanoidSound8 from '@/shared/assets/arkanoid/Arkanoid_8.wav'
 import './Arkanoid.css'
 
 type Props = {
@@ -72,6 +82,13 @@ type GameState = {
 
 const CANVAS_WIDTH = 900
 const CANVAS_HEIGHT = 600
+
+// Очень низкое внутреннее разрешение создаёт выраженный pixel-art эффект
+// при растягивании Canvas до размера игрового поля: один логический пиксель
+// превращается примерно в 3x3 физических пикселя.
+const PIXEL_CANVAS_WIDTH = 300
+const PIXEL_CANVAS_HEIGHT = 200
+const PIXEL_SCALE = PIXEL_CANVAS_WIDTH / CANVAS_WIDTH
 
 const STORAGE_KEY = 'arkanoid-progress-v1'
 
@@ -428,7 +445,18 @@ export function Arkanoid({ onComplete }: Props) {
 
   const animationRef = useRef<number | null>(null)
 
-  const gameRef = useRef<GameState | null>(null)
+  const audioRef = useRef({
+    launch: null as HTMLAudioElement | null,
+    hit: null as HTMLAudioElement | null,
+    destroy: null as HTMLAudioElement | null,
+    powerUp: null as HTMLAudioElement | null,
+    levelComplete: null as HTMLAudioElement | null,
+    gameOver: null as HTMLAudioElement | null,
+    lifeLost: null as HTMLAudioElement | null,
+    platformBounce: null as HTMLAudioElement | null,
+  })
+
+  const gameRef = useRef<GameState | null>(createInitialGame(loadProgress().currentLevel))
 
   const keysRef = useRef({
     left: false,
@@ -437,7 +465,7 @@ export function Arkanoid({ onComplete }: Props) {
 
   const [unlockedLevel, setUnlockedLevel] = useState(() => loadProgress().unlockedLevel)
 
-  const [selectedLevel, setSelectedLevel] = useState(() => loadProgress().currentLevel)
+  const [, setSelectedLevel] = useState(() => loadProgress().currentLevel)
 
   const [level, setLevel] = useState(() => loadProgress().currentLevel)
 
@@ -450,8 +478,43 @@ export function Arkanoid({ onComplete }: Props) {
   const [gameOver, setGameOver] = useState(false)
 
   const [started, setStarted] = useState(false)
+  const [completedLevels, setCompletedLevels] = useState(0)
 
   const [activePowerUps, setActivePowerUps] = useState<PowerUpType[]>([])
+
+  useEffect(() => {
+    audioRef.current.launch = new Audio(arkanoidSound1)
+    audioRef.current.hit = new Audio(arkanoidSound2)
+    audioRef.current.destroy = new Audio(arkanoidSound3)
+    audioRef.current.powerUp = new Audio(arkanoidSound4)
+    audioRef.current.levelComplete = new Audio(arkanoidSound5)
+    audioRef.current.gameOver = new Audio(arkanoidSound6)
+    audioRef.current.lifeLost = new Audio(arkanoidSound7)
+    audioRef.current.platformBounce = new Audio(arkanoidSound8)
+
+    for (const audio of Object.values(audioRef.current)) {
+      if (audio) {
+        audio.preload = 'auto'
+      }
+    }
+
+    return () => {
+      for (const audio of Object.values(audioRef.current)) {
+        audio?.pause()
+      }
+    }
+  }, [])
+
+  const playSound = useCallback((key: keyof typeof audioRef.current) => {
+    const audio = audioRef.current[key]
+
+    if (!audio) {
+      return
+    }
+
+    audio.currentTime = 0
+    void audio.play().catch(() => undefined)
+  }, [])
 
   const drawPowerUpIcon = useCallback((ctx: CanvasRenderingContext2D, powerUp: FallingPowerUp) => {
     const centerX = powerUp.x + powerUp.width / 2
@@ -588,6 +651,11 @@ export function Arkanoid({ onComplete }: Props) {
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, game: GameState) => {
+      // Рендерим игру в 2 раза меньшем разрешении и затем
+      // растягиваем Canvas без сглаживания — получается пиксельная графика.
+      ctx.setTransform(PIXEL_SCALE, 0, 0, PIXEL_SCALE, 0, 0)
+      ctx.imageSmoothingEnabled = false
+
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
       const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT)
@@ -630,15 +698,57 @@ export function Arkanoid({ onComplete }: Props) {
 
       ctx.save()
 
-      ctx.fillStyle = game.wideTimer > 0 ? '#39d98a' : '#f2f2f2'
+      if (game.wideTimer > 0) {
+        const remainingRatio = Math.max(0, Math.min(1, game.wideTimer / WIDE_DURATION))
+        const whiteRatio = 1 - remainingRatio
 
-      ctx.shadowColor = game.wideTimer > 0 ? '#39d98a' : 'transparent'
+        const r = Math.round(57 + (255 - 57) * whiteRatio)
+        const g = Math.round(217 + (255 - 217) * whiteRatio)
+        const b = Math.round(138 + (255 - 138) * whiteRatio)
 
-      ctx.shadowBlur = game.wideTimer > 0 ? 12 : 0
+        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
+        ctx.shadowColor = `rgb(${r}, ${g}, ${b})`
+        ctx.shadowBlur = 12
+      } else {
+        ctx.fillStyle = '#f2f2f2'
+        ctx.shadowColor = 'transparent'
+        ctx.shadowBlur = 0
+      }
 
       ctx.fillRect(game.paddle.x, game.paddle.y, game.paddle.width, game.paddle.height)
 
       ctx.restore()
+
+      // Индикатор оставшихся жизней: на одну меньше текущего значения.
+      const remainingLives = Math.max(0, game.lives - 1)
+      const lifeRadius = 4
+      const lifeGap = 13
+      const lifeCenterY = game.paddle.y + game.paddle.height / 2
+      const lifeStartX =
+        game.paddle.x +
+        game.paddle.width / 2 -
+        ((remainingLives - 1) * lifeGap) / 2
+
+      if (remainingLives > 0) {
+        ctx.save()
+
+        ctx.fillStyle = '#ff2f5f'
+        ctx.strokeStyle = '#5a071c'
+        ctx.lineWidth = 3
+        ctx.shadowColor = '#ff69b4'
+        ctx.shadowBlur = 12
+
+        for (let index = 0; index < remainingLives; index++) {
+          const centerX = lifeStartX + index * lifeGap
+
+          ctx.beginPath()
+          ctx.arc(centerX, lifeCenterY, lifeRadius, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.stroke()
+        }
+
+        ctx.restore()
+      }
 
       for (const ball of game.balls) {
         ctx.save()
@@ -705,6 +815,8 @@ export function Arkanoid({ onComplete }: Props) {
   }, [])
 
   const activatePowerUp = useCallback((game: GameState, type: PowerUpType) => {
+    playSound('powerUp')
+
     if (type === 'wide') {
       game.wideTimer = WIDE_DURATION
 
@@ -796,7 +908,7 @@ export function Arkanoid({ onComplete }: Props) {
 
       game.fireShotTimer = FIRE_SHOT_INTERVAL
     }
-  }, [])
+  }, [playSound])
 
   const loseLife = useCallback((game: GameState) => {
     game.lives -= 1
@@ -807,13 +919,25 @@ export function Arkanoid({ onComplete }: Props) {
     game.fireShotTimer = 0
 
     if (game.lives <= 0) {
+      const passedLevels = Math.max(0, game.level - 1)
+
       game.running = false
       game.gameOver = true
 
+      setCompletedLevels(passedLevels)
+      playSound('gameOver')
       setGameOver(true)
+
+      // После потери всех жизней прогресс полностью сбрасывается.
+      saveProgress(1, 1, false)
+      setUnlockedLevel(1)
+      setSelectedLevel(1)
+      setLevel(1)
 
       return
     }
+
+    playSound('lifeLost')
 
     const speed = getBallSpeed(game.level)
 
@@ -827,7 +951,7 @@ export function Arkanoid({ onComplete }: Props) {
 
         radius: BALL_RADIUS,
 
-        vx: speed * 0.7,
+        vx: 0,
 
         vy: -speed,
 
@@ -835,8 +959,12 @@ export function Arkanoid({ onComplete }: Props) {
       },
     ]
 
+    game.running = false
+    game.started = false
+    setStarted(false)
+
     game.powerUps = []
-  }, [])
+  }, [playSound])
 
   const hitBrick = useCallback((game: GameState, brick: Brick, fireBall: boolean) => {
     if (brick.type === 'indestructible') {
@@ -848,6 +976,7 @@ export function Arkanoid({ onComplete }: Props) {
     }
 
     if (fireBall) {
+      playSound('destroy')
       game.score += brick.type === 'strong' ? 30 : brick.type === 'hard' ? 20 : 10
 
       if (brick.powerUp) {
@@ -874,11 +1003,13 @@ export function Arkanoid({ onComplete }: Props) {
     brick.hp -= 1
 
     if (brick.hp > 0) {
+      playSound('hit')
       game.score += 5
 
       return true
     }
 
+    playSound('destroy')
     game.score += brick.type === 'strong' ? 30 : brick.type === 'hard' ? 20 : 10
 
     if (brick.powerUp) {
@@ -900,7 +1031,7 @@ export function Arkanoid({ onComplete }: Props) {
     brick.hp = 0
 
     return true
-  }, [])
+  }, [playSound])
 
   const checkLevelComplete = useCallback(
     (game: GameState) => {
@@ -914,6 +1045,8 @@ export function Arkanoid({ onComplete }: Props) {
       game.won = true
 
       setWon(true)
+      setCompletedLevels(game.level)
+      playSound('levelComplete')
 
       if (game.level >= TOTAL_LEVELS) {
         saveProgress(TOTAL_LEVELS, TOTAL_LEVELS, true)
@@ -933,15 +1066,11 @@ export function Arkanoid({ onComplete }: Props) {
 
       return true
     },
-    [unlockedLevel],
+    [playSound, unlockedLevel],
   )
 
   const update = useCallback(
     (game: GameState, deltaTime: number) => {
-      if (!game.running) {
-        return
-      }
-
       const dt = Math.min(deltaTime, 50)
 
       if (keysRef.current.left) {
@@ -953,6 +1082,19 @@ export function Arkanoid({ onComplete }: Props) {
       }
 
       game.paddle.x = Math.max(0, Math.min(CANVAS_WIDTH - game.paddle.width, game.paddle.x))
+
+      if (!game.running) {
+        const waitingBall = game.balls[0]
+
+        if (waitingBall) {
+          waitingBall.x = game.paddle.x + game.paddle.width / 2
+          waitingBall.y = game.paddle.y - BALL_RADIUS - 3
+          waitingBall.vx = 0
+          waitingBall.vy = 0
+        }
+
+        return
+      }
 
       if (game.wideTimer > 0) {
         game.wideTimer--
@@ -1009,6 +1151,7 @@ export function Arkanoid({ onComplete }: Props) {
           ball.x >= game.paddle.x &&
           ball.x <= game.paddle.x + game.paddle.width
         ) {
+          playSound('platformBounce')
           const hit = (ball.x - (game.paddle.x + game.paddle.width / 2)) / (game.paddle.width / 2)
 
           const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy)
@@ -1188,8 +1331,8 @@ export function Arkanoid({ onComplete }: Props) {
 
       const game = createInitialGame(selected)
 
-      game.running = true
-      game.started = true
+      game.running = false
+      game.started = false
 
       gameRef.current = game
 
@@ -1198,19 +1341,45 @@ export function Arkanoid({ onComplete }: Props) {
 
       setScore(0)
       setLives(3)
+      setCompletedLevels(Math.max(0, selected - 1))
 
       setWon(false)
       setGameOver(false)
-      setStarted(true)
+      setStarted(false)
 
       setActivePowerUps([])
     },
     [unlockedLevel],
   )
 
-  const resetCurrentLevel = useCallback(() => {
-    startGame(level)
-  }, [level, startGame])
+  const launchBall = useCallback(() => {
+    const game = gameRef.current
+
+    if (!game || game.gameOver || game.won || game.running) {
+      return
+    }
+
+    const ball = game.balls[0]
+
+    if (!ball) {
+      return
+    }
+
+    const speed = getBallSpeed(game.level)
+
+    playSound('launch')
+
+    ball.x = game.paddle.x + game.paddle.width / 2
+    ball.y = game.paddle.y - BALL_RADIUS - 3
+    ball.vx = 0
+    ball.vy = -speed
+    ball.fire = false
+
+    game.running = true
+    game.started = true
+    setStarted(true)
+  }, [playSound])
+
 
   const nextLevel = useCallback(() => {
     if (level >= TOTAL_LEVELS) {
@@ -1227,43 +1396,46 @@ export function Arkanoid({ onComplete }: Props) {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+      const key = event.key.toLowerCase()
+
+      if (event.key === 'ArrowLeft' || key === 'a' || key === 'ф') {
         keysRef.current.left = true
-
         event.preventDefault()
       }
 
-      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
+      if (event.key === 'ArrowRight' || key === 'd' || key === 'в') {
         keysRef.current.right = true
-
         event.preventDefault()
       }
 
-      if (event.code === 'Space' && !started) {
-        startGame(selectedLevel)
+      if (event.code === 'Space') {
+        event.preventDefault()
+        if (!event.repeat) {
+          launchBall()
+        }
       }
     }
 
     const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+      const key = event.key.toLowerCase()
+
+      if (event.key === 'ArrowLeft' || key === 'a' || key === 'ф') {
         keysRef.current.left = false
       }
 
-      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
+      if (event.key === 'ArrowRight' || key === 'd' || key === 'в') {
         keysRef.current.right = false
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
-
     window.addEventListener('keyup', handleKeyUp)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
-
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [selectedLevel, startGame, started])
+  }, [launchBall])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -1329,7 +1501,15 @@ export function Arkanoid({ onComplete }: Props) {
   }
 
   return (
-    <div className="arkanoid">
+    <div
+      className="arkanoid"
+      style={{
+        '--arkanoid-width': ARKANOID_LAYOUT.width,
+        '--arkanoid-height': ARKANOID_LAYOUT.height,
+        '--arkanoid-x': ARKANOID_LAYOUT.x,
+        '--arkanoid-y': ARKANOID_LAYOUT.y,
+      } as CSSProperties}
+    >
       <div className="arkanoid__header">
         <div>
           <strong>
@@ -1386,20 +1566,61 @@ export function Arkanoid({ onComplete }: Props) {
       <div className="arkanoid__canvas-wrap">
         <canvas
           ref={canvasRef}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
+          width={PIXEL_CANVAS_WIDTH}
+          height={PIXEL_CANVAS_HEIGHT}
           className="arkanoid__canvas"
+          style={{
+            width: '100%',
+            height: '100%',
+            imageRendering: 'pixelated',
+            filter: 'contrast(1.18) saturate(1.22) brightness(0.97)',
+          }}
+        />
+
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 2,
+            background: `repeating-linear-gradient(
+              to bottom,
+              rgba(255, 255, 255, 0.065) 0px,
+              rgba(255, 255, 255, 0.065) 1px,
+              transparent 1px,
+              transparent 3px
+            )`,
+            boxShadow: `
+              inset 0 0 32px rgba(255, 70, 150, 0.20),
+              inset 0 0 80px rgba(30, 110, 255, 0.15)
+            `,
+            mixBlendMode: 'screen',
+          }}
+        />
+
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 2,
+            background: `radial-gradient(
+              ellipse at center,
+              transparent 58%,
+              rgba(0, 0, 0, 0.18) 78%,
+              rgba(0, 0, 0, 0.52) 100%
+            )`,
+          }}
         />
 
         {!started && !won && !gameOver && (
-          <div className="arkanoid__overlay">
-            <h2>Арканоид</h2>
-
-            <p>Управление: ← → или A / D</p>
-
-            <button type="button" onClick={() => startGame(selectedLevel)}>
-              Играть
-            </button>
+          <div
+            className="arkanoid__overlay arkanoid__overlay--ready"
+            style={{ background: 'transparent', pointerEvents: 'none' }}
+          >
+            <p>Нажмите Space, чтобы запустить шар</p>
           </div>
         )}
 
@@ -1408,8 +1629,9 @@ export function Arkanoid({ onComplete }: Props) {
             <h2>Игра окончена</h2>
 
             <p>Очки: {score}</p>
+            <p>Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}</p>
 
-            <button type="button" onClick={resetCurrentLevel}>
+            <button type="button" onClick={() => startGame(1)}>
               Попробовать снова
             </button>
           </div>
@@ -1420,6 +1642,7 @@ export function Arkanoid({ onComplete }: Props) {
             <h2>{level >= TOTAL_LEVELS ? 'Все уровни пройдены!' : `Уровень ${level} пройден!`}</h2>
 
             <p>Очки: {score}</p>
+            <p>Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}</p>
 
             {level < TOTAL_LEVELS ? (
               <button type="button" onClick={nextLevel}>

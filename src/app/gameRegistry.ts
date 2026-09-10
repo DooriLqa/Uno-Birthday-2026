@@ -13,18 +13,11 @@ import { ShellGameScreen } from '@/features/shell-game'
 import { TotemCodeGame } from '@/features/totem-code'
 import { WackAMole } from '@/features/wack-a-mole'
 import { Arkanoid } from '@/features/arkanoid'
-import { Japonsk } from '@/features/Japonsk'
-import { RobotMazeGame } from '@/features/RobotMazeGame'
 import type { GameDefinition } from '@/entities/game/model/types'
-import arcadeFrameImage from '@/shared/assets/flappy-bird/arcade-frame-transparent.png'
+import flappyBirdLagoonBackground from '@/shared/assets/flappy-bird/lagoon-cliff-vista-background.png'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
-import robotMazeGameBackground from '@/shared/assets/robot/background.png'
-import findAPairBackground from '@/shared/assets/find-a-pair/findapairbackground.png'
-import fishingScene from '@/shared/assets/locations/fishing.png'
-import raccoonArcadeBackground from '@/shared/assets/arkanoid/raccoon-arcade-background.png'
-import libraryBackground from '@/shared/assets/locations/tourist/library.png'
-import wildTotemCamp from '@/shared/assets/locations/wild/totem-camp.png'
-/* import wildPirateShore from '@/shared/assets/locations/wild/pirate-shore.png' */
+import totemBeachScene from '@/shared/assets/totem-code/totem-beach-scene-no-fire.png'
+import arkanoidArcadeFrame from '@/shared/assets/arkanoid/arcade-frame-transparent.png'
 
 const locationTransition = {
   transitionSound: '/audio/sfx/location-footsteps.ogg',
@@ -70,7 +63,6 @@ export const games: GameDefinition[] = [
     mapPosition: { left: '42%', top: '32%' },
     pageClassName: 'book-shelf-page',
     ...islandGame,
-    backgroundImage: libraryBackground,
     Screen: BookShelfGame,
   },
   {
@@ -82,7 +74,7 @@ export const games: GameDefinition[] = [
     target: '10 труб',
     mapPosition: { left: '60%', top: '23%' },
     pageClassName: 'flappy-bird-page',
-    backgroundImage: arcadeFrameImage,
+    backgroundImage: flappyBirdLagoonBackground,
     ...locationTransition,
     Screen: FlappyBirdGame,
   },
@@ -95,7 +87,7 @@ export const games: GameDefinition[] = [
     target: 'код тотемов',
     mapPosition: { left: '27%', top: '38%' },
     pageClassName: 'totem-code-page',
-    backgroundImage: wildTotemCamp,
+    backgroundImage: totemBeachScene,
     ...locationTransition,
     Screen: TotemCodeGame,
   },
@@ -119,7 +111,6 @@ export const games: GameDefinition[] = [
     target: '20 ценностей',
     mapPosition: { left: '83%', top: '45%' },
     pageClassName: 'fruit-basket-page',
-    backgroundImage: arcadeFrameImage,
     ...locationTransition,
     Screen: FruitBasketGame,
   },
@@ -186,9 +177,7 @@ export const games: GameDefinition[] = [
     color: '#d8c5e8',
     target: 'все пары',
     mapPosition: { left: '42%', top: '30%' },
-    pageClassName: 'find-a-pair-page',
-    backgroundImage: findAPairBackground,
-    ...locationTransition,
+    ...islandGame,
     Screen: FindAPair,
   },
   {
@@ -211,7 +200,7 @@ export const games: GameDefinition[] = [
     target: 'все кирпичи',
     mapPosition: { left: '50%', top: '30%' },
     pageClassName: 'arkanoid-page',
-    backgroundImage: raccoonArcadeBackground,
+    backgroundImage: arkanoidArcadeFrame,
     ...locationTransition,
     Screen: Arkanoid,
   },
@@ -246,34 +235,16 @@ export const games: GameDefinition[] = [
     target: 'рыбу',
     mapPosition: { left: '58%', top: '22%' },
     pageClassName: 'fishing-page',
-    backgroundImage: fishingScene,
-    ...locationTransition,
+    ...islandGame,
     Screen: FishingGame,
   },
-  {
-    id: 'robot-maze',
-    title: 'Робот-лабиринт',
-    description: 'Собери маршрут из записок и проведи робота к сокровищам.',
-    emoji: '🤖',
-    color: '#a2c9f0',
-    target: 'скрытое сокровище',
-    mapPosition: { left: '22%', top: '34%' },
-    pageClassName: 'robot-maze-page',
-    backgroundImage: robotMazeGameBackground,
-    ...locationTransition,
-    Screen: RobotMazeGame,
-  },
-  {
+  /* {
     id: 'japonsk',
     title: 'Японский кроссворд',
     description: 'Реши японский кроссворд.',
     emoji: '⛰️',
     color: '#f0a2a2',
     target: 'японский кроссворд',
-    mapPosition: { left: '55%', top: '30%' },
-    pageClassName: 'japonsk-page',
-    ...islandGame,
-    Screen: Japonsk,
   },
   {
     id: 'robot-maze',
@@ -282,11 +253,7 @@ export const games: GameDefinition[] = [
     emoji: '🤖',
     color: '#a2c9f0',
     target: 'выход из лабиринта',
-    mapPosition: { left: '60%', top: '30%' },
-    pageClassName: 'robot-maze-page',
-    backgroundImage: robotMazeGameBackground,
-    Screen: RobotMazeGame,
-  },
+  } */
 ]
 
 export const getGame = (gameId: string | null) => games.find((game) => game.id === gameId)
