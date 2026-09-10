@@ -13,17 +13,18 @@ import { ShellGameScreen } from '@/features/shell-game'
 import { TotemCodeGame } from '@/features/totem-code'
 import { WackAMole } from '@/features/wack-a-mole'
 import { Arkanoid } from '@/features/arkanoid'
-import { RobotMazeGame } from '@/features/cropp/RobotMazeGame'
-import { Japonsk } from '@/features/cropp/Japonsk'
+import { Japonsk } from '@/features/Japonsk'
+import { RobotMazeGame } from '@/features/RobotMazeGame'
 import type { GameDefinition } from '@/entities/game/model/types'
 import arcadeFrameImage from '@/shared/assets/flappy-bird/arcade-frame-transparent.png'
 import islandMapImage from '@/shared/assets/island-map/tropical-island-map-expanded.png'
+import robotMazeGameBackground from '@/shared/assets/robot/background.png'
 import findAPairBackground from '@/shared/assets/find-a-pair/findapairbackground.png'
 import fishingScene from '@/shared/assets/locations/fishing.png'
 import raccoonArcadeBackground from '@/shared/assets/arkanoid/raccoon-arcade-background.png'
 import libraryBackground from '@/shared/assets/locations/tourist/library.png'
 import wildTotemCamp from '@/shared/assets/locations/wild/totem-camp.png'
-import wildPirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
+/* import wildPirateShore from '@/shared/assets/locations/wild/pirate-shore.png' */
 
 const locationTransition = {
   transitionSound: '/audio/sfx/location-footsteps.ogg',
@@ -258,7 +259,7 @@ export const games: GameDefinition[] = [
     target: 'скрытое сокровище',
     mapPosition: { left: '22%', top: '34%' },
     pageClassName: 'robot-maze-page',
-    backgroundImage: wildPirateShore,
+    backgroundImage: robotMazeGameBackground,
     ...locationTransition,
     Screen: RobotMazeGame,
   },
@@ -269,10 +270,22 @@ export const games: GameDefinition[] = [
     emoji: '⛰️',
     color: '#f0a2a2',
     target: 'японский кроссворд',
-    mapPosition: { left: '54%', top: '20%' },
+    mapPosition: { left: '55%', top: '30%' },
     pageClassName: 'japonsk-page',
-    ...locationTransition,
+    ...islandGame,
     Screen: Japonsk,
+  },
+  {
+    id: 'robot-maze',
+    title: 'Робот-лабиринт',
+    description: 'Помоги роботу найти выход из лабиринта.',
+    emoji: '🤖',
+    color: '#a2c9f0',
+    target: 'выход из лабиринта',
+    mapPosition: { left: '60%', top: '30%' },
+    pageClassName: 'robot-maze-page',
+    backgroundImage: robotMazeGameBackground,
+    Screen: RobotMazeGame,
   },
 ]
 
