@@ -4,6 +4,7 @@ import { useInventoryStore, type InventoryItem } from '@/features/inventory/mode
 import { useRadioStore } from '@/features/beach-radio/model/radioStore'
 import './GameHud.css'
 import { useLibraryPages } from '@/features/beach-library/model/pagesStore'
+import { PAGE_ASSETS } from '@/features/beach-library/model/pageAssets'
 
 const EMPTY_SLOTS = 2
 const RADIO_ITEM_ID = 'beach-radio'
@@ -114,7 +115,15 @@ function InventorySlot({ item, onOpenRadio }: { item: InventoryItem; onOpenRadio
         aria-label={item.name}
         onClick={() => togglePage(item.id)}
       >
-        <span>{item.icon}</span>
+        {PAGE_ASSETS[item.id] ? (
+          <img
+            src={PAGE_ASSETS[item.id].src}
+            alt=""
+            style={{ width: 32, height: 36, objectFit: 'contain' }}
+          />
+        ) : (
+          <span>{item.icon}</span>
+        )}
         {item.id.includes('-page-') && <small>{Number(item.id.split('-').at(-1)) + 1}</small>}
       </button>
     )

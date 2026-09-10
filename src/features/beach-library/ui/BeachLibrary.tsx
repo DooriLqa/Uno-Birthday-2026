@@ -3,6 +3,7 @@ import { BOOKS, GENRES, DIRECTIONS, ROWS, isBookCorrect } from '../model/config'
 import { useLibraryStore } from '../model/store'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import floorBook from '../assets/floor-book.png'
+import { PAGE_ASSETS } from '../model/pageAssets'
 import './BeachLibrary.css'
 
 export function BeachLibrary() {
@@ -13,7 +14,7 @@ export function BeachLibrary() {
   const [status, setStatus] = useState(
     'Сверху — жанр, слева — направление. Поставь книгу на их пересечение.',
   )
-  const [flight, setFlight] = useState<{ x: number; y: number } | null>(null)
+  const [flight, setFlight] = useState<{ x: number; y: number; page: string } | null>(null)
   const canvas = useRef<HTMLDivElement>(null)
   useEffect(() => {
     enter()
@@ -57,7 +58,7 @@ export function BeachLibrary() {
     )
     if (rewards.length) {
       const row = ROWS[Math.floor(slot / 5)]
-      setFlight({ x: row.x + ((slot % 5) * row.width) / 5, y: row.y })
+      setFlight({ x: row.x + ((slot % 5) * row.width) / 5, y: row.y, page: rewards[0] })
     }
     setHeld(null)
   }
@@ -176,7 +177,7 @@ export function BeachLibrary() {
           style={{ left: `${flight.x}%`, top: `${flight.y}%` }}
           onAnimationEnd={() => setFlight(null)}
         >
-          📄
+          <img src={PAGE_ASSETS[flight.page].src} alt="Найденная страница" />
         </span>
       )}
       <div className="beach-library__help">

@@ -220,16 +220,10 @@
   height: 100%;
   pointer-events: none;
 }
-.library-pages__sheet header {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 700;
-}
-.library-pages__sheet button {
+.library-pages__return {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   border: 1px solid #b4925d;
   border-radius: 4px;
   background: #fff7dc;
@@ -238,15 +232,8 @@
   width: 30px;
   height: 28px;
 }
-.library-pages__sheet p {
-  position: relative;
-  padding: 18px;
-  font-size: 15px;
-  line-height: 1.55;
-}
-.library-pages__sheet small {
-  position: absolute;
-  bottom: 12px;
-  left: 20px;
-  font-size: 11px;
+.beach-library__flight img {
+  width: 3cqw;
+  height: 3.6cqw;
+  object-fit: contain;
 }
