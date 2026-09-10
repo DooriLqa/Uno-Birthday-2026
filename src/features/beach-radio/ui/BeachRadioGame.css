@@ -509,7 +509,7 @@
   border: 1px solid #6f6040;
   border-radius: 1px;
 
-  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 0 0, pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 0 0, pointer;
   cursor: var(--cursor-pointer);
 }
 
@@ -548,7 +548,7 @@
 
   z-index: 10;
 
-  --cursor-pointer: url('../../../shared/assets/cursors/hand-point.png') 32 50, pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 32 50, pointer;
   cursor: var(--cursor-pointer);
 }
 

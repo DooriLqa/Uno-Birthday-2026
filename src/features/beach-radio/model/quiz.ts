@@ -1,5 +1,16 @@
 import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
 import type { QuizQuestion } from './types'
+import ravenOst from '@/shared/assets/games/beach-radio/audio/quiz/ost/raven.mp3'
+import fableOst from '@/shared/assets/games/beach-radio/audio/quiz/ost/fable.mp3'
+import halfLifeOst from '@/shared/assets/games/beach-radio/audio/quiz/ost/hlf2.mp3'
+import lineageOst from '@/shared/assets/games/beach-radio/audio/quiz/ost/linage.mp3'
+import morrowindOst from '@/shared/assets/games/beach-radio/audio/quiz/ost/mor.mp3'
+import worldOfGooOst from '@/shared/assets/games/beach-radio/audio/quiz/ost/wog.mp3'
+import factorioStream from '@/shared/assets/games/beach-radio/audio/quiz/stream/factorio.mp3'
+import untilDawnStream from '@/shared/assets/games/beach-radio/audio/quiz/stream/until.mp3'
+import anotherCrabsTreasureStream from '@/shared/assets/games/beach-radio/audio/quiz/stream/another.mp3'
+import darkSoulsStream from '@/shared/assets/games/beach-radio/audio/quiz/stream/darksouls.mp3'
+import sekiroStream from '@/shared/assets/games/beach-radio/audio/quiz/stream/sekiro.mp3'
 
 export const questions: QuizQuestion[] = [
   {
@@ -29,14 +40,14 @@ export const questions: QuizQuestion[] = [
   {
     id: 'q05',
     text: 'Из какой игры OST?',
-    audioSrc: '/audio/quiz/ost/raven.mp3',
+    audioSrc: ravenOst,
     answers: ['Clair Obscur: Expedition 33', 'Diablo 4', 'Ravenswatch', 'Grim Dawn'],
     correctIndex: 2,
   },
   {
     id: 'q06',
     text: 'Из какой игры OST?',
-    audioSrc: '/audio/quiz/ost/fable.mp3',
+    audioSrc: fableOst,
     answers: [
       'Ori and The Blind Forest',
       'Minecraft',
@@ -48,28 +59,28 @@ export const questions: QuizQuestion[] = [
   {
     id: 'q07',
     text: 'Из какой игры OST?',
-    audioSrc: '/audio/quiz/ost/hlf2.mp3',
+    audioSrc: halfLifeOst,
     answers: ['Half-Life 2', 'S.T.A.L.K.E.R.: Shadow of Chernobyl', 'Deus Ex', 'BioShock'],
     correctIndex: 0,
   },
   {
     id: 'q08',
     text: 'Из какой игры OST?',
-    audioSrc: '/audio/quiz/ost/linage.mp3',
+    audioSrc: lineageOst,
     answers: ['Heroes of Might & Magic 5', 'Yes, you grace', 'Guild Wars', 'Lineage 2'],
     correctIndex: 3,
   },
   {
     id: 'q09',
     text: 'Из какой игры OST?',
-    audioSrc: '/audio/quiz/ost/mor.mp3',
+    audioSrc: morrowindOst,
     answers: ['Gothic', 'The Elder Scrolls III: Morrowind', 'Dragon Age: Origins', 'Risen'],
     correctIndex: 1,
   },
   {
     id: 'q10',
     text: 'Из какой игры OST?',
-    audioSrc: '/audio/quiz/ost/wog.mp3',
+    audioSrc: worldOfGooOst,
     answers: ['World of Goo', 'Disco Elysium', 'Deponia', 'Worms 4 Mayhem'],
     correctIndex: 0,
   },
@@ -88,35 +99,35 @@ export const questions: QuizQuestion[] = [
   {
     id: 'q13',
     text: 'Из какой игры отрывок стрима?',
-    audioSrc: '/audio/quiz/stream/factorio.mp3',
+    audioSrc: factorioStream,
     answers: ['Meet the Robinsons', 'The Farmer Was Replaced', 'Minecraft', 'Factorio'],
     correctIndex: 3,
   },
   {
     id: 'q14',
     text: 'Из какой игры отрывок стрима?',
-    audioSrc: '/audio/quiz/stream/until.mp3',
+    audioSrc: untilDawnStream,
     answers: ['Until Dawn', 'Life Is Strange', 'Mixtape', 'Silent Hill'],
     correctIndex: 0,
   },
   {
     id: 'q15',
     text: 'Из какой игры отрывок стрима?',
-    audioSrc: '/audio/quiz/stream/another.mp3',
+    audioSrc: anotherCrabsTreasureStream,
     answers: ['GTA: Vise City', 'Mixtape', 'Hades', 'Another Crab ́s Treasure'],
     correctIndex: 3,
   },
   {
     id: 'q16',
     text: 'Из какой игры отрывок стрима?',
-    audioSrc: '/audio/quiz/stream/darksouls.mp3',
+    audioSrc: darkSoulsStream,
     answers: ['Elden Ring', 'Dark Souls: Remastered', 'Gothic 1', 'Freddi Fish 5'],
     correctIndex: 1,
   },
   {
     id: 'q17',
     text: 'Из какой игры отрывок стрима?',
-    audioSrc: '/audio/quiz/stream/sekiro.mp3',
+    audioSrc: sekiroStream,
     answers: [
       'Dark Souls: Remastered',
       'Thief Simulator',

@@ -13,6 +13,7 @@ import pirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
 import jungleOverview from '@/shared/assets/locations/jungle/overview.png'
 import jungleCave from '@/shared/assets/locations/jungle/cave.png'
 import jungleWaterfall from '@/shared/assets/locations/jungle/waterfall.png'
+import locationFootstepsSound from '@/shared/assets/common/audio/location-footsteps.ogg'
 
 export type LocationId =
   | 'pier'
@@ -76,17 +77,17 @@ const area = (left: number, top: number, width: number, height: number) => ({
 })
 const base = {
   regionId: 'tourist-beach',
-  transitionSound: '/audio/sfx/location-footsteps.ogg',
+  transitionSound: locationFootstepsSound,
   ambienceVolume: 1,
 } as const
 const wildBase = {
   regionId: 'wild-beach',
-  transitionSound: '/audio/sfx/location-footsteps.ogg',
+  transitionSound: locationFootstepsSound,
   ambienceVolume: 1,
 } as const
 const jungleBase = {
   regionId: 'jungle',
-  transitionSound: '/audio/sfx/location-footsteps.ogg',
+  transitionSound: locationFootstepsSound,
 } as const
 export const locations: Record<LocationId, LocationDefinition> = {
   pier: {

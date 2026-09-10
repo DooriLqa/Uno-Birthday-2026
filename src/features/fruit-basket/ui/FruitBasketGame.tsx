@@ -1,21 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
-import brickImage from '@/assets/fruit-basket/brick.png'
-import buildingImage from '@/assets/fruit-basket/building.png'
-import groundImage from '@/assets/fruit-basket/ground.png'
-import handcuffsImage from '@/assets/fruit-basket/handcuffs.png'
-import cameraImage from '@/assets/fruit-basket/camera.png'
-import coinImage from '@/assets/fruit-basket/coin.png'
-import diamondImage from '@/assets/fruit-basket/diamond.png'
-import laptopImage from '@/assets/fruit-basket/laptop.png'
-import magnetImage from '@/assets/fruit-basket/magnet.png'
-import phoneImage from '@/assets/fruit-basket/phone.png'
-import playerImage from '@/assets/fruit-basket/playerThief.png'
-import ringImage from '@/assets/fruit-basket/ring.png'
-import skyImage from '@/assets/fruit-basket/sky.png'
-import sweetsImage from '@/assets/fruit-basket/sweets-box.png'
-import watchImage from '@/assets/fruit-basket/watch.png'
-import x2Image from '@/assets/fruit-basket/x2-bonus.png'
+import brickImage from '@/shared/assets/games/fruit-basket/brick.png'
+import buildingImage from '@/shared/assets/games/fruit-basket/building.png'
+import groundImage from '@/shared/assets/games/fruit-basket/ground.png'
+import handcuffsImage from '@/shared/assets/games/fruit-basket/handcuffs.png'
+import cameraImage from '@/shared/assets/games/fruit-basket/camera.png'
+import coinImage from '@/shared/assets/games/fruit-basket/coin.png'
+import diamondImage from '@/shared/assets/games/fruit-basket/diamond.png'
+import laptopImage from '@/shared/assets/games/fruit-basket/laptop.png'
+import magnetImage from '@/shared/assets/games/fruit-basket/magnet.png'
+import phoneImage from '@/shared/assets/games/fruit-basket/phone.png'
+import playerImage from '@/shared/assets/games/fruit-basket/playerThief.png'
+import ringImage from '@/shared/assets/games/fruit-basket/ring.png'
+import skyImage from '@/shared/assets/games/fruit-basket/sky.png'
+import sweetsImage from '@/shared/assets/games/fruit-basket/sweets-box.png'
+import watchImage from '@/shared/assets/games/fruit-basket/watch.png'
+import x2Image from '@/shared/assets/games/fruit-basket/x2-bonus.png'
+import loseSound from '@/shared/assets/games/fruit-basket/audio/blya.mp3'
+import startSound from '@/shared/assets/games/fruit-basket/audio/pognali.mp3'
+import handcuffsSound from '@/shared/assets/games/fruit-basket/audio/handcuffs.mp3'
+import brickSound from '@/shared/assets/games/fruit-basket/audio/brick.mp3'
+import fullBasketSound from '@/shared/assets/games/fruit-basket/audio/full-basket.mp3'
+import bonusSound from '@/shared/assets/games/fruit-basket/audio/bonus.mp3'
+import catchSound from '@/shared/assets/common/audio/location-footsteps.ogg'
+import winSound from '@/shared/assets/common/audio/win-sound.mp3'
+import coinSound from '@/shared/assets/common/audio/coin.mp3'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import { FRUIT_BASKET_LAYOUT } from '../model/layout'
 import { BASKET_CATCH_OFFSET, isCaught, isMissed } from '../model/collision'
@@ -77,15 +86,15 @@ const MAGNET_DURATION_SECONDS = 8
 const BONUS_SPAWN_INTERVAL = BONUS_SPAWN_INTERVAL_SECONDS * 1000
 const MAGNET_DURATION = MAGNET_DURATION_SECONDS * 1000
 
-const LOOSE_SOUND = '/audio/sfx/blya.MP3'
-const START_SOUND = '/audio/sfx/pognali.MP3'
-const WIN_SOUND = '/audio/sfx/winSound.MP3'
-const COIN_SOUND = '/audio/sfx/coin.mp3'
-const HANDCUFFS_SOUND = '/audio/sfx/handcuffs.mp3'
-const BRICK_SOUND = '/audio/sfx/brick.mp3'
-const FULL_BASKET_SOUND = '/audio/sfx/fullBasket.mp3'
-const BONUS_SOUND = '/audio/sfx/bonus.mp3'
-const CATCH_SOUND = '/audio/sfx/location-footsteps.ogg'
+const LOOSE_SOUND = loseSound
+const START_SOUND = startSound
+const WIN_SOUND = winSound
+const COIN_SOUND = coinSound
+const HANDCUFFS_SOUND = handcuffsSound
+const BRICK_SOUND = brickSound
+const FULL_BASKET_SOUND = fullBasketSound
+const BONUS_SOUND = bonusSound
+const CATCH_SOUND = catchSound
 
 const GOOD_ITEMS = [
   cameraImage,
@@ -95,7 +104,7 @@ const GOOD_ITEMS = [
   phoneImage,
   ringImage,
   sweetsImage,
-  watchImage
+  watchImage,
 ]
 
 const BAD_ITEMS = [handcuffsImage, brickImage]
@@ -120,23 +129,17 @@ const initialState: GameState = {
 }
 
 function isAtDropZone(game: GameState, side: 'left' | 'right') {
-  return side === 'left'
-    ? game.basketX <= DROP_ZONE_WIDTH
-    : game.basketX >= 100 - DROP_ZONE_WIDTH
+  return side === 'left' ? game.basketX <= DROP_ZONE_WIDTH : game.basketX >= 100 - DROP_ZONE_WIDTH
 }
 
 function basketDropZoneClass(game: GameState, side: 'left' | 'right') {
   if (!isAtDropZone(game, side) || game.basketLoad === 0) return ''
 
-  return game.deliveryProgress > 0
-    ? 'is-charging'
-    : 'is-ready'
+  return game.deliveryProgress > 0 ? 'is-charging' : 'is-ready'
 }
 
 function dropProgressPercent(game: GameState, side: 'left' | 'right') {
-  return isAtDropZone(game, side)
-    ? (game.deliveryProgress / DROP_DURATION) * 100
-    : 0
+  return isAtDropZone(game, side) ? (game.deliveryProgress / DROP_DURATION) * 100 : 0
 }
 
 export function FruitBasketGame({ onComplete }: Props) {
@@ -260,29 +263,16 @@ export function FruitBasketGame({ onComplete }: Props) {
 
       if (started && !current.gameOver && !current.won) {
         const isGood = Math.random() > 0.28
-        const magnetActive =
-          current.magnetUntil !== null &&
-          Date.now() < current.magnetUntil
+        const magnetActive = current.magnetUntil !== null && Date.now() < current.magnetUntil
 
         const item: FallingItem = {
           id: nextId.current++,
-          x:
-            ITEM_SPAWN_MIN_X +
-            Math.random() *
-            (ITEM_SPAWN_MAX_X - ITEM_SPAWN_MIN_X),
+          x: ITEM_SPAWN_MIN_X + Math.random() * (ITEM_SPAWN_MAX_X - ITEM_SPAWN_MIN_X),
           y: -8,
           kind: isGood ? 'good' : 'bad',
           image: isGood
-            ? GOOD_ITEMS[
-            Math.floor(
-              Math.random() * GOOD_ITEMS.length,
-            )
-            ]
-            : BAD_ITEMS[
-            Math.floor(
-              Math.random() * BAD_ITEMS.length,
-            )
-            ],
+            ? GOOD_ITEMS[Math.floor(Math.random() * GOOD_ITEMS.length)]
+            : BAD_ITEMS[Math.floor(Math.random() * BAD_ITEMS.length)],
           speed: 0.7 + Math.random() * 0.35,
 
           // Все новые хорошие предметы сразу летят
@@ -298,8 +288,7 @@ export function FruitBasketGame({ onComplete }: Props) {
         startupSpawnCountRef.current += 1
       }
 
-      const isStartup =
-        startupSpawnCountRef.current < STARTUP_SPAWN_COUNT
+      const isStartup = startupSpawnCountRef.current < STARTUP_SPAWN_COUNT
 
       const delay = isStartup
         ? STARTUP_ITEM_SPAWN_INTERVAL
@@ -310,10 +299,7 @@ export function FruitBasketGame({ onComplete }: Props) {
       spawnTimer = window.setTimeout(spawnItem, delay)
     }
 
-    spawnTimer = window.setTimeout(
-      spawnItem,
-      STARTUP_ITEM_SPAWN_INTERVAL,
-    )
+    spawnTimer = window.setTimeout(spawnItem, STARTUP_ITEM_SPAWN_INTERVAL)
 
     return () => {
       window.clearTimeout(spawnTimer)
@@ -329,14 +315,11 @@ export function FruitBasketGame({ onComplete }: Props) {
 
       if (started && !current.gameOver && !current.won) {
         // 50/50 между x2 и магнитом
-        const bonusType: 'x2' | 'magnet' =
-          Math.random() < 0.5 ? 'x2' : 'magnet'
+        const bonusType: 'x2' | 'magnet' = Math.random() < 0.5 ? 'x2' : 'magnet'
 
         const bonus: FallingItem = {
           id: nextId.current++,
-          x:
-            ITEM_SPAWN_MIN_X +
-            Math.random() * (ITEM_SPAWN_MAX_X - ITEM_SPAWN_MIN_X),
+          x: ITEM_SPAWN_MIN_X + Math.random() * (ITEM_SPAWN_MAX_X - ITEM_SPAWN_MIN_X),
           y: -8,
           kind: 'bonus',
           bonusType,
@@ -350,16 +333,10 @@ export function FruitBasketGame({ onComplete }: Props) {
         }))
       }
 
-      bonusTimer = window.setTimeout(
-        spawnBonus,
-        BONUS_SPAWN_INTERVAL,
-      )
+      bonusTimer = window.setTimeout(spawnBonus, BONUS_SPAWN_INTERVAL)
     }
 
-    bonusTimer = window.setTimeout(
-      spawnBonus,
-      BONUS_SPAWN_INTERVAL,
-    )
+    bonusTimer = window.setTimeout(spawnBonus, BONUS_SPAWN_INTERVAL)
 
     return () => {
       window.clearTimeout(bonusTimer)
@@ -377,24 +354,16 @@ export function FruitBasketGame({ onComplete }: Props) {
         const now = Date.now()
 
         // Проверяем, активен ли магнит
-        const magnetActive =
-          current.magnetUntil !== null &&
-          now < current.magnetUntil
+        const magnetActive = current.magnetUntil !== null && now < current.magnetUntil
 
-        const direction =
-          Number(controlsRef.current.right) -
-          Number(controlsRef.current.left)
+        const direction = Number(controlsRef.current.right) - Number(controlsRef.current.left)
 
-        if (
-          direction === 0 ||
-          direction !== lastDirectionRef.current
-        ) {
+        if (direction === 0 || direction !== lastDirectionRef.current) {
           basketSpeedRef.current = BASKET_SPEED
         } else {
           basketSpeedRef.current = Math.min(
             MAX_BASKET_SPEED,
-            basketSpeedRef.current +
-            BASKET_ACCELERATION,
+            basketSpeedRef.current + BASKET_ACCELERATION,
           )
         }
 
@@ -402,11 +371,7 @@ export function FruitBasketGame({ onComplete }: Props) {
 
         const basketX = Math.max(
           8,
-          Math.min(
-            92,
-            current.basketX +
-            direction * basketSpeedRef.current,
-          ),
+          Math.min(92, current.basketX + direction * basketSpeedRef.current),
         )
 
         let score = current.score
@@ -414,14 +379,9 @@ export function FruitBasketGame({ onComplete }: Props) {
         let lives = current.lives
         let x2Active = current.x2Active
 
-        const atDropZone =
-          basketX <= DROP_ZONE_WIDTH ||
-          basketX >= 100 - DROP_ZONE_WIDTH
+        const atDropZone = basketX <= DROP_ZONE_WIDTH || basketX >= 100 - DROP_ZONE_WIDTH
 
-        const deliveryProgress =
-          atDropZone && basketLoad > 0
-            ? current.deliveryProgress + 32
-            : 0
+        const deliveryProgress = atDropZone && basketLoad > 0 ? current.deliveryProgress + 32 : 0
 
         const remainingItems: FallingItem[] = []
 
@@ -433,30 +393,19 @@ export function FruitBasketGame({ onComplete }: Props) {
 
           // Если магнит активен, хороший предмет
           // должен притягиваться к корзине.
-          const shouldMagnetize =
-            item.kind === 'good' &&
-            (item.magnetized || magnetActive)
+          const shouldMagnetize = item.kind === 'good' && (item.magnetized || magnetActive)
 
           if (shouldMagnetize) {
-            const magnetSpeed =
-              item.speed *
-              MAGNET_SPEED_MULTIPLIER
+            const magnetSpeed = item.speed * MAGNET_SPEED_MULTIPLIER
 
-            const xDistance =
-              basketX + BASKET_CATCH_OFFSET - item.x
+            const xDistance = basketX + BASKET_CATCH_OFFSET - item.x
 
             nextX =
               Math.abs(xDistance) <= 1
                 ? basketX + BASKET_CATCH_OFFSET
-                : item.x +
-                Math.sign(xDistance) *
-                Math.min(
-                  Math.abs(xDistance),
-                  magnetSpeed * 1.5,
-                )
+                : item.x + Math.sign(xDistance) * Math.min(Math.abs(xDistance), magnetSpeed * 1.5)
 
-            nextY =
-              item.y + magnetSpeed
+            nextY = item.y + magnetSpeed
           } else {
             nextY = item.y + item.speed
           }
@@ -490,17 +439,13 @@ export function FruitBasketGame({ onComplete }: Props) {
             // Бонус
             if (item.kind === 'bonus') {
               playOneShotSound(BONUS_SOUND, 'basket-bonus')
-              if (
-                item.bonusType === 'x2'
-              ) {
+              if (item.bonusType === 'x2') {
                 // x2 действует на текущую
                 // корзину.
                 x2Active = true
               }
 
-              if (
-                item.bonusType === 'magnet'
-              ) {
+              if (item.bonusType === 'magnet') {
                 magnetWasCaught = true
               }
 
@@ -534,10 +479,7 @@ export function FruitBasketGame({ onComplete }: Props) {
 
             // Если магнит активен,
             // помечаем предмет.
-            magnetized:
-              item.kind === 'good'
-                ? shouldMagnetize
-                : item.magnetized,
+            magnetized: item.kind === 'good' ? shouldMagnetize : item.magnetized,
           })
         }
 
@@ -548,20 +490,17 @@ export function FruitBasketGame({ onComplete }: Props) {
          * находятся на поле, начинают лететь
          * к корзине.
          */
-        const magnetUntil =
-          magnetWasCaught
-            ? now + MAGNET_DURATION
-            : current.magnetUntil
+        const magnetUntil = magnetWasCaught ? now + MAGNET_DURATION : current.magnetUntil
 
         const finalItems = magnetWasCaught
           ? remainingItems.map((item) =>
-            item.kind === 'good'
-              ? {
-                ...item,
-                magnetized: true,
-              }
-              : item,
-          )
+              item.kind === 'good'
+                ? {
+                    ...item,
+                    magnetized: true,
+                  }
+                : item,
+            )
           : remainingItems
 
         /*
@@ -569,12 +508,8 @@ export function FruitBasketGame({ onComplete }: Props) {
          *
          * x2 применяется только к этой корзине.
          */
-        if (
-          deliveryProgress >= DROP_DURATION
-        ) {
-          score +=
-            basketLoad *
-            (x2Active ? 2 : 1)
+        if (deliveryProgress >= DROP_DURATION) {
+          score += basketLoad * (x2Active ? 2 : 1)
           playOneShotSound(COIN_SOUND, 'basket-coin', 0.1)
           basketLoad = 0
 
@@ -589,23 +524,20 @@ export function FruitBasketGame({ onComplete }: Props) {
          * которые ещё не успели долететь.
          */
         const activeItems =
-          magnetUntil !== null &&
-            now < magnetUntil
+          magnetUntil !== null && now < magnetUntil
             ? finalItems
             : finalItems.map((item) =>
-              item.kind === 'good'
-                ? {
-                  ...item,
-                  magnetized: false,
-                }
-                : item,
-            )
+                item.kind === 'good'
+                  ? {
+                      ...item,
+                      magnetized: false,
+                    }
+                  : item,
+              )
 
-        const won =
-          score >= TARGET_SCORE
+        const won = score >= TARGET_SCORE
 
-        const gameOver =
-          lives <= 0
+        const gameOver = lives <= 0
 
         if (won) {
           addPawCoinsRef.current(1)
@@ -624,22 +556,12 @@ export function FruitBasketGame({ onComplete }: Props) {
           items: activeItems,
           score,
           basketLoad,
-          deliveryProgress:
-            basketLoad === 0
-              ? 0
-              : Math.min(
-                deliveryProgress,
-                DROP_DURATION,
-              ),
+          deliveryProgress: basketLoad === 0 ? 0 : Math.min(deliveryProgress, DROP_DURATION),
           lives: Math.max(0, lives),
           gameOver,
           won,
           x2Active,
-          magnetUntil:
-            magnetUntil !== null &&
-              now < magnetUntil
-              ? magnetUntil
-              : null,
+          magnetUntil: magnetUntil !== null && now < magnetUntil ? magnetUntil : null,
         }
       })
     }, 32)
@@ -666,20 +588,29 @@ export function FruitBasketGame({ onComplete }: Props) {
     <div
       className="fruit-basket-game"
       ref={screenRef}
-      style={{
-        '--fruit-basket-width': FRUIT_BASKET_LAYOUT.width,
-        '--fruit-basket-height': FRUIT_BASKET_LAYOUT.height,
-        '--fruit-basket-x': FRUIT_BASKET_LAYOUT.x,
-        '--fruit-basket-y': FRUIT_BASKET_LAYOUT.y,
-      } as React.CSSProperties}
+      style={
+        {
+          '--fruit-basket-width': FRUIT_BASKET_LAYOUT.width,
+          '--fruit-basket-height': FRUIT_BASKET_LAYOUT.height,
+          '--fruit-basket-x': FRUIT_BASKET_LAYOUT.x,
+          '--fruit-basket-y': FRUIT_BASKET_LAYOUT.y,
+        } as React.CSSProperties
+      }
     >
-      <div
-        className="fruit-basket-game__field"
-        aria-label="Игровое поле"
-      >
+      <div className="fruit-basket-game__field" aria-label="Игровое поле">
         <img className="fruit-basket-game__sky" src={skyImage} alt="" aria-hidden="true" />
-        <img className="fruit-basket-game__building" src={buildingImage} alt="" aria-hidden="true" />
-        <img className="fruit-basket-game__ground-image" src={groundImage} alt="" aria-hidden="true" />
+        <img
+          className="fruit-basket-game__building"
+          src={buildingImage}
+          alt=""
+          aria-hidden="true"
+        />
+        <img
+          className="fruit-basket-game__ground-image"
+          src={groundImage}
+          alt=""
+          aria-hidden="true"
+        />
 
         <div className="fruit-basket-game__hud" aria-label="Состояние игры">
           <span aria-label={`Сдано ${game.score} из ${TARGET_SCORE}`}>
@@ -688,7 +619,10 @@ export function FruitBasketGame({ onComplete }: Props) {
           <span aria-label={`В корзине ${game.basketLoad} из ${MAX_BASKET_LOAD}`}>
             {game.basketLoad}/{MAX_BASKET_LOAD}
           </span>
-          <span className="fruit-basket-game__hearts" aria-label={`${game.lives} из ${MAX_LIVES} жизней`}>
+          <span
+            className="fruit-basket-game__hearts"
+            aria-label={`${game.lives} из ${MAX_LIVES} жизней`}
+          >
             {'♥'.repeat(game.lives)}
             <span className="fruit-basket-game__empty-hearts">
               {'♡'.repeat(MAX_LIVES - game.lives)}
@@ -700,8 +634,14 @@ export function FruitBasketGame({ onComplete }: Props) {
         {!started && !game.gameOver && !game.won && (
           <div className="fruit-basket-game__start-screen">
             <strong>Корзинка удачи</strong>
-            <p>Управление персонажем на A и D или стрелками. Лови ценности, складывай их в корзину и сдавай груз по краям поля. Наручники и кирпичи пропускай. Бонус x2 удваивает все очки в корзине при сдаче, действует один раз.</p>
-            <button type="button" onClick={startGame}>Начать игру</button>
+            <p>
+              Управление персонажем на A и D или стрелками. Лови ценности, складывай их в корзину и
+              сдавай груз по краям поля. Наручники и кирпичи пропускай. Бонус x2 удваивает все очки
+              в корзине при сдаче, действует один раз.
+            </p>
+            <button type="button" onClick={startGame}>
+              Начать игру
+            </button>
           </div>
         )}
 
@@ -716,10 +656,7 @@ export function FruitBasketGame({ onComplete }: Props) {
 
           <i
             style={{
-              height: `${dropProgressPercent(
-                game,
-                'left',
-              )}%`,
+              height: `${dropProgressPercent(game, 'left')}%`,
             }}
           />
         </div>
@@ -735,10 +672,7 @@ export function FruitBasketGame({ onComplete }: Props) {
 
           <i
             style={{
-              height: `${dropProgressPercent(
-                game,
-                'right',
-              )}%`,
+              height: `${dropProgressPercent(game, 'right')}%`,
             }}
           />
         </div>
@@ -749,12 +683,8 @@ export function FruitBasketGame({ onComplete }: Props) {
             className={[
               'fruit-basket-game__item',
               `fruit-basket-game__item--${item.kind}`,
-              item.magnetized
-                ? 'fruit-basket-game__item--magnetized'
-                : '',
-              item.bonusType
-                ? `fruit-basket-game__item--bonus-${item.bonusType}`
-                : '',
+              item.magnetized ? 'fruit-basket-game__item--magnetized' : '',
+              item.bonusType ? `fruit-basket-game__item--bonus-${item.bonusType}` : '',
             ]
               .filter(Boolean)
               .join(' ')}
@@ -769,10 +699,9 @@ export function FruitBasketGame({ onComplete }: Props) {
         ))}
 
         <div
-          className={`fruit-basket-game__basket ${game.basketLoad >= MAX_BASKET_LOAD
-            ? 'is-full'
-            : ''
-            }`}
+          className={`fruit-basket-game__basket ${
+            game.basketLoad >= MAX_BASKET_LOAD ? 'is-full' : ''
+          }`}
           style={{
             left: `${game.basketX}%`,
           }}
@@ -782,22 +711,13 @@ export function FruitBasketGame({ onComplete }: Props) {
           <i>●</i>
         </div>
 
-        <div
-          className="fruit-basket-game__ground"
-          aria-hidden="true"
-        />
+        <div className="fruit-basket-game__ground" aria-hidden="true" />
 
         {(game.gameOver || game.won) && (
           <div className="fruit-basket-game__result">
-            <span className="fruit-basket-game__result-icon">
-              {game.won ? '🌟' : '🍂'}
-            </span>
+            <span className="fruit-basket-game__result-icon">{game.won ? '🌟' : '🍂'}</span>
 
-            <h2>
-              {game.won
-                ? 'Ценности собраны!'
-                : 'Попытка окончена'}
-            </h2>
+            <h2>{game.won ? 'Ценности собраны!' : 'Попытка окончена'}</h2>
 
             <p>
               {game.won
@@ -805,10 +725,7 @@ export function FruitBasketGame({ onComplete }: Props) {
                 : 'Попробуй ещё раз и береги жизни.'}
             </p>
 
-            <button
-              type="button"
-              onClick={restart}
-            >
+            <button type="button" onClick={restart}>
               Сыграть снова
             </button>
           </div>

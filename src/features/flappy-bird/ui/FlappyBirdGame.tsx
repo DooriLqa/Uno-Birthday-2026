@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import playerImage from '@/assets/flappy-bird/dachshund-wings-up.png'
-import playerWingsDownImage from '@/assets/flappy-bird/dachshund-wings-down.png'
-import coinImage from '@/assets/flappy-bird/coin-bone.png'
-import backgroundImage1 from '@/assets/flappy-bird/bg1.png'
-import backgroundImage2 from '@/assets/flappy-bird/bg2.png'
-import pipeImage1 from '@/assets/flappy-bird/pipe1.png'
-import pipeImage2 from '@/assets/flappy-bird/pipe2.png'
+import playerImage from '@/shared/assets/games/flappy-bird/dachshund-wings-up.png'
+import playerWingsDownImage from '@/shared/assets/games/flappy-bird/dachshund-wings-down.png'
+import coinImage from '@/shared/assets/games/flappy-bird/coin-bone.png'
+import backgroundImage1 from '@/shared/assets/games/flappy-bird/bg1.png'
+import backgroundImage2 from '@/shared/assets/games/flappy-bird/bg2.png'
+import pipeImage1 from '@/shared/assets/games/flappy-bird/pipe1.png'
+import pipeImage2 from '@/shared/assets/games/flappy-bird/pipe2.png'
+import screamSound from '@/shared/assets/games/flappy-bird/audio/scream.mp3'
+import startSound from '@/shared/assets/games/flappy-bird/audio/bird.mp3'
+import winSound from '@/shared/assets/common/audio/win-sound.mp3'
+import coinSound from '@/shared/assets/common/audio/coin.mp3'
 import { FLAPPY_BIRD_LAYOUT } from '../model/layout'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import './FlappyBirdGame.css'
@@ -67,10 +71,10 @@ const PIPE_ALPHA_BOUNDS = {
   [pipeImage1]: { left: 362 / 1024, right: 662 / 1024, bottom: 1447 / 1536 },
   [pipeImage2]: { left: 305 / 1024, right: 707 / 1024, bottom: 1450 / 1536 },
 }
-const SCREAM_SOUND = '/audio/sfx/scream.MP3'
-const START_SOUND = '/audio/sfx/bird.MP3'
-const WIN_SOUND = '/audio/sfx/winSound.MP3'
-const COIN_SOUND = '/audio/sfx/coin.mp3'
+const SCREAM_SOUND = screamSound
+const START_SOUND = startSound
+const WIN_SOUND = winSound
+const COIN_SOUND = coinSound
 
 const createInitialState = (): GameState => ({
   birdY: GAME_HEIGHT / 2 - BIRD_HEIGHT / 2,
@@ -231,16 +235,18 @@ export function FlappyBirdGame({ onComplete }: Props) {
         }
 
         let passedPipes = current.passedPipes
-        pipes = pipes.map((pipe) => {
-          const alphaBounds = PIPE_ALPHA_BOUNDS[pipe.image]
-          const visibleRight = pipe.x + PIPE_WIDTH * alphaBounds.right
-          if (!pipe.counted && visibleRight < BIRD_X) {
-            const nextPassedPipes = passedPipes + 1
-            passedPipes = nextPassedPipes
-            return { ...pipe, counted: true }
-          }
-          return pipe
-        }).filter((pipe) => pipe.x > -PIPE_WIDTH - 10)
+        pipes = pipes
+          .map((pipe) => {
+            const alphaBounds = PIPE_ALPHA_BOUNDS[pipe.image]
+            const visibleRight = pipe.x + PIPE_WIDTH * alphaBounds.right
+            if (!pipe.counted && visibleRight < BIRD_X) {
+              const nextPassedPipes = passedPipes + 1
+              passedPipes = nextPassedPipes
+              return { ...pipe, counted: true }
+            }
+            return pipe
+          })
+          .filter((pipe) => pipe.x > -PIPE_WIDTH - 10)
 
         const birdLeft = BIRD_X + BIRD_HITBOX_INSET_X
         const birdRight = BIRD_X + BIRD_WIDTH - BIRD_HITBOX_INSET_X
@@ -274,8 +280,7 @@ export function FlappyBirdGame({ onComplete }: Props) {
 
           const topPipeBottom = pipe.gapTop * alphaBounds.bottom
           const bottomPipeHeight = GAME_HEIGHT - pipe.gapTop - PIPE_GAP + PIPE_VISUAL_EXTENSION
-          const bottomPipeTop =
-            pipe.gapTop + PIPE_GAP + (1 - alphaBounds.bottom) * bottomPipeHeight
+          const bottomPipeTop = pipe.gapTop + PIPE_GAP + (1 - alphaBounds.bottom) * bottomPipeHeight
 
           return birdTop < topPipeBottom || birdBottom > bottomPipeTop
         })
@@ -316,14 +321,16 @@ export function FlappyBirdGame({ onComplete }: Props) {
   return (
     <div
       className="flappy-bird-game"
-      style={{
-        '--flappy-width': FLAPPY_BIRD_LAYOUT.width,
-        '--flappy-height': FLAPPY_BIRD_LAYOUT.height,
-        '--flappy-x': FLAPPY_BIRD_LAYOUT.x,
-        '--flappy-y': FLAPPY_BIRD_LAYOUT.y,
-        '--flappy-bird-width': `${BIRD_WIDTH}px`,
-        '--flappy-bird-height': `${BIRD_HEIGHT}px`,
-      } as React.CSSProperties}
+      style={
+        {
+          '--flappy-width': FLAPPY_BIRD_LAYOUT.width,
+          '--flappy-height': FLAPPY_BIRD_LAYOUT.height,
+          '--flappy-x': FLAPPY_BIRD_LAYOUT.x,
+          '--flappy-y': FLAPPY_BIRD_LAYOUT.y,
+          '--flappy-bird-width': `${BIRD_WIDTH}px`,
+          '--flappy-bird-height': `${BIRD_HEIGHT}px`,
+        } as React.CSSProperties
+      }
     >
       <button
         type="button"
@@ -338,7 +345,10 @@ export function FlappyBirdGame({ onComplete }: Props) {
         aria-label="Прыгнуть или начать полёт"
         ref={stageRef}
       >
-        <span className="flappy-bird-game__score" aria-label={`Собрано монет: ${game.collectedCoins} из ${COINS_TO_COMPLETE}`}>
+        <span
+          className="flappy-bird-game__score"
+          aria-label={`Собрано монет: ${game.collectedCoins} из ${COINS_TO_COMPLETE}`}
+        >
           {game.collectedCoins}/{COINS_TO_COMPLETE}
         </span>
         <img
@@ -351,7 +361,9 @@ export function FlappyBirdGame({ onComplete }: Props) {
           <span className="flappy-bird-game__sun" aria-hidden />
           <span
             className="flappy-bird-game__bird"
-            style={{ transform: `translate(${BIRD_X}px, ${game.birdY}px) rotate(${Math.max(-18, Math.min(76, game.birdVelocity / 8))}deg)` }}
+            style={{
+              transform: `translate(${BIRD_X}px, ${game.birdY}px) rotate(${Math.max(-18, Math.min(76, game.birdVelocity / 8))}deg)`,
+            }}
           >
             <img src={isHolding ? playerImage : playerWingsDownImage} alt="" aria-hidden />
           </span>
@@ -369,13 +381,20 @@ export function FlappyBirdGame({ onComplete }: Props) {
             <span
               key={pipe.id}
               className="flappy-bird-game__pipe-pair"
-              style={{
-                '--flappy-pipe-width': `${PIPE_WIDTH}px`,
-                transform: `translateX(${pipe.x}px)`,
-              } as React.CSSProperties}
+              style={
+                {
+                  '--flappy-pipe-width': `${PIPE_WIDTH}px`,
+                  transform: `translateX(${pipe.x}px)`,
+                } as React.CSSProperties
+              }
               aria-hidden
             >
-              <img className="flappy-bird-game__pipe flappy-bird-game__pipe--top" src={pipe.image} alt="" style={{ height: pipe.gapTop }} />
+              <img
+                className="flappy-bird-game__pipe flappy-bird-game__pipe--top"
+                src={pipe.image}
+                alt=""
+                style={{ height: pipe.gapTop }}
+              />
               <img
                 className="flappy-bird-game__pipe flappy-bird-game__pipe--bottom"
                 src={pipe.image}
@@ -388,7 +407,9 @@ export function FlappyBirdGame({ onComplete }: Props) {
           {!game.running && !game.gameOver && !game.completed && (
             <span className="flappy-bird-game__message">
               <strong>Прыг!</strong>
-              <small>Пробел или левая кнопка мыши. Чтобы парить, продолжай удерживать кнопку после прыжка</small>
+              <small>
+                Пробел или левая кнопка мыши. Чтобы парить, продолжай удерживать кнопку после прыжка
+              </small>
             </span>
           )}
           {game.gameOver && !game.completed && (

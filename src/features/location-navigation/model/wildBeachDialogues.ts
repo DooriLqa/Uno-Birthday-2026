@@ -1,6 +1,11 @@
-import { openDialogue, useDialogueStore, type Dialogue, type DialogueSpeaker } from '@/features/dialogues'
-import fishermanSprite from '@/shared/assets/dialogues/fisherman-basset.png'
-import pirateSprite from '@/shared/assets/dialogues/pirate-corgi.png'
+import {
+  openDialogue,
+  useDialogueStore,
+  type Dialogue,
+  type DialogueSpeaker,
+} from '@/features/dialogues'
+import fishermanSprite from '@/shared/assets/features/dialogues/fisherman-basset.png'
+import pirateSprite from '@/shared/assets/features/dialogues/pirate-corgi.png'
 
 export const FISHERMAN_DIALOGUE_ID = 'wild-beach-fisherman-intro-v1'
 export const PIRATE_DIALOGUE_ID = 'wild-beach-pirate-intro-v1'

@@ -30,7 +30,7 @@
 
   aspect-ratio: 3 / 2;
 
-  background-image: url('@/shared/assets/patapon/japonsk-bg.png');
+  background-image: url('@/shared/assets/games/japonsk/japonsk-bg.png');
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;

@@ -184,11 +184,11 @@
 }
 
 .totem-code-game__carving--natural {
-  background-image: url('../../../shared/assets/totem-code/carved-glyph-sprite-sheet-natural-v2.png');
+  background-image: url('@/shared/assets/common/decorative-glyphs/carved-glyph-sprite-sheet-natural-v2.png');
 }
 
 .totem-code-game__carving--ornamented {
-  background-image: url('../../../shared/assets/totem-code/carved-glyph-sprite-sheet-ornamented-v1.png');
+  background-image: url('@/shared/assets/common/decorative-glyphs/carved-glyph-sprite-sheet-ornamented-v1.png');
 }
 
 .totem-code-game__carving--shape {

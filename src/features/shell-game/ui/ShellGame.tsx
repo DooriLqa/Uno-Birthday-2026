@@ -1,8 +1,8 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import './ShellGame.css'
 
-import cupImage from '@/assets/ShellGame/cup.png'
-import pearlImage from '@/assets/ShellGame/pearl.png'
+import cupImage from '@/shared/assets/games/shell-game/cup.png'
+import pearlImage from '@/shared/assets/games/shell-game/pearl.png'
 
 export type ShellGameProps = {
   shuffleIterations: number

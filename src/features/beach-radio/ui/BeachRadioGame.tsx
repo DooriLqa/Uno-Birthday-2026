@@ -17,7 +17,7 @@ import { pickQuestion } from '@/features/beach-radio/model/quiz'
 import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
 import type { QuizQuestion } from '@/features/beach-radio/model/types'
 import { VolumeKnob } from './VolumeKnob/VolumeKnob'
-import radio from '@/shared/assets/radio/radio.png'
+import radio from '@/shared/assets/games/beach-radio/radio.png'
 import './BeachRadioGame.css'
 
 type Props = { onComplete: () => void; onOpenRadio?: () => void }
