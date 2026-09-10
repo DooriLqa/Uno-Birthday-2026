@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { BOOKS, GENRES, ROWS } from '../model/config'
+import { BOOKS, GENRES, DIRECTIONS, ROWS, isBookCorrect } from '../model/config'
 import { useLibraryStore } from '../model/store'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import floorBook from '../assets/floor-book.png'
@@ -9,15 +9,26 @@ export function BeachLibrary() {
   const { slots, enter, place, rewarded } = useLibraryStore()
   const [held, setHeld] = useState<number | null>(null)
   const [pointer, setPointer] = useState({ x: 50, y: 70 })
-  const [genre, setGenre] = useState<number | null>(null)
+  const [category, setCategory] = useState<{ name: string; description: string } | null>(null)
   const [status, setStatus] = useState(
-    'Выбери книгу и поставь её в ряд подходящего жанра. Значки на полках — подсказки.',
+    'Сверху — жанр, слева — направление. Поставь книгу на их пересечение.',
   )
   const [flight, setFlight] = useState<{ x: number; y: number } | null>(null)
   const canvas = useRef<HTMLDivElement>(null)
   useEffect(() => {
     enter()
   }, [enter])
+  useEffect(() => {
+    // Picking a floor book removes its focused button. Listen on window so Escape
+    // still works on the very first pickup, even when focus falls back to body.
+    const cancel = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      setHeld(null)
+      setCategory(null)
+    }
+    window.addEventListener('keydown', cancel)
+    return () => window.removeEventListener('keydown', cancel)
+  }, [])
   const pick = (id: number, element: HTMLElement) => {
     if (held !== null) return
     const bounds = element.getBoundingClientRect()
@@ -35,14 +46,14 @@ export function BeachLibrary() {
       setStatus('Не удалось поставить книгу. Выбери место на полке.')
       return
     }
-    const correct = BOOKS[held].genre === Math.floor(slot / 5)
+    const correct = isBookCorrect(held, slot)
     playOneShotSound(correct ? '/audio/sfx/coin.mp3' : '/audio/sfx/brick.mp3', 'library', 0.45)
     setStatus(
       rewards.length
         ? `Стеллаж собран! В инвентарь добавлены страницы: ${rewards.length}.`
         : correct
-          ? 'Верно! Эта книга подходит к жанру.'
-          : 'Жанр не совпадает. Книгу можно переставить.',
+          ? 'Верно! Жанр и направление совпадают.'
+          : 'Жанр или направление не совпадает. Книгу можно переставить.',
     )
     if (rewards.length) {
       const row = ROWS[Math.floor(slot / 5)]
@@ -54,7 +65,7 @@ export function BeachLibrary() {
     <div
       ref={canvas}
       className="beach-library"
-      aria-label="Расстановка книг по жанрам"
+      aria-label="Расстановка книг по жанрам и направлениям"
       onPointerMove={(event) => {
         if (held === null) return
         const bounds = event.currentTarget.getBoundingClientRect()
@@ -63,13 +74,36 @@ export function BeachLibrary() {
           y: ((event.clientY - bounds.top) / bounds.height) * 100,
         })
       }}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape') {
-          setHeld(null)
-          setGenre(null)
-        }
-      }}
     >
+      {GENRES.map((genre, column) => {
+        const row = ROWS[column * 3]
+        return (
+          <button
+            key={genre.name}
+            className="beach-library__axis beach-library__axis--column"
+            style={{ left: `${row.x}%`, width: `${row.width}%` }}
+            aria-label={`Жанр: ${genre.name}`}
+            onClick={() => setCategory(genre)}
+          >
+            <span>{genre.icon.includes('/') ? <img src={genre.icon} alt="" /> : genre.icon}</span>
+            {genre.name}
+          </button>
+        )
+      })}
+      {DIRECTIONS.map((direction, index) => (
+        <button
+          key={direction.name}
+          className="beach-library__axis beach-library__axis--row"
+          style={{ top: `${ROWS[index].y + ROWS[index].height / 2}%` }}
+          aria-label={`Направление: ${direction.name}`}
+          onClick={() => setCategory(direction)}
+        >
+          <span>
+            {direction.icon.includes('/') ? <img src={direction.icon} alt="" /> : direction.icon}
+          </span>
+          {direction.name}
+        </button>
+      ))}
       {ROWS.map((row) => (
         <div
           key={row.id}
@@ -81,17 +115,6 @@ export function BeachLibrary() {
             height: `${row.height}%`,
           }}
         >
-          <button
-            className="beach-library__genre"
-            aria-label={`Жанр: ${GENRES[row.id].name}`}
-            onClick={() => setGenre(row.id)}
-          >
-            {GENRES[row.id].icon.includes('/') ? (
-              <img src={GENRES[row.id].icon} alt="" />
-            ) : (
-              GENRES[row.id].icon
-            )}
-          </button>
           {Array.from({ length: 5 }, (_, column) => {
             const slot = row.id * 5 + column
             const id = slots[slot]
@@ -100,7 +123,11 @@ export function BeachLibrary() {
               <button
                 key={slot}
                 className={`beach-library__slot ${held !== null ? 'is-target' : ''}`}
-                aria-label={book ? book.title : `${GENRES[row.id].name}, место ${column + 1}`}
+                aria-label={
+                  book
+                    ? book.title
+                    : `${GENRES[row.cabinet].name}, ${DIRECTIONS[row.direction].name}, место ${column + 1}`
+                }
                 onClick={(event) =>
                   held !== null ? drop(slot) : book && pick(book.id, event.currentTarget)
                 }
@@ -156,11 +183,11 @@ export function BeachLibrary() {
         <span role="status">{status}</span> <small>Стеллажи: {rewarded.length}/3</small>
         {held !== null && <button onClick={() => setHeld(null)}>Вернуть книгу · Esc</button>}
       </div>
-      {genre !== null && (
-        <div className="beach-library__genre-info" role="dialog" aria-label={GENRES[genre].name}>
-          <h3>{GENRES[genre].name}</h3>
-          <p>{GENRES[genre].description}</p>
-          <button autoFocus onClick={() => setGenre(null)}>
+      {category !== null && (
+        <div className="beach-library__genre-info" role="dialog" aria-label={category.name}>
+          <h3>{category.name}</h3>
+          <p>{category.description}</p>
+          <button autoFocus onClick={() => setCategory(null)}>
             Понятно
           </button>
         </div>

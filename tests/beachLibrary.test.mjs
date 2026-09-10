@@ -14,14 +14,35 @@ function compile(path, replacements = {}) {
   return `data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`
 }
 const configUrl = compile('../src/features/beach-library/model/config.ts')
-const { BOOKS, GENRES, LETTERS, placeBook, completedCabinets } = await import(configUrl)
+const { BOOKS, GENRES, DIRECTIONS, LETTERS, placeBook, completedCabinets, isBookCorrect } =
+  await import(configUrl)
 
-test('45 unique books, five per genre, fixed rectangular letter sheet', () => {
+test('45 unique books, five per genre × direction, fixed rectangular letter sheet', () => {
   assert.equal(BOOKS.length, 45)
   assert.equal(new Set(BOOKS.map((book) => book.id)).size, 45)
-  GENRES.forEach((_, genre) => assert.equal(BOOKS.filter((book) => book.genre === genre).length, 5))
+  assert.equal(new Set(BOOKS.map((book) => book.title)).size, 45)
+  assert.equal(GENRES.length, 3)
+  assert.equal(DIRECTIONS.length, 3)
+  GENRES.forEach((_, genre) =>
+    DIRECTIONS.forEach((_, direction) =>
+      assert.equal(
+        BOOKS.filter((book) => book.genre === genre && book.direction === direction).length,
+        5,
+      ),
+    ),
+  )
   assert.equal(LETTERS.length, 12)
   assert.ok(LETTERS.every((line) => line.length === 12))
+})
+
+test('a book must match both its genre column and its direction row', () => {
+  for (const book of BOOKS) {
+    for (let slot = 0; slot < 45; slot++) {
+      assert.equal(isBookCorrect(book.id, slot), Math.floor(book.id / 5) === Math.floor(slot / 5))
+    }
+  }
+  assert.equal(isBookCorrect(0, 5), false) // Same genre, wrong direction.
+  assert.equal(isBookCorrect(0, 15), false) // Same direction, wrong genre.
 })
 test('wrong placements are accepted, can be moved, and do not complete a cabinet', () => {
   const original = Array(45).fill(null)

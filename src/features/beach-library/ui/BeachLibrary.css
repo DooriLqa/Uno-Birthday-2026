@@ -55,26 +55,48 @@
     var(--book-color);
   box-shadow: 3px 2px 3px #24130477;
 }
-.beach-library__genre {
+.beach-library__axis {
   position: absolute;
-  bottom: -15%;
-  left: -9%;
-  width: 2.8cqw;
-  height: 2.8cqw;
-  padding: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5cqw;
+  padding: 0.3cqw 0.5cqw;
   border: 2px solid #c99a50;
-  border-radius: 50%;
-  background: #523522;
-  font-size: 1.5cqw;
+  border-radius: 0.8cqw;
+  background: #523522ed;
+  font-size: 1.1cqw;
+  font-weight: 700;
   z-index: 2;
   box-shadow: 1px 3px 4px #0007;
 }
-.beach-library__genre img {
+.beach-library__axis--column {
+  top: 24%;
+}
+.beach-library__axis--row {
+  left: 10.5%;
+  width: 12%;
+  translate: 0 -50%;
+}
+.beach-library__axis span {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2cqw;
+  height: 2cqw;
+  border: 1px solid #c99a50;
+  border-radius: 50%;
+  font-size: 1.35cqw;
+  background: #6b482e;
+}
+.beach-library__axis img {
   width: 75%;
   height: 75%;
   object-fit: contain;
+}
+.beach-library__axis:focus-visible {
+  outline: 2px solid #fff3bd;
+  outline-offset: 3px;
 }
 .beach-library__floor {
   position: absolute;
