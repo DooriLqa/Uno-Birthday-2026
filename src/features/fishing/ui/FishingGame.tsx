@@ -180,7 +180,7 @@ export function FishingGame({ onClose }: Props) {
       }
     } else {
       coins = rarityInfo.reward
-      message = `+${coins} ${coins === 1 ? 'монетка' : coins > 5 ? 'монеток' : 'монетки'}`
+      message = `+${coins} ${coins === 1 ? 'монетка' : coins >= 5 ? 'монеток' : 'монетки'}`
     }
 
     if (coins > 0) {
