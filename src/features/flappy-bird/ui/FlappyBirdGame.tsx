@@ -14,6 +14,7 @@ import insertCoinSound from '@/shared/assets/common/audio/insert-coin.mp3'
 
 import { FLAPPY_BIRD_LAYOUT, FLAPPY_WORLD, type FlappyBirdLayout } from '../model/layout'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
+import { usePawCoinStore } from '@/features/currency/model/store'
 import './FlappyBirdGame.css'
 
 type Props = { onComplete: () => void; layout?: FlappyBirdLayout }
@@ -44,6 +45,7 @@ type GameState = {
   running: boolean
   gameOver: boolean
   completed: boolean
+  lives: number
 }
 
 const FLAPPY_GAME_KEY = 'flappy-game'
@@ -94,6 +96,7 @@ const createInitialState = (): GameState => ({
   running: false,
   gameOver: false,
   completed: false,
+  lives: 3,
 })
 
 const createPipe = (id: number, x: number): Pipe => ({
@@ -132,6 +135,8 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
   const pipeTimerRef = useRef(0)
   const coinTimerRef = useRef(0)
   const holdingRef = useRef(false)
+  const deathLockUntilRef = useRef(0)
+  const startDelayRef = useRef(false)
 
   useEffect(() => {
     const stage = stageRef.current
@@ -164,9 +169,46 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
     setGame(nextGame)
   }, [])
 
-  const flap = useCallback(() => {
+  const flap = useCallback(async () => {
     const current = gameRef.current
-    if (current.gameOver || current.completed) {
+
+    // After inserting the coin, keep the game locked for 1 second so
+    // accidental clicks/Space presses cannot start it during the delay.
+    if (startDelayRef.current) {
+      return
+    }
+
+    // A life was lost. The existing "Бух в воду!" screen is shown while
+    // gameOver is true. The next Space/click starts the next life immediately.
+    // No Paw Coin is charged for a retry.
+    if (current.gameOver) {
+      if (current.lives <= 0) {
+        return
+      }
+
+      const nextPipe = createPipe(1, FIRST_PIPE_X)
+
+      updateGame({
+        ...createInitialState(),
+        lives: current.lives,
+        running: true,
+        gameOver: false,
+        completed: false,
+        birdVelocity: FLAP_VELOCITY,
+        pipes: [nextPipe],
+        nextPipeId: 2,
+      })
+
+      lastTimeRef.current = null
+      pipeTimerRef.current = 0
+      coinTimerRef.current = 0
+
+      playOneShotSound(START_SOUND, FLAPPY_START_SOUND_KEY)
+      return
+    }
+
+    // Completed game: starting a completely new game costs one Paw Coin.
+    if (current.completed) {
       updateGame(createInitialState())
       lastTimeRef.current = null
       pipeTimerRef.current = 0
@@ -176,6 +218,39 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
 
     const isFirstFlap = current.pipes.length === 0
     const isGameStart = !current.running
+
+    // Only the first start of the 3-life session costs one Paw Coin.
+    if (isGameStart) {
+      const { spendPawCoins } = usePawCoinStore.getState()
+      if (!spendPawCoins(1)) {
+        return
+      }
+
+      startDelayRef.current = true
+      playOneShotSound(COIN_INSERT_SOUND, FLAPPY_COIN_INSERT_SOUND_KEY, 0.52)
+
+      await new Promise((resolve) => window.setTimeout(resolve, 1000))
+
+      startDelayRef.current = false
+
+      // The game starts only after the full 1-second delay.
+      const latest = gameRef.current
+      const latestIsFirstFlap = latest.pipes.length === 0
+
+      updateGame({
+        ...latest,
+        running: true,
+        birdVelocity: FLAP_VELOCITY,
+        pipes: latestIsFirstFlap
+          ? [createPipe(1, FIRST_PIPE_X)]
+          : latest.pipes,
+        nextPipeId: latestIsFirstFlap ? 2 : latest.nextPipeId,
+      })
+
+      playOneShotSound(START_SOUND, FLAPPY_START_SOUND_KEY)
+      return
+    }
+
     updateGame({
       ...current,
       running: true,
@@ -183,13 +258,12 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
       pipes: isFirstFlap ? [createPipe(1, FIRST_PIPE_X)] : current.pipes,
       nextPipeId: isFirstFlap ? 2 : current.nextPipeId,
     })
-    if (isGameStart) {
-      playOneShotSound(COIN_INSERT_SOUND, FLAPPY_COIN_INSERT_SOUND_KEY, 0.52)
-      playOneShotSound(START_SOUND, FLAPPY_START_SOUND_KEY)
-    }
   }, [updateGame])
 
   const startHolding = useCallback(() => {
+    // Ignore the first second after death to protect against an accidental
+    // click/Space event that caused the death.
+    if (Date.now() < deathLockUntilRef.current) return
     if (holdingRef.current) return
     holdingRef.current = true
     setIsHolding(true)
@@ -307,24 +381,73 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
 
         if (gameOver && !current.gameOver) {
           playOneShotSound(SCREAM_SOUND, FLAPPY_GAME_KEY)
+
+          const remainingLives = Math.max(0, current.lives - 1)
+
+          // After the third death return to the normal start screen.
+          // This also restores the three-life session and prevents the
+          // game-over state from becoming a dead end.
+          if (remainingLives === 0) {
+            updateGame(createInitialState())
+          } else {
+            updateGame({
+              ...current,
+              birdY: Math.max(0, Math.min(GAME_HEIGHT - BIRD_HEIGHT, birdY)),
+              birdVelocity,
+              pipes,
+              coins,
+              nextPipeId,
+              nextCoinId,
+              passedPipes,
+              collectedCoins,
+              gameOver: true,
+              running: false,
+              completed: false,
+              lives: remainingLives,
+            })
+          }
+
+          lastTimeRef.current = null
+          pipeTimerRef.current = 0
+          coinTimerRef.current = 0
+          deathLockUntilRef.current = Date.now() + 1000
+          holdingRef.current = false
+          setIsHolding(false)
         } else if (collectedCoins >= COINS_TO_COMPLETE && !current.completed) {
           playOneShotSound(WIN_SOUND, FLAPPY_GAME_KEY)
-        }
 
-        updateGame({
-          ...current,
-          birdY: Math.max(0, Math.min(GAME_HEIGHT - BIRD_HEIGHT, birdY)),
-          birdVelocity,
-          pipes,
-          coins,
-          nextPipeId,
-          nextCoinId,
-          passedPipes,
-          collectedCoins,
-          gameOver,
-          running: collectedCoins < COINS_TO_COMPLETE,
-          completed: current.completed || collectedCoins >= COINS_TO_COMPLETE,
-        })
+          updateGame({
+            ...current,
+            birdY: Math.max(0, Math.min(GAME_HEIGHT - BIRD_HEIGHT, birdY)),
+            birdVelocity,
+            pipes,
+            coins,
+            nextPipeId,
+            nextCoinId,
+            passedPipes,
+            collectedCoins,
+            gameOver: false,
+            running: false,
+            completed: true,
+            lives: current.lives,
+          })
+        } else {
+          updateGame({
+            ...current,
+            birdY: Math.max(0, Math.min(GAME_HEIGHT - BIRD_HEIGHT, birdY)),
+            birdVelocity,
+            pipes,
+            coins,
+            nextPipeId,
+            nextCoinId,
+            passedPipes,
+            collectedCoins,
+            gameOver,
+            running: collectedCoins < COINS_TO_COMPLETE,
+            completed: current.completed || collectedCoins >= COINS_TO_COMPLETE,
+            lives: current.lives,
+          })
+        }
       }
 
       frameRef.current = requestAnimationFrame(tick)
@@ -390,6 +513,20 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
           </defs>
         </svg>
       )}
+      <style>{`
+        .flappy-bird-game__lives {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          z-index: 10;
+          font-size: 20px;
+          line-height: 1;
+          letter-spacing: 2px;
+          pointer-events: none;
+          user-select: none;
+          text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.55);
+        }
+      `}</style>
       <div className="flappy-bird-game__cabinet">
         <img
           className="flappy-bird-game__cabinet-image"
@@ -421,6 +558,12 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
                 aria-label={`Собрано монет: ${game.collectedCoins} из ${COINS_TO_COMPLETE}`}
               >
                 {game.collectedCoins}/{COINS_TO_COMPLETE}
+              </span>
+              <span
+                className="flappy-bird-game__lives"
+                aria-label={`Жизни: ${game.lives} из 3`}
+              >
+                {'❤️'.repeat(game.lives)}
               </span>
               <img
                 className="flappy-bird-game__background"
@@ -474,7 +617,7 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
                 </span>
               ))}
               <span className="flappy-bird-game__ground" aria-hidden />
-              {!game.running && !game.gameOver && !game.completed && (
+              {!game.running && !game.gameOver && !game.completed && game.lives === 3 && (
                 <span className="flappy-bird-game__message">
                   <strong>Прыг!</strong>
                   <small>
