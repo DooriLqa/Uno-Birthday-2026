@@ -516,7 +516,7 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
       <style>{`
         .flappy-bird-game__lives {
           position: absolute;
-          top: 10px;
+          top: 20px;
           left: 10px;
           z-index: 10;
           font-size: 20px;
