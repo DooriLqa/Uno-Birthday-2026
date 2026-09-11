@@ -17,10 +17,10 @@ import brickIndestructibleImage from '@/shared/assets/games/arkanoid/brick-indes
 import barrelImage from '@/shared/assets/games/arkanoid/barrel.png'
 import paddleImage from '@/shared/assets/games/arkanoid/paddle.png'
 import paddleWideImage from '@/shared/assets/games/arkanoid/paddle-wide.png'
+import arkanoidBackgroundImage from '@/shared/assets/games/arkanoid/background.png'
 import ballImage from '@/shared/assets/games/arkanoid/ball.png'
 import powerUpWideImage from '@/shared/assets/games/arkanoid/powerup-wide.png'
 import powerUpTripleImage from '@/shared/assets/games/arkanoid/powerup-triple.png'
-import powerUpShotImage from '@/shared/assets/games/arkanoid/powerup-shot.png'
 import powerUpFireImage from '@/shared/assets/games/arkanoid/powerup-fire.png'
 
 import './Arkanoid.css'
@@ -31,7 +31,7 @@ type Props = {
 
 type BrickType = 'normal' | 'hard' | 'strong' | 'barrel' | 'indestructible'
 
-type PowerUpType = 'wide' | 'triple' | 'shot' | 'fire'
+type PowerUpType = 'wide' | 'triple' | 'fire'
 
 type Brick = {
   x: number
@@ -101,8 +101,9 @@ const STORAGE_KEY = 'arkanoid-progress-v1'
 
 const TOTAL_LEVELS = 5
 
-const PADDLE_BASE_WIDTH = 110
-const PADDLE_HEIGHT = 22
+const PADDLE_BASE_WIDTH = 165
+const PADDLE_HEIGHT = 33
+const WIDE_PADDLE_MULTIPLIER = 1.5
 
 // Все обычные кирпичи имеют соотношение ширины к высоте 2.25 : 1.
 const BRICK_ASPECT_RATIO = 2.25
@@ -126,7 +127,7 @@ const FIRE_SHOT_INTERVAL = 500
 const FIRE_SHOT_COUNT = 10
 
 // Время, пока после разрушения показывается последний кадр спрайта.
-const BRICK_DESTRUCTION_DURATION = 180
+const BRICK_DESTRUCTION_DURATION = 500
 
 /*
  * =========================================================
@@ -173,7 +174,7 @@ const LEVEL_LAYOUTS: number[][][] = [
     [9, 9, 2, 3, 1, 3, 2, 9, 9],
     [9, 2, 3, 1, 9, 1, 3, 2, 9],
     [2, 3, 1, 9, 9, 9, 1, 3, 2],
-    [9, 2, 3, 1, 9, 1, 3, 2, 9],
+    [9, 2, 3, 8, 9, 8, 3, 2, 9],
     [9, 9, 2, 3, 1, 3, 2, 9, 9],
   ],
 
@@ -241,14 +242,9 @@ function randomPowerUp(): PowerUpType | undefined {
     return 'wide'
   }
 
-  if (roll < 0.7) {
+  if (roll < 0.8) {
     return 'triple'
   }
-
-  if (roll < 0.9) {
-    return 'shot'
-  }
-
   return 'fire'
 }
 
@@ -427,7 +423,7 @@ export function Arkanoid({ onComplete }: Props) {
 
   const [score, setScore] = useState(0)
 
-  const [lives, setLives] = useState(3)
+  const [, setLives] = useState(3)
 
   const [won, setWon] = useState(false)
 
@@ -436,7 +432,7 @@ export function Arkanoid({ onComplete }: Props) {
   const [started, setStarted] = useState(false)
   const [completedLevels, setCompletedLevels] = useState(0)
 
-  const [activePowerUps, setActivePowerUps] = useState<PowerUpType[]>([])
+  const [, setActivePowerUps] = useState<PowerUpType[]>([])
 
   useEffect(() => {
     audioRef.current.launch = new Audio(arkanoidSound1)
@@ -472,10 +468,10 @@ export function Arkanoid({ onComplete }: Props) {
       barrelImage,
       paddleImage,
       paddleWideImage,
+      arkanoidBackgroundImage,
       ballImage,
       powerUpWideImage,
       powerUpTripleImage,
-      powerUpShotImage,
       powerUpFireImage,
     ]
 
@@ -504,8 +500,6 @@ export function Arkanoid({ onComplete }: Props) {
         return powerUpWideImage
       case 'triple':
         return powerUpTripleImage
-      case 'shot':
-        return powerUpShotImage
       case 'fire':
         return powerUpFireImage
     }
@@ -602,6 +596,56 @@ export function Arkanoid({ onComplete }: Props) {
         drawImage(ctx, brickIndestructibleImage, brick.x, brick.y, brick.width, brick.height)
         return
       }
+      if (brick.powerUp === 'wide') {
+        const frame = brick.destroyTimer > 0 ? 1 : 0
+
+        drawSpriteFrame(
+          ctx,
+          powerUpWideImage,
+          frame,
+          2,
+          brick.x,
+          brick.y,
+          brick.width,
+          brick.height,
+        )
+
+        return
+      }
+
+      if (brick.powerUp === 'fire') {
+        const frame = brick.destroyTimer > 0 ? 1 : 0
+
+        drawSpriteFrame(
+          ctx,
+          powerUpFireImage,
+          frame,
+          2,
+          brick.x,
+          brick.y,
+          brick.width,
+          brick.height,
+        )
+
+        return
+      }
+
+      if (brick.powerUp === 'triple') {
+        const frame = brick.destroyTimer > 0 ? 1 : 0
+
+        drawSpriteFrame(
+          ctx,
+          powerUpTripleImage,
+          frame,
+          2,
+          brick.x,
+          brick.y,
+          brick.width,
+          brick.height,
+        )
+
+        return
+      }
 
       /*
        * Отдельная картинка соответствует отдельной крепости:
@@ -673,19 +717,16 @@ export function Arkanoid({ onComplete }: Props) {
         return
       }
 
-      // Размер спрайта не зависит от физической ширины платформы.
-      // Меняется только collision-box. Сохраняем исходное соотношение сторон.
-      const visualHeight = 48
+      // Увеличенный размер спрайта.
+      // Не даём картинке визуально выйти за границы canvas.
+      const visualHeight = 72
       const visualWidth = visualHeight * (image.naturalWidth / image.naturalHeight)
 
+      const drawX = Math.max(0, Math.min(CANVAS_WIDTH - visualWidth, centerX - visualWidth / 2))
+      const drawY = centerY - visualHeight / 2
+
       ctx.imageSmoothingEnabled = true
-      ctx.drawImage(
-        image,
-        centerX - visualWidth / 2,
-        centerY - visualHeight / 2,
-        visualWidth,
-        visualHeight,
-      )
+      ctx.drawImage(image, drawX, drawY, visualWidth, visualHeight)
     },
     [],
   )
@@ -693,40 +734,6 @@ export function Arkanoid({ onComplete }: Props) {
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, game: GameState) => {
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-      const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT)
-
-      gradient.addColorStop(0, '#101827')
-
-      gradient.addColorStop(1, '#05080d')
-
-      ctx.fillStyle = gradient
-
-      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-      ctx.strokeStyle = 'rgba(255,255,255,0.04)'
-
-      ctx.lineWidth = 1
-
-      for (let x = 0; x < CANVAS_WIDTH; x += 45) {
-        ctx.beginPath()
-
-        ctx.moveTo(x, 0)
-
-        ctx.lineTo(x, CANVAS_HEIGHT)
-
-        ctx.stroke()
-      }
-
-      for (let y = 0; y < CANVAS_HEIGHT; y += 45) {
-        ctx.beginPath()
-
-        ctx.moveTo(0, y)
-
-        ctx.lineTo(CANVAS_WIDTH, y)
-
-        ctx.stroke()
-      }
 
       for (const brick of game.bricks) {
         drawBrick(ctx, brick)
@@ -833,7 +840,8 @@ export function Arkanoid({ onComplete }: Props) {
       if (type === 'wide') {
         game.wideTimer = WIDE_DURATION
 
-        game.paddle.width = game.paddle.baseWidth * 1.65
+        game.paddle.width = game.paddle.baseWidth * WIDE_PADDLE_MULTIPLIER
+        game.paddle.x = Math.max(0, Math.min(CANVAS_WIDTH - game.paddle.width, game.paddle.x))
 
         return
       }
@@ -873,43 +881,6 @@ export function Arkanoid({ onComplete }: Props) {
             vx: 0,
             vy: -speed,
             fire,
-          },
-        )
-
-        return
-      }
-
-      if (type === 'shot') {
-        const speed = getBallSpeed(game.level)
-
-        const centerX = game.paddle.x + game.paddle.width / 2
-
-        const startY = game.paddle.y - BALL_RADIUS - 4
-
-        game.balls.push(
-          {
-            x: centerX - 22,
-            y: startY,
-            radius: BALL_RADIUS,
-            vx: -speed * 0.75,
-            vy: -speed,
-            fire: false,
-          },
-          {
-            x: centerX,
-            y: startY,
-            radius: BALL_RADIUS,
-            vx: 0,
-            vy: -speed,
-            fire: false,
-          },
-          {
-            x: centerX + 22,
-            y: startY,
-            radius: BALL_RADIUS,
-            vx: speed * 0.75,
-            vy: -speed,
-            fire: false,
           },
         )
 
@@ -1022,7 +993,7 @@ export function Arkanoid({ onComplete }: Props) {
       }
 
       const destroyBrick = (target: Brick, giveScore = true) => {
-        if (target.hp <= 0) {
+        if (target.destroyTimer > 0) {
           return
         }
 
@@ -1043,7 +1014,12 @@ export function Arkanoid({ onComplete }: Props) {
         center.destroyTimer = BRICK_DESTRUCTION_DURATION
 
         for (const target of game.bricks) {
-          if (target === center || target.type === 'indestructible' || target.hp <= 0) {
+          if (
+            target === center ||
+            target.type === 'indestructible' ||
+            target.hp <= 0 ||
+            target.destroyTimer > 0
+          ) {
             continue
           }
 
@@ -1055,7 +1031,10 @@ export function Arkanoid({ onComplete }: Props) {
           const columnDistance = Math.abs(targetX - centerX)
           const rowDistance = Math.abs(targetY - centerY)
 
-          if (columnDistance <= center.width + 2 && rowDistance <= center.height + 2) {
+          const horizontalRange = (center.width + target.width) / 2 + 6
+          const verticalRange = (center.height + target.height) / 2 + 6
+
+          if (columnDistance <= horizontalRange && rowDistance <= verticalRange) {
             destroyBrick(target)
           }
         }
@@ -1175,7 +1154,7 @@ export function Arkanoid({ onComplete }: Props) {
 
       if (game.wideTimer > 0) {
         game.wideTimer = Math.max(0, game.wideTimer - dt)
-        game.paddle.width = game.paddle.baseWidth * 1.65
+        game.paddle.width = game.paddle.baseWidth * WIDE_PADDLE_MULTIPLIER
 
         if (game.wideTimer <= WIDE_WARNING_DURATION) {
           game.wideBlinkTimer -= dt
@@ -1587,25 +1566,6 @@ export function Arkanoid({ onComplete }: Props) {
     }
   }, [draw, update])
 
-  const getPowerUpName = (type: PowerUpType) => {
-    switch (type) {
-      case 'wide':
-        return 'Широкая платформа'
-
-      case 'triple':
-        return 'Разделение шара'
-
-      case 'shot':
-        return 'Три обычных шара'
-
-      case 'fire':
-        return 'Огненная стрельба'
-
-      default:
-        return ''
-    }
-  }
-
   return (
     <div
       className="arkanoid"
@@ -1618,73 +1578,26 @@ export function Arkanoid({ onComplete }: Props) {
         } as CSSProperties
       }
     >
-      <div className="arkanoid__header">
-        <div>
-          <strong>
-            Уровень {level} / {TOTAL_LEVELS}
-          </strong>
-
-          <span>Очки: {score}</span>
-
-          <span>Жизни: {lives}</span>
-        </div>
-
-        <div className="arkanoid__levels">
-          {Array.from(
-            {
-              length: TOTAL_LEVELS,
-            },
-            (_, index) => {
-              const current = index + 1
-
-              const unlocked = current <= unlockedLevel
-
-              return (
-                <button
-                  key={current}
-                  type="button"
-                  disabled={!unlocked}
-                  className={
-                    current === level
-                      ? 'arkanoid__level arkanoid__level--active'
-                      : 'arkanoid__level'
-                  }
-                  onClick={() => {
-                    if (unlocked) {
-                      startGame(current)
-                    }
-                  }}
-                >
-                  {current}
-                </button>
-              )
-            },
-          )}
-        </div>
-      </div>
-
-      <div className="arkanoid__powerups">
-        {activePowerUps.map((powerUp) => (
-          <span key={powerUp} className="arkanoid__powerup-active">
-            <img
-              src={getPowerUpImage(powerUp)}
-              alt={getPowerUpName(powerUp)}
-              className="arkanoid__powerup-active-image"
-            />
-            <span>{getPowerUpName(powerUp)}</span>
-          </span>
-        ))}
-      </div>
-
       <div className="arkanoid__canvas-wrap">
+        <img
+          src={arkanoidBackgroundImage}
+          alt=""
+          className="arkanoid__background"
+          draggable={false}
+        />
+
         <canvas
           ref={canvasRef}
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
           className="arkanoid__canvas"
           style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
             width: '100%',
             height: '100%',
+            background: 'transparent',
           }}
         />
 
@@ -1732,24 +1645,6 @@ export function Arkanoid({ onComplete }: Props) {
             )}
           </div>
         )}
-      </div>
-
-      <div className="arkanoid__legend">
-        <span>
-          <b>W</b> — широкая палочка
-        </span>
-
-        <span>
-          <b>3</b> — текущий шар разделяется на 3
-        </span>
-
-        <span>
-          <b>S</b> — из палочки вылетают 3 обычных шара
-        </span>
-
-        <span>
-          <b>F</b> — 10 огненных шаров по одному каждые 0,5 сек.
-        </span>
       </div>
     </div>
   )
