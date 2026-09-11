@@ -3,6 +3,7 @@ import { locations, type LocationAction, type LocationId } from '../model/locati
 import { useWorldStore, type SceneSnapshot } from '../model/worldStore'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import { useDialogueStore } from '@/features/dialogues'
+import { BeachLibrary } from '@/features/beach-library/ui/BeachLibrary'
 import './LocationNavigator.css'
 
 type Props = {
@@ -91,7 +92,10 @@ export function LocationNavigator({
   }, [active, dialogueOpen])
 
   const aspect = size ? size.width / size.height : 16 / 9
-  const width = Math.max(viewport.width, viewport.height * aspect)
+  const width =
+    location.id === 'library'
+      ? Math.min(viewport.width, viewport.height * aspect)
+      : Math.max(viewport.width, viewport.height * aspect)
   const height = width / aspect
   const overflow = width - viewport.width
   const layout = {
@@ -171,6 +175,7 @@ export function LocationNavigator({
         <img className="location-navigator__image" style={layout} src={location.image} alt="" />
         <div className="location-navigator__hotspot-layer">
           <div className="location-navigator__hotspot-canvas is-wide" style={layout}>
+            {location.id === 'library' && active && !dialogueOpen && <BeachLibrary />}
             {location.hotspots.map((hotspot) => (
               <button
                 key={hotspot.id}

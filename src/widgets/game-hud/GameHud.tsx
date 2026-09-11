@@ -17,6 +17,8 @@ import {
 } from '@/features/inventory/model/items'
 import { useRadioStore } from '@/features/beach-radio/model/radioStore'
 import './GameHud.css'
+import { useLibraryPages } from '@/features/beach-library/model/pagesStore'
+import { PAGE_ASSETS } from '@/features/beach-library/model/pageAssets'
 
 const INVENTORY_COLUMNS = 2
 const RADIO_ITEM_ID = 'beach-radio'
