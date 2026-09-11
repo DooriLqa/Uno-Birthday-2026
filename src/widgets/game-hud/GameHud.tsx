@@ -3,6 +3,8 @@ import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import { useRadioStore } from '@/features/beach-radio/model/radioStore'
 import './GameHud.css'
+import { useLibraryPages } from '@/features/beach-library/model/pagesStore'
+import { PAGE_ASSETS } from '@/features/beach-library/model/pageAssets'
 
 const EMPTY_SLOTS = 2
 const RADIO_ITEM_ID = 'beach-radio'
@@ -47,7 +49,7 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
         <div className="game-hud__inventory" aria-label="Инвентарь">
           <span className="game-hud__inventory-label">Инвентарь</span>
           <div className="game-hud__slots">
-            {inventory.slice(0, EMPTY_SLOTS).map((item) => (
+            {inventory.map((item) => (
               <InventorySlot key={item.id} item={item} onOpenRadio={onOpenRadio} />
             ))}
             {Array.from({ length: Math.max(0, EMPTY_SLOTS - inventory.length) }, (_, index) => (
@@ -103,6 +105,29 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
 
 function InventorySlot({ item, onOpenRadio }: { item: InventoryItem; onOpenRadio?: () => void }) {
   const isRadio = item.id === RADIO_ITEM_ID
+  const togglePage = useLibraryPages((state) => state.toggle)
+
+  if (item.id.startsWith('beach-library-')) {
+    return (
+      <button
+        className="game-hud__slot game-hud__slot--button"
+        title={item.name}
+        aria-label={item.name}
+        onClick={() => togglePage(item.id)}
+      >
+        {PAGE_ASSETS[item.id] ? (
+          <img
+            src={PAGE_ASSETS[item.id].src}
+            alt=""
+            style={{ width: 32, height: 36, objectFit: 'contain' }}
+          />
+        ) : (
+          <span>{item.icon}</span>
+        )}
+        {item.id.includes('-page-') && <small>{Number(item.id.split('-').at(-1)) + 1}</small>}
+      </button>
+    )
+  }
 
   if (!isRadio || !onOpenRadio) {
     return (

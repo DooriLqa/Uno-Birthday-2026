@@ -155,15 +155,7 @@ export const locations: Record<LocationId, LocationDefinition> = {
     title: 'Пляжная библиотека',
     image: library,
     ambienceVolume: 0.3,
-    hotspots: [
-      {
-        id: 'books',
-        label: 'Расставить книги по полкам',
-        area: area(20, 16, 60, 69),
-        cursor: 'hand-grab',
-        action: { type: 'game', gameId: 'book-shelf' },
-      },
-    ],
+    hotspots: [],
   },
   lounger: { ...base, id: 'lounger', title: 'Вид с лежака', image: lounger, hotspots: [] },
   'tourist-beach': {
