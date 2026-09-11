@@ -84,8 +84,13 @@
 .game-hud__slots {
   display: flex;
   gap: 6px;
+  max-width: min(65vw, 600px);
+  overflow-x: auto;
+  padding: 2px 2px 5px;
 }
 .game-hud__slot {
+  position: relative;
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   width: 42px;
