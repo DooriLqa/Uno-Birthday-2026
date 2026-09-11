@@ -13,6 +13,7 @@ import pirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
 import jungleOverview from '@/shared/assets/locations/jungle/overview.png'
 import jungleCave from '@/shared/assets/locations/jungle/cave.png'
 import jungleWaterfall from '@/shared/assets/locations/jungle/waterfall.png'
+import nicheStream from '@/shared/assets/locations/jungle/niche-stream.png'
 import locationFootstepsSound from '@/shared/assets/common/audio/location-footsteps.ogg'
 
 export type LocationId =
@@ -30,6 +31,7 @@ export type LocationId =
   | 'jungle'
   | 'jungle-cave'
   | 'jungle-waterfall'
+  | 'niche-stream'
 export type LocationAction =
   | { type: 'location'; locationId: LocationId }
   | { type: 'game'; gameId: string }
@@ -37,6 +39,7 @@ export type LocationAction =
   | { type: 'sailor' }
   | { type: 'map' }
   | { type: 'jungle-cave' }
+  | { type: 'barista' }
 export type LocationCursor =
   | 'pointer'
   | 'magnify'
@@ -67,6 +70,7 @@ export type LocationDefinition = {
   transitionSound?: string
   isWide?: boolean
   ambienceVolume?: number
+  ambience?: 'beach' | 'niche-stream'
   hotspots: LocationHotspot[]
 }
 const area = (left: number, top: number, width: number, height: number) => ({
@@ -79,11 +83,13 @@ const base = {
   regionId: 'tourist-beach',
   transitionSound: locationFootstepsSound,
   ambienceVolume: 1,
+  ambience: 'beach',
 } as const
 const wildBase = {
   regionId: 'wild-beach',
   transitionSound: locationFootstepsSound,
   ambienceVolume: 1,
+  ambience: 'beach',
 } as const
 const jungleBase = {
   regionId: 'jungle',
@@ -209,13 +215,6 @@ export const locations: Record<LocationId, LocationDefinition> = {
     title: 'Игровые автоматы',
     image: arcades,
     hotspots: [
-      {
-        id: 'flight',
-        label: 'Полёт над лагуной',
-        area: area(18, 15, 20, 73),
-        cursor: 'projected-forward',
-        action: { type: 'game', gameId: 'flappy-bird' },
-      },
       {
         id: 'catch',
         label: 'Ловля предметов',
@@ -350,7 +349,39 @@ export const locations: Record<LocationId, LocationDefinition> = {
     id: 'jungle-waterfall',
     title: 'Водопад в джунглях',
     image: jungleWaterfall,
-    hotspots: [],
+    hotspots: [
+      {
+        id: 'niche-stream',
+        label: 'Зайти за стену водопада в кофейню «Нишевый поток»',
+        area: area(69, 6, 29, 69),
+        cursor: 'projected-forward',
+        action: { type: 'location', locationId: 'niche-stream' },
+      },
+    ],
+  },
+  'niche-stream': {
+    ...jungleBase,
+    id: 'niche-stream',
+    title: 'Нишевый поток',
+    image: nicheStream,
+    ambience: 'niche-stream',
+    ambienceVolume: 1,
+    hotspots: [
+      {
+        id: 'coffee-bar',
+        label: 'Поговорить с баристой',
+        area: area(0, 9, 35, 57),
+        cursor: 'dialogue',
+        action: { type: 'barista' },
+      },
+      {
+        id: 'lagoon-flight',
+        label: 'Сыграть в «Полёт над лагуной»',
+        area: area(44, 20, 20, 54),
+        cursor: 'projected-forward',
+        action: { type: 'game', gameId: 'flappy-bird' },
+      },
+    ],
   },
 }
 export const worldRegions = [

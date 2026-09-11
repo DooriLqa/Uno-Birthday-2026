@@ -20,8 +20,11 @@ import {
   openPirateIntroduction,
 } from '@/features/location-navigation/model/wildBeachDialogues'
 import { talkToPierSailor } from '@/features/location-navigation/model/pierDialogues'
+import { talkToNicheStreamBarista } from '@/features/location-navigation/model/nicheStreamDialogues'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import { useDialogueStore } from '@/features/dialogues'
+
+const DEV_TOOLS_ENABLED = import.meta.env.VITE_ENABLE_DEV_TOOLS === 'true'
 
 export function GameFlow() {
   const [activeGameId, setActiveGameId] = useState<string | null>(null)
@@ -30,7 +33,8 @@ export function GameFlow() {
   const { scene, setScene, setHistory } = useWorldStore()
   const activeGame = getGame(activeGameId)
   const ambienceVolume = locations[scene.locationId]?.ambienceVolume ?? 0
-  useBeachAmbience(mapOpen ? 0 : activeGame ? ambienceVolume * 0.15 : ambienceVolume)
+  const ambience = locations[scene.locationId]?.ambience ?? 'beach'
+  useBeachAmbience(mapOpen ? 0 : activeGame ? ambienceVolume * 0.15 : ambienceVolume, ambience)
 
   useEffect(() => {
     if (mapOpen || activeGame || radioOpen) return
@@ -77,6 +81,7 @@ export function GameFlow() {
         onMerchant={() => talkToMerchant(() => openGame('beach-radio'))}
         onSailor={() => talkToPierSailor(() => openGame('find-a-pair'))}
         onEnterJungleCave={() => tryEnterJungleCave(() => openGame('japonsk'))}
+        onBarista={talkToNicheStreamBarista}
       />
       {activeGame && (
         <GamePage
@@ -89,7 +94,7 @@ export function GameFlow() {
         />
       )}
       <RadioModal open={radioOpen} onClose={() => setRadioOpen(false)} />
-      <DevCoinControls />
+      {DEV_TOOLS_ENABLED && <DevCoinControls />}
     </main>
   )
 }

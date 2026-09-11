@@ -1,11 +1,25 @@
 import { ArrowLeft } from 'lucide-react'
 import type { GameDefinition } from '@/entities/game/model/types'
 import { useProgressStore } from '@/features/game-progress/model/store'
+import { useInventoryStore } from '@/features/inventory/model/store'
+import { ARCADE_REWARDS_BY_GAME_ID } from '@/features/inventory/model/items'
 type Props = { game: GameDefinition; onBack: () => void; onOpenRadio?: () => void }
 
 export function GamePage({ game, onBack, onOpenRadio }: Props) {
   const completeGame = useProgressStore((state) => state.completeGame)
+  const addItem = useInventoryStore((state) => state.addItem)
   const GameScreen = game.Screen
+
+  const handleComplete = () => {
+    const isFirstVictory = !useProgressStore.getState().completedGameIds.includes(game.id)
+    completeGame(game.id)
+
+    const reward = ARCADE_REWARDS_BY_GAME_ID[game.id]
+    const rewardAlreadyOwned = reward
+      ? useInventoryStore.getState().items.some((item) => item.id === reward.id)
+      : false
+    if (isFirstVictory && reward && !rewardAlreadyOwned) addItem(reward)
+  }
 
   return (
     <main className={['beach-shell', 'game-overlay', game.pageClassName].filter(Boolean).join(' ')}>
@@ -24,11 +38,7 @@ export function GamePage({ game, onBack, onOpenRadio }: Props) {
           </button>
           <span>{game.emoji}</span>
         </div>
-        <GameScreen
-          onComplete={() => completeGame(game.id)}
-          onOpenRadio={onOpenRadio}
-          onClose={onBack}
-        />
+        <GameScreen onComplete={handleComplete} onOpenRadio={onOpenRadio} onClose={onBack} />
       </div>
     </main>
   )
