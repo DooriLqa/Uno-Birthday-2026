@@ -1,7 +1,9 @@
-import { MessageCircle, Minus, PackagePlus, Plus, Wrench, RotateCcw } from 'lucide-react'
+import { MessageCircle, Minus, PackagePlus, Plus, RotateCcw, Trash2, Wrench } from 'lucide-react'
 import { useState } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { dialogueTestSamples, openDialogue } from '@/features/dialogues'
+import { resetGameState } from '@/features/game-progress/model/resetGameState'
+import { ARCADE_REWARDS_BY_GAME_ID, BOOK_ITEMS } from '@/features/inventory/model/items'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
 import './DevCoinControls.css'
@@ -9,6 +11,8 @@ import './DevCoinControls.css'
 const DEV_ITEMS: InventoryItem[] = [
   { id: 'beach-radio', name: 'Радиоприёмник', icon: '📻' },
   { id: 'oil-lantern', name: 'Масляный фонарь', icon: '🏮' },
+  ...BOOK_ITEMS,
+  ...Object.values(ARCADE_REWARDS_BY_GAME_ID),
 ]
 
 export function DevCoinControls() {
@@ -20,6 +24,13 @@ export function DevCoinControls() {
   const removeItem = useInventoryStore((state) => state.removeItem)
   const [open, setOpen] = useState(false)
   const [inventoryOpen, setInventoryOpen] = useState(false)
+
+  const handleGameReset = () => {
+    const confirmed = window.confirm(
+      'Полностью сбросить прогресс, инвентарь, монеты, диалоги и состояния мини-игр?',
+    )
+    if (confirmed) resetGameState()
+  }
 
   return (
     <div className="dev-coin-controls">
@@ -97,6 +108,15 @@ export function DevCoinControls() {
             title="Сбросить веса всех вопросов квиза"
           >
             <RotateCcw size={15} /> Стереть память квиза
+          </button>
+
+          <button
+            type="button"
+            className="dev-coin-controls__game-reset"
+            onClick={handleGameReset}
+            title="Вернуть игру в начальное состояние"
+          >
+            <Trash2 size={15} /> Сбросить состояние игры
           </button>
         </div>
       )}

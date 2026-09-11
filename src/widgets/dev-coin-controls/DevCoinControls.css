@@ -6,6 +6,8 @@
   display: grid;
   justify-items: end;
   gap: 8px;
+  max-height: calc(100dvh - 28px);
+  pointer-events: none;
 }
 .dev-coin-controls__toggle {
   display: grid;
@@ -18,21 +20,30 @@
   color: #70421d;
   box-shadow: 0 5px 12px rgba(23, 91, 117, 0.2);
   cursor: pointer;
+  pointer-events: auto;
 }
 .dev-coin-controls__panel {
   display: grid;
   gap: 9px;
-  max-width: min(360px, calc(100vw - 28px));
+  width: min(360px, calc(100vw - 28px));
+  max-height: calc(100dvh - 78px);
   padding: 11px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border: 2px solid rgba(112, 66, 29, 0.3);
   border-radius: 14px;
   background: rgba(255, 250, 228, 0.97);
   color: #70421d;
   box-shadow: 0 10px 25px rgba(23, 91, 117, 0.2);
   font-size: 0.78rem;
+  pointer-events: auto;
+  scrollbar-color: #c99849 rgba(112, 66, 29, 0.08);
+  scrollbar-width: thin;
 }
 .dev-coin-controls__coin-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 5px;
 }
 .dev-coin-controls__panel button {
@@ -48,6 +59,7 @@
   font-size: 0.75rem;
   font-weight: 900;
   cursor: pointer;
+  min-width: 0;
 }
 .dev-coin-controls__inventory-toggle {
   width: 100%;
@@ -88,4 +100,26 @@
 }
 .dev-coin-controls__quiz-reset {
   width: 100%;
+}
+.dev-coin-controls__panel .dev-coin-controls__game-reset {
+  width: 100%;
+  border-color: #c9735d;
+  background: #fff0e9;
+  color: #9a3828;
+}
+.dev-coin-controls__panel .dev-coin-controls__game-reset:hover {
+  background: #ffe0d4;
+}
+
+@media (max-width: 420px) {
+  .dev-coin-controls {
+    right: 8px;
+    bottom: 8px;
+    max-height: calc(100dvh - 16px);
+  }
+
+  .dev-coin-controls__panel {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 66px);
+  }
 }
