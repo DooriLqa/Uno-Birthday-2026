@@ -9,7 +9,7 @@ import {
 import { useProgressStore } from '@/features/game-progress/model/store'
 import totemCorgi from '@/shared/assets/games/totem-code/totem-corgi-three-slot-v4.png'
 import totemDachshund from '@/shared/assets/games/totem-code/totem-dachshund-three-slot-v4.png'
-import totemHusky from '@/shared/assets/games/totem-code/totem-husky-three-slot-v4.png'
+import totemHusky from '@/shared/assets/games/totem-code/totem-husky-three-slot-v3.png'
 import totemTerrier from '@/shared/assets/games/totem-code/totem-terrier-three-slot-v4.png'
 import totemCampfire from '@/shared/assets/games/totem-code/totem-campfire.png'
 import totemCampfireExtinguished from '@/shared/assets/games/totem-code/totem-campfire-extinguished-v2.png'

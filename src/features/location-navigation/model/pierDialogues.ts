@@ -13,7 +13,7 @@ export function talkToPierSailor(onOpenFindAPair: () => void) {
         id: 'memory-offer',
         speaker: oldSailor,
         emotion: 'happy',
-        text: 'Эй, юнга! Хочешь потренировать вместе со мной память? Найдёшь все пары — получишь от меня монетку.',
+        text: 'Эй, юнга! Самое главное в старости - держать память в тонусе. И молодых я этому тоже учу. Успеешь найти все пары - премирую тебя монеткой',
       },
       {
         id: 'memory-choice',
@@ -28,7 +28,7 @@ export function talkToPierSailor(onOpenFindAPair: () => void) {
           },
           {
             id: 'play',
-            label: 'давай сыграем',
+            label: 'Давай сыграем',
             onSelect: onOpenFindAPair,
           },
         ],
