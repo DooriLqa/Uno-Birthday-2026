@@ -20,5 +20,5 @@ export const PAGE_ASSETS: Record<string, { src?: string; title: string; descript
     title: 'Лист с текстом',
     description: 'Лист с текстом для наложения найденных страниц.',
   },
-  [NOTE_PAGE]: { title: 'Записка библиотекаря', description: INSTRUCTION },
+  [NOTE_PAGE]: { title: 'Записка от незнакомца', description: INSTRUCTION },
 }

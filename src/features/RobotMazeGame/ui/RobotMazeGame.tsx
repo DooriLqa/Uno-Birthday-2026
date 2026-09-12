@@ -1,4 +1,5 @@
 import treasureOpen from '@/shared/assets/games/robot-maze/treasure-open.png'
+import coinIcon from '@/shared/assets/common/branding/coin.png'
 import treasurePile from '@/shared/assets/games/robot-maze/treasure-pile.png'
 import victorySound from '@/shared/assets/common/audio/the-sound-of-victory-winning.mp3'
 import { audioController } from '@/shared/lib/audio/audioController'
@@ -845,7 +846,8 @@ export function RobotMazeGame({ onComplete }: Props) {
           <div className="RobotMaze__summary-text">Вы собрали все монеты</div>
 
           <div className="RobotMaze__summary-coins">
-            {collectedCoins} / {totalCoins} 🪙
+            {collectedCoins} / {totalCoins}
+            <img className="RobotMaze__summary-coin-icon" src={coinIcon} alt="монет" />
           </div>
         </div>
       </div>
@@ -861,7 +863,8 @@ export function RobotMazeGame({ onComplete }: Props) {
           <div className="RobotMaze__summary-text">Вы прошли все уровни</div>
 
           <div className="RobotMaze__summary-coins">
-            Собрано: {collectedCoins} / {totalCoins} 🪙
+            Собрано: {collectedCoins} / {totalCoins}
+            <img className="RobotMaze__summary-coin-icon" src={coinIcon} alt="монет" />
           </div>
 
           {collectedCoins < totalCoins ? (
