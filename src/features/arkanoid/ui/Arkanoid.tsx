@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import { ARKANOID_LAYOUT } from '../model/layout'
 import { ArcadeDisplay } from '@/shared/ui/ArcadeDisplay'
 import { useArcadeCoin } from '@/shared/lib/arcade/useArcadeCoin'
+import { audioController } from '@/shared/lib/audio/audioController'
 import arkanoidSound1 from '@/shared/assets/games/arkanoid/Arkanoid_1.wav'
 import arkanoidSound2 from '@/shared/assets/games/arkanoid/Arkanoid_2.wav'
 import arkanoidSound3 from '@/shared/assets/games/arkanoid/Arkanoid_3.wav'
@@ -30,6 +31,17 @@ import powerUpFallFireImage from '@/shared/assets/games/arkanoid/fallpowerup-fir
 import fireBallImage from '@/shared/assets/games/arkanoid/fire-ball.png'
 
 import './Arkanoid.css'
+
+const ARKANOID_SOUNDS = {
+  launch: arkanoidSound1,
+  hit: arkanoidSound2,
+  destroy: arkanoidSound3,
+  powerUp: arkanoidSound4,
+  levelComplete: arkanoidSound5,
+  gameOver: arkanoidSound6,
+  lifeLost: arkanoidSound7,
+  platformBounce: arkanoidSound8,
+} as const
 
 type Props = {
   onComplete: () => void
@@ -535,17 +547,6 @@ export function Arkanoid({ onComplete }: Props) {
 
   const animationRef = useRef<number | null>(null)
 
-  const audioRef = useRef({
-    launch: null as HTMLAudioElement | null,
-    hit: null as HTMLAudioElement | null,
-    destroy: null as HTMLAudioElement | null,
-    powerUp: null as HTMLAudioElement | null,
-    levelComplete: null as HTMLAudioElement | null,
-    gameOver: null as HTMLAudioElement | null,
-    lifeLost: null as HTMLAudioElement | null,
-    platformBounce: null as HTMLAudioElement | null,
-  })
-
   const imageCacheRef = useRef<Record<string, HTMLImageElement>>({})
 
   const keysRef = useRef({
@@ -573,26 +574,9 @@ export function Arkanoid({ onComplete }: Props) {
   const [, setActivePowerUps] = useState<PowerUpType[]>([])
 
   useEffect(() => {
-    audioRef.current.launch = new Audio(arkanoidSound1)
-    audioRef.current.hit = new Audio(arkanoidSound2)
-    audioRef.current.destroy = new Audio(arkanoidSound3)
-    audioRef.current.powerUp = new Audio(arkanoidSound4)
-    audioRef.current.levelComplete = new Audio(arkanoidSound5)
-    audioRef.current.gameOver = new Audio(arkanoidSound6)
-    audioRef.current.lifeLost = new Audio(arkanoidSound7)
-    audioRef.current.platformBounce = new Audio(arkanoidSound8)
-
-    for (const audio of Object.values(audioRef.current)) {
-      if (audio) {
-        audio.preload = 'auto'
-      }
-    }
-
-    const audioElements = Object.values(audioRef.current)
-
     return () => {
-      for (const audio of audioElements) {
-        audio?.pause()
+      for (const key of Object.keys(ARKANOID_SOUNDS)) {
+        audioController.stop(`arkanoid-${key}`)
       }
     }
   }, [])
@@ -621,15 +605,8 @@ export function Arkanoid({ onComplete }: Props) {
     }
   }, [])
 
-  const playSound = useCallback((key: keyof typeof audioRef.current) => {
-    const audio = audioRef.current[key]
-
-    if (!audio) {
-      return
-    }
-
-    audio.currentTime = 0
-    void audio.play().catch(() => undefined)
+  const playSound = useCallback((key: keyof typeof ARKANOID_SOUNDS) => {
+    audioController.playOneShot(ARKANOID_SOUNDS[key], { key: `arkanoid-${key}` })
   }, [])
 
   const getPowerUpImage = useCallback((type: PowerUpType): string => {

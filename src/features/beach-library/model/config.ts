@@ -66,7 +66,7 @@ export const BOOK_TITLES = [
   [
     'Тайна 3й колонки с планеты ЖОПА',
     '10 тиранидяд',
-    '6-и ликий убийца',
+    '6-и ликий киборг-убийца',
     'Андроид 007: лицензия на расследование',
     'Убийство в 4-м измерении',
   ],
@@ -108,10 +108,11 @@ export const BOOKS = BOOK_TITLES.flatMap((titles, row) =>
     title,
     // Fixed scatter and colours do not reveal either classification.
     // Keep the right window clear, including rotated and hovered book edges.
+    // Keep a compact overlapping pile between the shelves and the bottom exit.
     x: 12 + ((((row * 5 + index) * 17) % 45) % 15) * 3.8 + Math.sin(row * 13 + index * 5) * 0.5,
     y:
       62 +
-      Math.floor((((row * 5 + index) * 17) % 45) / 15) * 8 +
+      Math.floor((((row * 5 + index) * 17) % 45) / 15) * 0.75 +
       Math.cos(row * 7 + index * 9) * 0.8,
     angle: ((row * 29 + index * 17) % 55) - 27,
     color: ['#32766c', '#a95037', '#345c85', '#ad8638', '#714e77'][(row * 3 + index) % 5],
