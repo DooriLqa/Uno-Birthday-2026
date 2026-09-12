@@ -253,3 +253,8 @@
   0%, 100% { transform: scale(1.05) rotate(0deg); }
   50% { transform: scale(1.18) rotate(-8deg); }
 }
+
+.fruit-basket-game__start-screen button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

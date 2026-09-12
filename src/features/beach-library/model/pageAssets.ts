@@ -10,8 +10,8 @@ export const PAGE_ASSETS: Record<string, { src?: string; title: string; descript
       pageId(index),
       {
         src,
-        title: `Страница ${index + 1}`,
-        description: `Страница из книги ${index + 1}. Наложи её на лист с текстом.`,
+        title: 'Страница из книги',
+        description: 'Наложи эту страницу на лист с текстом.',
       },
     ]),
   ),

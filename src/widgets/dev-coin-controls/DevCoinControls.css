@@ -9,6 +9,10 @@
   max-height: calc(100dvh - 28px);
   pointer-events: none;
 }
+.dev-coin {
+  width: 30px;
+  height: 30px;
+}
 .dev-coin-controls__toggle {
   display: grid;
   place-items: center;

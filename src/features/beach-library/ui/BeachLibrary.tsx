@@ -4,6 +4,7 @@ import { useLibraryStore } from '../model/store'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import { FLOOR_BOOK_ASSETS } from '../model/bookAssets'
 import { PAGE_ASSETS } from '../model/pageAssets'
+import { finishLibrarianCleanup, talkToLibrarian } from '../model/librarianDialogue'
 import './BeachLibrary.css'
 
 export function BeachLibrary() {
@@ -12,12 +13,17 @@ export function BeachLibrary() {
   const [pointer, setPointer] = useState({ x: 50, y: 70 })
   const [category, setCategory] = useState<{ name: string; description: string } | null>(null)
   const [status, setStatus] = useState(
-    'Сверху — жанр, слева — направление. Поставь книгу на их пересечение.',
+    'Сверху — жанр, слева — сеттинг. Поставь книгу на их пересечение.',
   )
   const [flight, setFlight] = useState<{ x: number; y: number; page: string } | null>(null)
   const canvas = useRef<HTMLDivElement>(null)
   useEffect(() => {
     enter()
+    const library = useLibraryStore.getState()
+    if (!library.librarianIntroduced) {
+      library.introduceLibrarian()
+      talkToLibrarian()
+    }
   }, [enter])
   useEffect(() => {
     // Picking a floor book removes its focused button. Listen on window so Escape
@@ -42,6 +48,7 @@ export function BeachLibrary() {
   }
   const drop = (slot: number) => {
     if (held === null) return
+    const wasFinished = useLibraryStore.getState().finished
     const rewards = place(held, slot)
     if (!rewards) {
       setStatus('Не удалось поставить книгу. Выбери место на полке.')
@@ -53,20 +60,21 @@ export function BeachLibrary() {
       rewards.length
         ? `Найдены страницы! Добавлено в инвентарь: ${rewards.length}.`
         : correct
-          ? 'Верно! Жанр и направление совпадают.'
-          : 'Жанр или направление не совпадает. Книгу можно переставить.',
+          ? 'Верно! Жанр и сеттинг совпадают.'
+          : 'Жанр или сеттинг не совпадает. Книгу можно переставить.',
     )
     if (rewards.length) {
       const row = ROWS[Math.floor(slot / 5)]
       setFlight({ x: row.x + ((slot % 5) * row.width) / 5, y: row.y, page: rewards[0] })
     }
     setHeld(null)
+    if (!wasFinished && useLibraryStore.getState().finished) finishLibrarianCleanup()
   }
   return (
     <div
       ref={canvas}
       className="beach-library"
-      aria-label="Расстановка книг по жанрам и направлениям"
+      aria-label="Расстановка книг по жанрам и сеттингам"
       onPointerMove={(event) => {
         if (held === null) return
         const bounds = event.currentTarget.getBoundingClientRect()
@@ -95,7 +103,7 @@ export function BeachLibrary() {
           key={direction.name}
           className="beach-library__axis beach-library__axis--row"
           style={{ top: `${ROWS[index].y + ROWS[index].height / 2}%` }}
-          aria-label={`Направление: ${direction.name}`}
+          aria-label={`Сеттинг: ${direction.name}`}
           onClick={() => setCategory(direction)}
         >
           <span>

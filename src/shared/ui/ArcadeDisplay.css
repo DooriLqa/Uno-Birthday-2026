@@ -1,0 +1,60 @@
+.arcade-crt-definitions {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* One composited screen keeps the scene, objects, messages and HUD under the same CRT. */
+.arcade-display {
+  position: absolute;
+  display: block;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.arcade-display.has-crt {
+  filter: var(--arcade-crt-filter) contrast(1.04) saturate(1.06);
+}
+
+.arcade-display.has-crt::before,
+.arcade-display.has-crt::after {
+  position: absolute;
+  z-index: 20;
+  display: block;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+}
+
+.arcade-display.has-crt::before {
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 2px,
+      rgb(4 14 24 / 0.09) 2px,
+      rgb(4 14 24 / 0.09) 3px
+    ),
+    repeating-linear-gradient(
+      to right,
+      rgb(255 64 64 / 0.035) 0,
+      rgb(255 64 64 / 0.035) 1px,
+      rgb(64 255 140 / 0.035) 1px,
+      rgb(64 255 140 / 0.035) 2px,
+      rgb(64 120 255 / 0.035) 2px,
+      rgb(64 120 255 / 0.035) 3px
+    );
+  background-size:
+    100% 3px,
+    3px 100%;
+  mix-blend-mode: multiply;
+}
+
+.arcade-display.has-crt::after {
+  background:
+    linear-gradient(115deg, rgb(255 255 255 / 0.045), transparent 18% 82%),
+    radial-gradient(ellipse at center, transparent 52%, rgb(1 8 15 / 0.4) 100%);
+  box-shadow: inset 0 0 16px rgb(3 8 15 / 0.28);
+}

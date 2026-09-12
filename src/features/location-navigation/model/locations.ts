@@ -6,9 +6,9 @@ import lounger from '@/shared/assets/locations/tourist/lounger.png'
 import beach from '@/shared/assets/locations/tourist/beach.png'
 import shop from '@/shared/assets/locations/tourist/shop.png'
 import arcades from '@/shared/assets/locations/tourist/arcades.png'
-import wildBeach from '@/shared/assets/locations/wild/overview.png'
+import wildBeach from '@/shared/assets/locations/wild/overview-v3.png'
 import fisherHut from '@/shared/assets/locations/wild/fisher-hut.png'
-import totemCamp from '@/shared/assets/locations/wild/totem-camp.png'
+import totemCamp from '@/shared/assets/locations/wild/totem-cape-closeup-extinguished-v3.png'
 import pirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
 import jungleOverview from '@/shared/assets/locations/jungle/overview.png'
 import jungleCave from '@/shared/assets/locations/jungle/cave.png'
@@ -37,6 +37,7 @@ export type LocationAction =
   | { type: 'game'; gameId: string }
   | { type: 'merchant' }
   | { type: 'sailor' }
+  | { type: 'librarian' }
   | { type: 'map' }
   | { type: 'jungle-cave' }
   | { type: 'barista' }
@@ -161,7 +162,15 @@ export const locations: Record<LocationId, LocationDefinition> = {
     title: 'Пляжная библиотека',
     image: library,
     ambienceVolume: 0.3,
-    hotspots: [],
+    hotspots: [
+      {
+        id: 'librarian',
+        label: 'Поговорить с библиотекаршей',
+        area: area(80, 26, 19, 70),
+        cursor: 'dialogue',
+        action: { type: 'librarian' },
+      },
+    ],
   },
   lounger: { ...base, id: 'lounger', title: 'Вид с лежака', image: lounger, hotspots: [] },
   'tourist-beach': {
@@ -214,13 +223,6 @@ export const locations: Record<LocationId, LocationDefinition> = {
         cursor: 'projected-forward',
         action: { type: 'game', gameId: 'fruit-basket' },
       },
-      {
-        id: 'arkanoid',
-        label: 'Арканоид',
-        area: area(60, 15, 21, 73),
-        cursor: 'projected-forward',
-        action: { type: 'game', gameId: 'arkanoid' },
-      },
     ],
   },
   'wild-beach': {
@@ -239,8 +241,8 @@ export const locations: Record<LocationId, LocationDefinition> = {
       },
       {
         id: 'totem-camp',
-        label: 'Кострище с тотемами',
-        area: area(31, 19, 38, 52),
+        label: 'Мыс с тотемами',
+        area: area(40, 13, 20, 46),
         cursor: 'magnify',
         action: { type: 'location', locationId: 'totem-camp' },
       },
@@ -295,6 +297,13 @@ export const locations: Record<LocationId, LocationDefinition> = {
         area: area(3, 43, 85, 52),
         cursor: 'hand-grab',
         action: { type: 'game', gameId: 'robot-maze' },
+      },
+      {
+        id: 'arkanoid',
+        label: 'Сыграть в «Арканоид»',
+        area: area(77, 30.5, 11, 30),
+        cursor: 'projected-forward',
+        action: { type: 'game', gameId: 'arkanoid' },
       },
     ],
   },

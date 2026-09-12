@@ -18,13 +18,14 @@ import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
 import type { QuizQuestion } from '@/features/beach-radio/model/types'
 import { VolumeKnob } from './VolumeKnob/VolumeKnob'
 import radio from '@/shared/assets/games/beach-radio/radio.png'
+import coin from '@/shared/assets/common/branding/coin.png'
 import './BeachRadioGame.css'
 
-type Props = { onComplete: () => void; onOpenRadio?: () => void }
+type Props = { onComplete: () => void; onOpenRadio?: () => void; onClose?: () => void }
 type DialogStep = 'seller' | 'quiz' | 'win'
 const RADIO_ITEM_ID = 'beach-radio'
 
-export function BeachRadioGame({ onComplete, onOpenRadio }: Props) {
+export function BeachRadioGame({ onComplete, onOpenRadio, onClose }: Props) {
   // const pawCoins = usePawCoinStore((state) => state.pawCoins)
   const spendPawCoins = usePawCoinStore((state) => state.spendPawCoins)
   const inventory = useInventoryStore((state) => state.items)
@@ -95,37 +96,27 @@ export function BeachRadioGame({ onComplete, onOpenRadio }: Props) {
 
   return (
     <div className="beach-radio-game">
-      <div className="beach-radio-game__scene" aria-label="Пляжный ларёк с собакой-продавцом">
-        <div className="beach-radio-game__kiosk" aria-label="Пляжный ларёк Бони">
-          <div className="beach-radio-game__awning">БОНЯ • ПЛЯЖНЫЙ ЛАРЁК</div>
-          <div className="beach-radio-game__shelf beach-radio-game__shelf--top">
-            {!hasRadio && <div className="kiosk-product kiosk-product--radio">📻</div>}
-            <div className="kiosk-product">🍹</div>
-            <div className="kiosk-product">🥥</div>
-            <div className="kiosk-product">🍸</div>
-            <div className="kiosk-product">🍍</div>
-          </div>
-          <div className="beach-radio-game__menu">
-            <span>МЕНЮ</span>
-            <strong>Кокосовый бриз</strong>
-            <strong>Манго-сёрф</strong>
-            <strong>Ананасовый закат</strong>
-          </div>
-          <DogSeller />
-          <div className="beach-radio-game__counter" />
-        </div>
-      </div>
-
       <section
         className={`beach-radio-dialog ${dialogStep === 'quiz' ? 'beach-radio-dialog--quiz' : ''}`}
         aria-live="polite"
       >
         {dialogStep === 'seller' && (
+          <button
+            type="button"
+            className="beach-radio-quiz-close"
+            onClick={onClose}
+            aria-label="Закрыть радио и вернуться в локацию"
+          >
+            <X size={21} aria-hidden="true" />
+          </button>
+        )}
+
+        {dialogStep === 'seller' && (
           <>
-            <div className="beach-radio-dialog__name">Боня, продавец</div>
+            <div className="beach-radio-dialog__name">Пончик, продавец</div>
             <p>
               {hasRadio
-                ? 'Радио уже твоё. Но я всегда готов ещё поиграть, если хочешь! Попытка стоит всего 1 🐾.'
+                ? 'Радио уже твоё. Но я всегда готов ещё поиграть, если хочешь! Попытка стоит всего 1 монетку.'
                 : 'Привет! Хочешь забрать этот старенький радиоприёмник? Просто так не отдам — сыграем в квиз.'}
             </p>
             <div className="beach-radio-dialog__actions">
@@ -134,7 +125,7 @@ export function BeachRadioGame({ onComplete, onOpenRadio }: Props) {
                 className="radio-action radio-action--primary"
                 onClick={startQuiz}
               >
-                <Coins size={18} /> Играть за 1 🐾
+                <Coins size={18} /> Играть за 1 <img className="coin" src={coin} alt="" />
               </button>
               {hasRadio && (
                 <button type="button" className="radio-action" onClick={openRadio}>
@@ -161,12 +152,27 @@ export function BeachRadioGame({ onComplete, onOpenRadio }: Props) {
         )}
 
         {dialogStep === 'quiz' && quizQuestion && (
-          <QuizPanel key={quizQuestion.id} question={quizQuestion} onAnswer={answer} />
+          <>
+            <button
+              type="button"
+              className="beach-radio-quiz-close"
+              onClick={onClose}
+              aria-label="Закрыть квиз и вернуться в локацию"
+            >
+              <X size={21} aria-hidden="true" />
+            </button>
+            <QuizPanel
+              key={quizQuestion.id}
+              question={quizQuestion}
+              correctAnswers={correctAnswers}
+              onAnswer={answer}
+            />
+          </>
         )}
 
         {dialogStep === 'win' && (
           <>
-            <div className="beach-radio-dialog__name">Боня, продавец</div>
+            <div className="beach-radio-dialog__name">Пончик, продавец</div>
             <p>
               {hasRadio
                 ? 'Хорош! Сыграем ещё раз когда-нибудь? А радио можешь слушать сколько захочешь.'
@@ -195,32 +201,13 @@ export function BeachRadioGame({ onComplete, onOpenRadio }: Props) {
   )
 }
 
-function DogSeller() {
-  return (
-    <div className="dog-seller" aria-hidden>
-      <div className="dog-seller__shadow" />
-      <div className="dog-seller__body">
-        <div className="dog-seller__apron">BONYA</div>
-      </div>
-      <div className="dog-seller__head">
-        <span className="dog-seller__ear dog-seller__ear--left" />
-        <span className="dog-seller__ear dog-seller__ear--right" />
-        <span className="dog-seller__eye dog-seller__eye--left" />
-        <span className="dog-seller__eye dog-seller__eye--right" />
-        <span className="dog-seller__muzzle" />
-        <span className="dog-seller__nose" />
-        <span className="dog-seller__mouth" />
-        <span className="dog-seller__hat">☀</span>
-      </div>
-    </div>
-  )
-}
-
 function QuizPanel({
   question,
+  correctAnswers,
   onAnswer,
 }: {
   question: QuizQuestion
+  correctAnswers: number
   onAnswer: (index: number) => void
 }) {
   const audioRef = useRef<Sound | null>(null)
@@ -305,9 +292,31 @@ function QuizPanel({
 
   return (
     <div className="quiz-panel">
+      <header className="quiz-panel__header">
+        <div className="quiz-panel__title">
+          <span className="quiz-panel__wheel" aria-hidden="true">
+            ☸
+          </span>
+          <div>
+            <small>Радиорубка Пончика</small>
+            <strong>Пляжный квиз</strong>
+          </div>
+        </div>
+        <div className="quiz-panel__progress" aria-label={`Верных ответов: ${correctAnswers} из 5`}>
+          <small>Верных ответов: {correctAnswers} / 5</small>
+          <div aria-hidden="true">
+            {Array.from({ length: 5 }, (_, index) => (
+              <span key={index} className={index < correctAnswers ? 'is-earned' : ''}>
+                🐾
+              </span>
+            ))}
+          </div>
+        </div>
+      </header>
+
       {(question.text || question.audioSrc) && (
         <div className="quiz-panel__question">
-          <span>Вопрос</span>
+          <span>Вопрос {correctAnswers + 1} из 5</span>
           {question.text && <h2>{question.text}</h2>}
 
           {question.audioSrc && (
