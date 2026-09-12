@@ -16,11 +16,19 @@
   font-size: 0.75rem;
   font-weight: 800;
   backdrop-filter: blur(7px);
+    --cursor-image: url('@/shared/assets/common/cursors/hand-open.png') 20 10, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .audio-settings input {
   width: clamp(65px, 10vw, 120px);
   min-width: 0;
   accent-color: #70421d;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-open.png') 20 10, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
+}
+
+.audio-settings input:active {
+  --cursor-image: url('@/shared/assets/common/cursors/hand-grab.png') 20 10, grabbing;
 }
 .audio-settings output {
   min-width: 4ch;

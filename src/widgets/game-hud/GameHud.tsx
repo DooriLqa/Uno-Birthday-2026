@@ -14,8 +14,6 @@ import {
 } from '@/features/inventory/model/items'
 import { useRadioStore } from '@/features/beach-radio/model/radioStore'
 import './GameHud.css'
-import { useLibraryPages } from '@/features/beach-library/model/pagesStore'
-import { PAGE_ASSETS } from '@/features/beach-library/model/pageAssets'
 import coin from '@/shared/assets/common/branding/coin.png'
 
 const INVENTORY_COLUMNS = 2
