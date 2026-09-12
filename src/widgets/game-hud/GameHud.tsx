@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
+  Clapperboard,
   Map as MapIcon,
   Radio as RadioIcon,
   Volume2,
@@ -24,9 +25,19 @@ type Props = {
   onOpenRadio?: () => void
   onOpenMap?: () => void
   mapOpen?: boolean
+  showCreditsButton?: boolean
+  creditsOpen?: boolean
+  onToggleCredits?: () => void
 }
 
-export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
+export function GameHud({
+  onOpenRadio,
+  onOpenMap,
+  mapOpen = false,
+  showCreditsButton = false,
+  creditsOpen = false,
+  onToggleCredits,
+}: Props) {
   const pawCoins = usePawCoinStore((state) => state.pawCoins)
   const inventory = useInventoryStore((state) => state.items)
   const previewItemId = useInventoryStore((state) => state.previewItemId)
@@ -124,6 +135,20 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
         )}
       </div>
       {previewItem && <InventoryPreview item={previewItem} onClose={closeItemPreview} />}
+      {showCreditsButton && onToggleCredits &&
+        createPortal(
+          <button
+            type="button"
+            className={`game-hud__credits-button ${creditsOpen ? 'is-active' : ''}`}
+            onClick={onToggleCredits}
+            aria-pressed={creditsOpen}
+            aria-label={creditsOpen ? 'Закрыть титры' : 'Показать титры'}
+            title={creditsOpen ? 'Закрыть титры' : 'Показать титры'}
+          >
+            <Clapperboard size={20} />
+          </button>,
+          document.body,
+        )}
     </div>
   )
 }

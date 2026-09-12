@@ -28,9 +28,9 @@
 .totem-code-game__campfire {
   position: absolute;
   z-index: 1;
-  bottom: 7%;
+  bottom: 9%;
   left: 50%;
-  width: clamp(190px, 23vw, 320px);
+  width: clamp(210px, 33vw, 420px);
   height: auto;
   translate: -50% 0;
   user-select: none;
@@ -47,7 +47,7 @@
 }
 
 .totem-code-game__totem--1 {
-  bottom: 4%;
+  bottom: 13%;
   left: 7%;
 }
 
@@ -63,7 +63,7 @@
 
 .totem-code-game__totem--4 {
   right: 7%;
-  bottom: 4%;
+  bottom: 13%;
 }
 
 .totem-code-game__body {
