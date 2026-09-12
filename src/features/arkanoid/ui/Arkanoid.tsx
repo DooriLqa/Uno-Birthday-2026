@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
-import { ARKANOID_LAYOUT } from '../model/layout'
+/* import type { CSSProperties } from 'react'
+import { ARKANOID_LAYOUT } from '../model/layout' */
 import arkanoidSound1 from '@/shared/assets/games/arkanoid/Arkanoid_1.wav'
 import arkanoidSound2 from '@/shared/assets/games/arkanoid/Arkanoid_2.wav'
 import arkanoidSound3 from '@/shared/assets/games/arkanoid/Arkanoid_3.wav'
@@ -22,6 +22,10 @@ import ballImage from '@/shared/assets/games/arkanoid/ball.png'
 import powerUpWideImage from '@/shared/assets/games/arkanoid/powerup-wide.png'
 import powerUpTripleImage from '@/shared/assets/games/arkanoid/powerup-triple.png'
 import powerUpFireImage from '@/shared/assets/games/arkanoid/powerup-fire.png'
+import powerUpFallWideImage from '@/shared/assets/games/arkanoid/fallpowerup-wide.png'
+import powerUpFallTripleImage from '@/shared/assets/games/arkanoid/fallpowerup-triple.png'
+import powerUpFallFireImage from '@/shared/assets/games/arkanoid/fallpowerup-fire.png'
+import fireBallImage from '@/shared/assets/games/arkanoid/fire-ball.png'
 
 import './Arkanoid.css'
 
@@ -148,7 +152,7 @@ const LEVEL_LAYOUTS: number[][][] = [
     [0, 0, 1, 1, 1, 1, 1, 0, 0],
     [0, 1, 1, 1, 1, 1, 1, 1, 0],
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 2, 8, 3, 1, 1, 1, 1],
   ],
 
   // Уровень 2
@@ -290,7 +294,12 @@ function createBricks(level: number): Brick[] {
         maxHp: stats.hp,
 
         powerUp:
-          stats.type !== 'indestructible' && stats.type !== 'barrel' ? randomPowerUp() : undefined,
+          stats.type !== 'indestructible' &&
+          stats.type !== 'barrel' &&
+          stats.type !== 'hard' &&
+          stats.type !== 'strong'
+            ? randomPowerUp()
+            : undefined,
         destroyTimer: 0,
       })
     }
@@ -505,6 +514,17 @@ export function Arkanoid({ onComplete }: Props) {
     }
   }, [])
 
+  const getPowerUpFallImage = useCallback((type: PowerUpType): string => {
+    switch (type) {
+      case 'wide':
+        return powerUpFallWideImage
+      case 'triple':
+        return powerUpFallTripleImage
+      case 'fire':
+        return powerUpFallFireImage
+    }
+  }, [])
+
   const drawImage = useCallback(
     (
       ctx: CanvasRenderingContext2D,
@@ -537,14 +557,14 @@ export function Arkanoid({ onComplete }: Props) {
     (ctx: CanvasRenderingContext2D, powerUp: FallingPowerUp) => {
       drawImage(
         ctx,
-        getPowerUpImage(powerUp.type),
+        getPowerUpFallImage(powerUp.type),
         powerUp.x,
         powerUp.y,
         powerUp.width,
         powerUp.height,
       )
     },
-    [drawImage, getPowerUpImage],
+    [drawImage, getPowerUpFallImage],
   )
 
   const drawSpriteFrame = useCallback(
@@ -787,7 +807,7 @@ export function Arkanoid({ onComplete }: Props) {
       for (const ball of game.balls) {
         drawImage(
           ctx,
-          ballImage,
+          ball.fire ? fireBallImage : ballImage,
           ball.x - ball.radius,
           ball.y - ball.radius,
           ball.radius * 2,
@@ -1013,6 +1033,13 @@ export function Arkanoid({ onComplete }: Props) {
         center.hp = 0
         center.destroyTimer = BRICK_DESTRUCTION_DURATION
 
+        const explosionPadding = 8
+
+        const explosionLeft = center.x - center.width - explosionPadding
+        const explosionRight = center.x + center.width * 2 + explosionPadding
+        const explosionTop = center.y - center.height - explosionPadding
+        const explosionBottom = center.y + center.height * 2 + explosionPadding
+
         for (const target of game.bricks) {
           if (
             target === center ||
@@ -1023,18 +1050,16 @@ export function Arkanoid({ onComplete }: Props) {
             continue
           }
 
-          const centerX = center.x + center.width / 2
-          const centerY = center.y + center.height / 2
-          const targetX = target.x + target.width / 2
-          const targetY = target.y + target.height / 2
+          const targetRight = target.x + target.width
+          const targetBottom = target.y + target.height
 
-          const columnDistance = Math.abs(targetX - centerX)
-          const rowDistance = Math.abs(targetY - centerY)
+          const overlapsExplosion =
+            target.x < explosionRight &&
+            targetRight > explosionLeft &&
+            target.y < explosionBottom &&
+            targetBottom > explosionTop
 
-          const horizontalRange = (center.width + target.width) / 2 + 6
-          const verticalRange = (center.height + target.height) / 2 + 6
-
-          if (columnDistance <= horizontalRange && rowDistance <= verticalRange) {
+          if (overlapsExplosion) {
             destroyBrick(target)
           }
         }
@@ -1567,17 +1592,7 @@ export function Arkanoid({ onComplete }: Props) {
   }, [draw, update])
 
   return (
-    <div
-      className="arkanoid"
-      style={
-        {
-          '--arkanoid-width': ARKANOID_LAYOUT.width,
-          '--arkanoid-height': ARKANOID_LAYOUT.height,
-          '--arkanoid-x': ARKANOID_LAYOUT.x,
-          '--arkanoid-y': ARKANOID_LAYOUT.y,
-        } as CSSProperties
-      }
-    >
+    <div className="arkanoid">
       <div className="arkanoid__canvas-wrap">
         <img
           src={arkanoidBackgroundImage}
