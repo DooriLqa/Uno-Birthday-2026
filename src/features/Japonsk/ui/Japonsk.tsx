@@ -4,12 +4,15 @@ import JaponskBackground from '@/shared/assets/games/japonsk/japonsk-bg.png'
 import KeyBall from '@/shared/assets/games/japonsk/answer.png'
 import fireSound from '@/shared/assets/games/japonsk/fire.mp3'
 import keyAppearSound from '@/shared/assets/games/japonsk/key-appear.wav'
+import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 
 type Props = {
   onComplete: () => void
 }
 
 type Cell = 'empty' | 'filled' | 'cross'
+
+const JAPANSK_BOARD_STORAGE_KEY = 'japonsk-board-v1'
 
 const solution = [
   [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
@@ -65,8 +68,43 @@ const columnHints = [
   [9],
 ]
 
+const JAPONSK_GAME_KEY = 'japonsk'
+const WIN_SOUND_KEY = `${JAPONSK_GAME_KEY}:WIN`
+const WIN_SOUND = keyAppearSound
+
 export function Japonsk({ onComplete }: Props) {
-  const [board, setBoard] = useState<Cell[][]>(solution.map((row) => row.map(() => 'empty')))
+  const [board, setBoard] = useState<Cell[][]>(() => {
+    try {
+      const saved = localStorage.getItem(JAPANSK_BOARD_STORAGE_KEY)
+
+      if (saved) {
+        const parsed = JSON.parse(saved) as Cell[][]
+
+        if (
+          parsed.length === solution.length &&
+          parsed.every(
+            (row, index) =>
+              row.length === solution[index].length &&
+              row.every((cell) => cell === 'empty' || cell === 'filled' || cell === 'cross'),
+          )
+        ) {
+          return parsed
+        }
+      }
+    } catch {
+      // Если сохранение повреждено — начинаем пустую игру
+    }
+
+    return solution.map((row) => row.map(() => 'empty'))
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(JAPANSK_BOARD_STORAGE_KEY, JSON.stringify(board))
+    } catch {
+      // Ничего не делаем, если localStorage недоступен
+    }
+  }, [board])
 
   useEffect(() => {
     const audio = new Audio(fireSound)
@@ -119,9 +157,7 @@ export function Japonsk({ onComplete }: Props) {
       }
     }
 
-    const sound = new Audio(keyAppearSound)
-    sound.volume = 0.5
-    sound.play().catch(() => {})
+    playOneShotSound(WIN_SOUND, WIN_SOUND_KEY, 0.1)
 
     setShowKeyBall(true)
     onComplete()

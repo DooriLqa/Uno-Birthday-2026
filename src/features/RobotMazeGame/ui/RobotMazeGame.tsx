@@ -22,6 +22,7 @@ import ChestSound from '@/shared/assets/games/robot-maze/open-chest.mp3'
 import exitCross from '@/shared/assets/games/robot-maze/exit.png'
 
 import { useEffect, useState } from 'react'
+import { usePawCoinStore } from '@/features/currency/model/store'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import './RobotMazeGame.css'
 
@@ -314,6 +315,8 @@ const getRandomLevel = (availableLevels: number[]) => {
 }
 
 export function RobotMazeGame({ onComplete }: Props) {
+  const addCoins = usePawCoinStore((state) => state.addPawCoins)
+
   const [playedLevels, setPlayedLevels] = useState<number[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
@@ -533,49 +536,26 @@ export function RobotMazeGame({ onComplete }: Props) {
     setTurnTracksState([])
   }
 
-  const resetProgress = () => {
-    localStorage.removeItem(STORAGE_KEY)
-
-    setPlayedLevels([])
-    setLevelCoins({})
-    setGamePhase('playing')
-    setLevelIndex(0)
-
-    const firstLevel = levels[0]
-
-    setRobot({
-      row: firstLevel.startRow,
-      col: firstLevel.startCol,
-    })
-
-    setDirection(firstLevel.startDirection)
-
-    setCommands([])
-    setCurrentCommand(-1)
-    setMoves(0)
-    setOpenedChests([])
-    setMessage('Прогресс сброшен')
-    setIsRunning(false)
-
-    setCartTracksState([
-      {
-        row: firstLevel.startRow,
-        col: firstLevel.startCol,
-        direction: firstLevel.startDirection,
-      },
-    ])
-
-    setTurnTracksState([])
-  }
-
   const finishCurrentLevel = (collectedOnLevel: number) => {
     audioController.playOneShot(victorySound)
+
     const updatedPlayedLevels = playedLevels.includes(levelIndex)
       ? playedLevels
       : [...playedLevels, levelIndex]
 
+    // Сколько монет уже было получено с этого уровня раньше.
     const previousBest = levelCoins[levelIndex] ?? 0
 
+    // При первом прохождении выдаём все собранные монеты.
+    // При перепрохождении — только те, которых раньше не было.
+    const newCoins = Math.max(0, collectedOnLevel - previousBest)
+
+    if (newCoins > 0) {
+      addCoins(newCoins)
+    }
+
+    // В прогрессе сохраняем максимальное количество монет,
+    // которое когда-либо было собрано на этом уровне.
     const bestResult = Math.max(previousBest, collectedOnLevel)
 
     const updatedCoins = {
@@ -584,7 +564,6 @@ export function RobotMazeGame({ onComplete }: Props) {
     }
 
     setPlayedLevels(updatedPlayedLevels)
-
     setLevelCoins(updatedCoins)
 
     const newTotalCoins = Object.values(updatedCoins).reduce((sum, count) => sum + count, 0)
@@ -868,10 +847,6 @@ export function RobotMazeGame({ onComplete }: Props) {
           <div className="RobotMaze__summary-coins">
             {collectedCoins} / {totalCoins} 🪙
           </div>
-
-          <button className="RobotMaze__button" onClick={resetProgress}>
-            Сбросить прогресс
-          </button>
         </div>
       </div>
     )
@@ -910,10 +885,6 @@ export function RobotMazeGame({ onComplete }: Props) {
               Завершить
             </button>
           )}
-
-          <button className="RobotMaze__button" onClick={resetProgress}>
-            Сбросить прогресс
-          </button>
         </div>
       </div>
     )
@@ -1123,10 +1094,6 @@ export function RobotMazeGame({ onComplete }: Props) {
 
             <button className="RobotMaze__button" onClick={resetLevel} disabled={isRunning}>
               Сбросить уровень
-            </button>
-
-            <button className="RobotMaze__button" onClick={resetProgress} disabled={isRunning}>
-              Сбросить прогресс
             </button>
           </div>
 
