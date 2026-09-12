@@ -39,12 +39,20 @@ export function LibraryPages() {
               drag.current = null
             }}
           >
-            <img
-              className="library-pages__paper"
-              src={asset.src}
-              alt={asset.description}
-              draggable={false}
-            />
+            {asset.src ? (
+              <img
+                className="library-pages__paper"
+                src={asset.src}
+                alt={asset.description}
+                draggable={false}
+              />
+            ) : (
+              <div className="library-pages__note">
+                <small>Пляжная библиотека</small>
+                <h2>{asset.title}</h2>
+                <p>{asset.description}</p>
+              </div>
+            )}
             <button
               className="library-pages__return"
               onClick={() => toggle(page.id)}

@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 $assetDirectory = Join-Path $PSScriptRoot '../src/features/beach-library/assets/pages'
-$names = @('page-1', 'page-2', 'page-3', 'page-4', 'page-5', 'page-6', 'page-7', 'page-8', 'letters', 'note')
+$names = @('book1', 'book2', 'book3', 'book4', 'text')
 foreach ($name in $names) {
     $bitmap = [System.Drawing.Bitmap]::new((Join-Path $assetDirectory "$name.png"))
     try {
@@ -26,8 +26,8 @@ foreach ($name in $names) {
             }
         }
         if ($opaque -lt 1000) { throw "$name has no substantial opaque paper body" }
-        if ($name.StartsWith('page-') -and $clear -lt 50) { throw "$name has no real transparent interior cutout" }
-        if (-not $name.StartsWith('page-') -and $clear -gt 0) { throw "$name contains unexpected transparent holes" }
+        if ($name.StartsWith('book') -and $clear -lt 50) { throw "$name has no real transparent interior cutout" }
+        if (-not $name.StartsWith('book') -and $clear -gt 0) { throw "$name contains unexpected transparent holes" }
         [pscustomobject]@{
             Image = "$name.png"
             Dimensions = "$($bitmap.Width)x$($bitmap.Height)"

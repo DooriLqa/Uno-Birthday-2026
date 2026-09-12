@@ -16,12 +16,12 @@ import { Arkanoid } from '@/features/arkanoid'
 import { Japonsk } from '@/features/Japonsk'
 import { RobotMazeGame } from '@/features/RobotMazeGame'
 import type { GameDefinition } from '@/entities/game/model/types'
-import arcadeFrameImage from '@/shared/assets/games/flappy-bird/arcade-frame-transparent.png'
+import arcadeFrameImage from '@/shared/assets/games/fruit-basket/night-thief-arcade-frame.png'
 import islandMapImage from '@/shared/assets/features/island-map/tropical-island-map-expanded.png'
 import robotMazeGameBackground from '@/shared/assets/games/robot-maze/background.png'
 import findAPairBackground from '@/shared/assets/games/find-a-pair/findapairbackground.png'
 import fishingScene from '@/shared/assets/games/fishing/background.png'
-import raccoonArcadeBackground from '@/shared/assets/games/arkanoid/raccoon-arcade-background.png'
+import pirateShoreEnvironment from '@/shared/assets/games/arkanoid/pirate-shore-environment.png'
 import locationFootstepsSound from '@/shared/assets/common/audio/location-footsteps.ogg'
 import libraryBackground from '@/shared/assets/locations/tourist/library.png'
 import wildTotemCamp from '@/shared/assets/locations/wild/totem-cape-closeup-background-v2.png'
@@ -211,7 +211,7 @@ export const games: GameDefinition[] = [
     target: 'все кирпичи',
     mapPosition: { left: '50%', top: '30%' },
     pageClassName: 'arkanoid-page',
-    backgroundImage: raccoonArcadeBackground,
+    backgroundImage: pirateShoreEnvironment,
     ...locationTransition,
     Screen: Arkanoid,
   },

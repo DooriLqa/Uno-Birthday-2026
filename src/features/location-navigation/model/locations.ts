@@ -37,6 +37,7 @@ export type LocationAction =
   | { type: 'game'; gameId: string }
   | { type: 'merchant' }
   | { type: 'sailor' }
+  | { type: 'librarian' }
   | { type: 'map' }
   | { type: 'jungle-cave' }
   | { type: 'barista' }
@@ -161,7 +162,15 @@ export const locations: Record<LocationId, LocationDefinition> = {
     title: 'Пляжная библиотека',
     image: library,
     ambienceVolume: 0.3,
-    hotspots: [],
+    hotspots: [
+      {
+        id: 'librarian',
+        label: 'Поговорить с библиотекаршей',
+        area: area(80, 26, 19, 70),
+        cursor: 'dialogue',
+        action: { type: 'librarian' },
+      },
+    ],
   },
   lounger: { ...base, id: 'lounger', title: 'Вид с лежака', image: lounger, hotspots: [] },
   'tourist-beach': {
@@ -213,13 +222,6 @@ export const locations: Record<LocationId, LocationDefinition> = {
         area: area(40, 15, 19, 73),
         cursor: 'projected-forward',
         action: { type: 'game', gameId: 'fruit-basket' },
-      },
-      {
-        id: 'arkanoid',
-        label: 'Арканоид',
-        area: area(60, 15, 21, 73),
-        cursor: 'projected-forward',
-        action: { type: 'game', gameId: 'arkanoid' },
       },
     ],
   },
@@ -295,6 +297,13 @@ export const locations: Record<LocationId, LocationDefinition> = {
         area: area(3, 43, 85, 52),
         cursor: 'hand-grab',
         action: { type: 'game', gameId: 'robot-maze' },
+      },
+      {
+        id: 'arkanoid',
+        label: 'Сыграть в «Арканоид»',
+        area: area(77, 30.5, 11, 30),
+        cursor: 'projected-forward',
+        action: { type: 'game', gameId: 'arkanoid' },
       },
     ],
   },

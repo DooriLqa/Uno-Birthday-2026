@@ -1,17 +1,154 @@
 .arkanoid {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #382316 url('@/shared/assets/games/arkanoid/pirate-shore-environment.png') center /
+    cover no-repeat;
+}
+
+.arkanoid__cabinet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(
+    max(100vw, calc(100dvh * var(--arkanoid-artwork-ratio))),
+    var(--arkanoid-scene-max-width),
+    var(--arkanoid-scene-height-limit)
+  );
+  aspect-ratio: var(--arkanoid-artwork-ratio);
+  margin: 0;
+  transform: translate(-50%, -50%);
+}
+
+.arkanoid__cabinet-image {
+  position: relative;
+  z-index: 2;
+  display: block;
   width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.arkanoid__stage {
+  position: absolute;
+  z-index: 1;
+  left: var(--arkanoid-screen-x);
+  top: var(--arkanoid-screen-y);
+  width: var(--arkanoid-screen-width);
+  height: var(--arkanoid-screen-height);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  touch-action: none;
+}
+
+.arkanoid__world {
+  position: absolute;
+  z-index: 1;
+  top: 47%;
+  left: 50%;
+  width: var(--arkanoid-world-width);
+  height: var(--arkanoid-world-height);
+  transform-origin: center;
+}
+
+.arkanoid__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: var(--arkanoid-world-width);
+  height: var(--arkanoid-world-height);
+  background: transparent;
+  user-select: none;
+}
+
+.arkanoid__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
+
+  gap: 12px;
+
+  background: rgba(24, 15, 10, 0.84);
+  color: #fff0cb;
+  text-align: center;
 }
 
-.arkanoid__header {
-  width: min(900px, 100%);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
+.arkanoid__overlay h2 {
+  margin: 0;
+  font-size: 30px;
+  color: #ffe099;
+  text-shadow: 2px 2px 0 #713524;
+}
+
+.arkanoid__overlay p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.arkanoid__overlay button {
+  min-height: 48px;
+  max-width: calc(100% - 40px);
+  padding: 12px 24px;
+  border: 3px solid #edc575;
+  border-radius: 4px;
+  background: #843b27;
+  color: #fff0cb;
+  box-shadow:
+    6px 6px 0 rgba(24, 12, 7, 0.65),
+    inset 0 0 0 2px #b7693a;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  text-shadow: 2px 2px 0 #432115;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.arkanoid__overlay button:hover:not(:disabled) {
+  background: #a44b2e;
+}
+
+.arkanoid__overlay button:focus-visible {
+  outline: 3px solid #fff1bd;
+  outline-offset: 5px;
+}
+
+.arkanoid__overlay button:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow:
+    3px 3px 0 rgba(24, 12, 7, 0.65),
+    inset 0 0 0 2px #b7693a;
+}
+
+.arkanoid__overlay--ready {
+  background: transparent;
+}
+
+.arkanoid__overlay--ready p {
+  padding: 12px 20px;
+  border: 3px solid #c79b52;
+  border-radius: 4px;
+  background: rgba(45, 27, 17, 0.94);
+  box-shadow:
+    6px 6px 0 rgba(24, 12, 7, 0.5),
+    inset 0 0 0 2px #715032;
+  color: #fff0cb;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .arkanoid__header > div:first-child {
@@ -70,107 +207,34 @@
   font-weight: 600;
 }
 
-.arkanoid__canvas-wrap {
-  position: relative;
-  width: 900px;
-  max-width: 100%;
-  overflow: hidden;
-  border-radius: 16px;
-  touch-action: none;
-  box-shadow: 0 8px 28px rgba(38, 59, 87, 0.12);
+@media (max-width: 740px) {
+  .arkanoid__overlay h2 {
+    font-size: 24px;
+  }
+
+  .arkanoid__overlay p {
+    font-size: 14px;
+  }
+
+  .arkanoid__overlay button {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
 }
 
-.arkanoid__canvas {
-  display: block;
+.arkanoid__background {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
   user-select: none;
 }
 
-.arkanoid__overlay {
-  position: absolute;
-  inset: 0;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  gap: 12px;
-
-  background: rgba(5, 8, 13, 0.78);
-
-  color: #ffffff;
-  text-align: center;
-}
-
-.arkanoid__overlay h2 {
-  margin: 0;
-  font-size: 30px;
-}
-
-.arkanoid__overlay p {
-  margin: 0;
-  font-size: 16px;
-}
-
-.arkanoid__overlay button {
-  padding: 11px 24px;
-
-  border: 0;
-  border-radius: 10px;
-
-  background: #eb6c9a;
-  color: #ffffff;
-
-  font-size: 16px;
-  font-weight: 700;
-
-  cursor: pointer;
-}
-
-.arkanoid__overlay button:hover {
-  filter: brightness(1.05);
-}
-
-.arkanoid__legend {
-  width: min(900px, 100%);
-
-  display: flex;
-  justify-content: center;
-
-  gap: 18px;
-  flex-wrap: wrap;
-
-  color: #6b7280;
-  font-size: 13px;
-}
-
-.arkanoid__legend b {
-  color: #374151;
-}
-
-@media (max-width: 740px) {
-  .arkanoid__header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .arkanoid__header > div:first-child {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .arkanoid__levels {
-    justify-content: center;
-  }
-
-  .arkanoid__canvas-wrap {
-    border-radius: 12px;
-  }
-
-  .arkanoid__legend {
-    padding: 0 10px;
-    gap: 10px;
-  }
+.arkanoid__overlay button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #514235;
+  text-shadow: none;
 }

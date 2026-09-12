@@ -15,8 +15,8 @@ export const useLibraryPages = create<{
             ...pages,
             {
               id,
-              x: Math.max(0, window.innerWidth / 2 - 150),
-              y: Math.max(90, window.innerHeight / 2 - 180),
+              x: Math.max(0, window.innerWidth / 2 - 375),
+              y: Math.max(16, window.innerHeight / 2 - 450),
             },
           ],
     })),

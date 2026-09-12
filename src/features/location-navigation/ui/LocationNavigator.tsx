@@ -9,6 +9,7 @@ import ritualSiteExtinguished from '@/shared/assets/locations/wild/ritual-site-e
 import ritualSiteLit from '@/shared/assets/locations/wild/ritual-site-lit-v4.png'
 import totemCloseupExtinguished from '@/shared/assets/locations/wild/totem-cape-closeup-extinguished-v3.png'
 import totemCloseupLit from '@/shared/assets/locations/wild/totem-cape-closeup-lit-v3.png'
+import { talkToLibrarian } from '@/features/beach-library/model/librarianDialogue'
 import './LocationNavigator.css'
 
 type Props = {
@@ -147,6 +148,7 @@ export function LocationNavigator({
     if (item.type === 'game') onOpenGame(item.gameId)
     if (item.type === 'merchant') onMerchant()
     if (item.type === 'sailor') onSailor()
+    if (item.type === 'librarian') talkToLibrarian()
     if (item.type === 'map') onOpenMap()
     if (item.type === 'jungle-cave') onEnterJungleCave()
     if (item.type === 'barista') onBarista()

@@ -114,7 +114,7 @@ export const questions: QuizQuestion[] = [
     id: 'q15',
     text: 'Из какой игры отрывок стрима?',
     audioSrc: anotherCrabsTreasureStream,
-    answers: ['GTA: Vise City', 'Mixtape', 'Hades', 'Another Crab ́s Treasure'],
+    answers: ['GTA: Vice City', 'Mixtape', 'Hades', 'Another Crab ́s Treasure'],
     correctIndex: 3,
   },
   {
@@ -135,6 +135,20 @@ export const questions: QuizQuestion[] = [
       'Elden Ring',
     ],
     correctIndex: 2,
+  },
+  {
+    id: 'q18',
+    text: 'Какой игрой Югибани НЕ выигрывала Тянукус?',
+    audioSrc: sekiroStream,
+    answers: ['Greetings', 'Portal', 'Jump King', 'Crash Bandicoot 3:Warped'],
+    correctIndex: 2,
+  },
+  {
+    id: 'q19',
+    text: 'Сколько очков заработала Lizon на Тянукус 3?',
+    audioSrc: sekiroStream,
+    answers: ['855', '618', '552', '477'],
+    correctIndex: 3,
   },
 ]
 

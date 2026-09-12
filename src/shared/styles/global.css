@@ -527,6 +527,28 @@ h1 {
   pointer-events: none;
   user-select: none;
 }
+.game-overlay__bottom-exit {
+  position: fixed;
+  z-index: 50;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 11%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-down.png') 32 52, s-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
+}
+.game-overlay__bottom-exit:hover,
+.game-overlay__bottom-exit:focus-visible {
+  outline: none;
+}
+@media (max-width: 700px) {
+  .game-overlay__bottom-exit {
+    height: 13%;
+  }
+}
 .game-overlay.arkanoid-page {
   padding: 0;
   overflow: hidden;
@@ -538,83 +560,12 @@ h1 {
 .arkanoid-page .page-top {
   position: fixed;
   z-index: 3;
-  top: max(14px, env(safe-area-inset-top));
+  bottom: max(16px, env(safe-area-inset-bottom));
   left: max(14px, env(safe-area-inset-left));
   margin: 0;
 }
 .arkanoid-page .page-top > span {
   display: none;
-}
-.arkanoid-page .arkanoid {
-  position: absolute;
-  top: 58.7%;
-  left: 50%;
-  width: min(43.5vw, 72.5dvh);
-  aspect-ratio: 3 / 2;
-  transform: translate(-50%, -50%);
-  display: block;
-}
-.arkanoid-page .arkanoid__canvas-wrap {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  max-width: none;
-  overflow: hidden;
-  border-radius: 4%;
-  box-shadow: none;
-}
-.arkanoid-page .arkanoid__canvas {
-  width: 100%;
-  height: 100%;
-}
-.arkanoid-page .arkanoid__hud {
-  position: absolute;
-  z-index: 2;
-  top: 3%;
-  left: 4%;
-  width: 92%;
-  pointer-events: none;
-}
-.arkanoid-page .arkanoid__hud > div {
-  padding: 5px 9px;
-  border-radius: 8px;
-  background: rgba(244, 239, 232, 0.86);
-}
-.arkanoid-page .arkanoid__hud span {
-  font-size: clamp(10px, 0.85vw, 14px);
-}
-.arkanoid-page .arkanoid__hud strong {
-  font-size: clamp(14px, 1.2vw, 20px);
-}
-.arkanoid-page .arkanoid__controls {
-  position: absolute;
-  z-index: 3;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  min-height: 0;
-  pointer-events: none;
-}
-.arkanoid-page .arkanoid__button {
-  pointer-events: auto;
-}
-.arkanoid-page .arkanoid__hint {
-  position: absolute;
-  bottom: 3%;
-  color: #fff4d0;
-  font-size: clamp(10px, 1vw, 14px);
-  text-shadow: 0 1px 3px #16121a;
-}
-.arkanoid-page .arkanoid__message {
-  color: #fff4d0;
-  font-size: clamp(17px, 2vw, 22px);
-  text-shadow: 0 1px 3px #16121a;
-}
-@media (max-aspect-ratio: 4 / 3) {
-  .arkanoid-page .arkanoid {
-    top: 57%;
-    width: min(68vw, 72.5dvh);
-  }
 }
 .game-overlay.beach-search-page {
   padding: 88px 0 0;
@@ -682,13 +633,11 @@ h1 {
   z-index: auto;
 }
 .fruit-basket-page .page-top {
-  position: relative;
+  position: fixed;
   z-index: 3;
-  width: min(1120px, 100%);
-  margin: 0 auto;
-}
-.fruit-basket-page .page-top {
-  margin-bottom: 14px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: max(16px, env(safe-area-inset-left));
+  margin: 0;
 }
 .fruit-basket-page .game-overlay__background {
   z-index: 2;
@@ -703,9 +652,6 @@ h1 {
 @media (max-width: 760px) {
   .game-overlay.fruit-basket-page {
     padding: 72px 10px 14px;
-  }
-  .fruit-basket-page .page-top {
-    margin-bottom: 10px;
   }
 }
 @media (max-width: 760px) {
@@ -722,9 +668,9 @@ h1 {
   }
 }
 .game-overlay.beach-radio-page {
-  padding: 16px;
-  overflow: hidden;
-  background: linear-gradient(180deg, #67cde9 0 54%, #f6d18b 54% 100%);
+  padding: 0;
+  overflow: auto;
+  background: linear-gradient(180deg, rgba(11, 35, 46, 0.08), rgba(8, 25, 34, 0.56));
 }
 .beach-radio-page .page-top {
   position: absolute;

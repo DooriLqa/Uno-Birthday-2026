@@ -75,7 +75,7 @@ export function GameFlow() {
       <GameHud mapOpen={mapOpen} onOpenRadio={() => setRadioOpen(true)} onOpenMap={openMap} />
       <LocationNavigator
         active={!mapOpen && !activeGame && !radioOpen}
-        visible={!activeGame && !radioOpen}
+        visible={(!activeGame || activeGame.id === 'beach-radio') && !radioOpen}
         onOpenMap={openMap}
         onOpenGame={openGame}
         onMerchant={() => talkToMerchant(() => openGame('beach-radio'))}

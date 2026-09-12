@@ -14,10 +14,11 @@ function compile(path, replacements = {}) {
   return `data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`
 }
 const configUrl = compile('../src/features/beach-library/model/config.ts')
-const { BOOKS, GENRES, DIRECTIONS, LETTERS, placeBook, completedCabinets, isBookCorrect } =
-  await import(configUrl)
+const { BOOKS, GENRES, DIRECTIONS, placeBook, completedCabinets, isBookCorrect } = await import(
+  configUrl
+)
 
-test('45 unique books, five per genre × direction, fixed rectangular letter sheet', () => {
+test('45 unique books, five per genre Г— direction', () => {
   assert.equal(BOOKS.length, 45)
   assert.equal(new Set(BOOKS.map((book) => book.id)).size, 45)
   assert.equal(new Set(BOOKS.map((book) => book.title)).size, 45)
@@ -31,8 +32,6 @@ test('45 unique books, five per genre × direction, fixed rectangular letter she
       ),
     ),
   )
-  assert.equal(LETTERS.length, 12)
-  assert.ok(LETTERS.every((line) => line.length === 12))
 })
 
 test('a book must match both its genre column and its direction row', () => {
@@ -70,7 +69,7 @@ test('floor book replaces an occupied slot and displaces its book to the floor',
   assert.equal(next[0], 0)
   assert.equal(next.includes(5), false)
 })
-test('awards 3 + 3 + 2 pages and a final note exactly once, in any cabinet order', async () => {
+test('awards four random pages before completion and two final sheets exactly once', async () => {
   const memory = new Map()
   globalThis.localStorage = {
     getItem: (key) => memory.get(key) ?? null,
@@ -79,6 +78,7 @@ test('awards 3 + 3 + 2 pages and a final note exactly once, in any cabinet order
   }
   globalThis.window = { localStorage: globalThis.localStorage }
   const inventoryUrl = compile('../src/features/inventory/model/store.ts', {
+    "import { BOOK_ITEMS } from './items'": 'const BOOK_ITEMS = []',
     "'zustand'": `'${import.meta.resolve('zustand')}'`,
     "'zustand/middleware'": `'${import.meta.resolve('zustand/middleware')}'`,
   })
@@ -91,31 +91,91 @@ test('awards 3 + 3 + 2 pages and a final note exactly once, in any cabinet order
   const { useLibraryStore } = await import(storeUrl)
   const { useInventoryStore } = await import(inventoryUrl)
   const state = useLibraryStore.getState()
+  assert.equal(state.librarianIntroduced, false)
+  state.introduceLibrarian()
   state.enter()
   state.enter()
+  assert.equal(useInventoryStore.getState().items.length, 0)
   const counts = []
   for (const cabinet of [2, 0, 1]) {
     for (let offset = 0; offset < 15; offset++) {
       const id = cabinet * 15 + offset
       const rewards = state.place(id, id)
-      if (offset < 14) assert.equal(rewards.length, 0)
-      else counts.push(rewards.length)
+      counts.push(...rewards)
+      if (counts.length < 5) assert.ok(!counts.includes('beach-library-letters'))
+      if (cabinet === 1 && offset === 13) assert.equal(counts.length, 4)
     }
   }
-  assert.deepEqual(counts, [3, 3, 3])
+  assert.equal(counts.length, 6)
   const items = useInventoryStore.getState().items
-  assert.equal(items.length, 10)
-  assert.equal(items.filter((item) => item.id.includes('-page-')).length, 8)
+  assert.equal(items.length, 6)
+  assert.equal(items.filter((item) => item.id.includes('-page-')).length, 4)
   assert.ok(items.every((item) => item.quantity === 1))
   state.place(0, 5)
   assert.deepEqual(state.place(0, 0), [])
-  assert.equal(useInventoryStore.getState().items.length, 10)
+  assert.equal(useInventoryStore.getState().items.length, 6)
   const saved = memory.get('beach-library-v1')
   useLibraryStore.setState({ slots: Array(45).fill(null), rewarded: [] })
   memory.set('beach-library-v1', saved)
   await useLibraryStore.persist.rehydrate()
+  assert.equal(useLibraryStore.getState().librarianIntroduced, true)
   assert.deepEqual(completedCabinets(useLibraryStore.getState().slots), [0, 1, 2])
-  assert.deepEqual(useLibraryStore.getState().rewarded, [2, 0, 1])
+  assert.deepEqual([...useLibraryStore.getState().rewarded].sort(), [0, 1, 2, 3])
+  delete globalThis.localStorage
+  delete globalThis.window
+})
+
+test('scattered books stay left of the librarian even when rotated and hovered', () => {
+  for (const book of BOOKS) {
+    const angle = Math.abs(book.angle) * Math.PI / 180
+    const width = 12
+    const heightInWidthPercent = 13.5 * 941 / 1672
+    const halfRotatedWidth = (width * Math.cos(angle) + heightInWidthPercent * Math.sin(angle)) / 2
+    assert.ok(book.x + width / 2 + halfRotatedWidth * 1.1 < 81)
+    assert.ok(book.y + 13.5 < 93)
+  }
+})
+
+test('librarian repeats from the start after dismissal and completion; other dialogues resume', async () => {
+  globalThis.localStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} }
+  globalThis.window = { localStorage: globalThis.localStorage }
+  const storeUrl = compile('../src/features/dialogues/model/store.ts', {
+    "'zustand'": `'${import.meta.resolve('zustand')}'`,
+    "'zustand/middleware'": `'${import.meta.resolve('zustand/middleware')}'`,
+  })
+  const { useDialogueStore } = await import(storeUrl)
+  const dialogueUrl = compile('../src/features/beach-library/model/librarianDialogue.ts', {
+    "import librarianSprite from '@/shared/assets/features/dialogues/poodle-librarian.png'":
+      "const librarianSprite = 'poodle-librarian.png'",
+    "'@/features/dialogues'": `'${storeUrl}'`,
+  })
+  const { librarianCompletionDialogue, librarianDialogue, finishLibrarianCleanup, talkToLibrarian } =
+    await import(dialogueUrl)
+  const store = useDialogueStore.getState()
+  talkToLibrarian()
+  store.nextMessage()
+  store.closeDialogue()
+  talkToLibrarian()
+  assert.equal(useDialogueStore.getState().activeMessageIndex, 0)
+  store.closeDialogue()
+  store.openDialogueById(librarianDialogue.id)
+  assert.equal(useDialogueStore.getState().activeMessageIndex, 0)
+  librarianDialogue.messages.forEach(() => store.nextMessage())
+  assert.equal(useDialogueStore.getState().activeDialogueId, null)
+  talkToLibrarian()
+  assert.equal(useDialogueStore.getState().activeMessageIndex, 0)
+  const ordinary = { ...librarianDialogue, id: 'ordinary', restartOnOpen: false }
+  store.openDialogue(ordinary)
+  store.nextMessage()
+  store.closeDialogue()
+  store.openDialogue(ordinary)
+  assert.equal(useDialogueStore.getState().activeMessageIndex, 1)
+  finishLibrarianCleanup()
+  assert.equal(useDialogueStore.getState().activeDialogueId, librarianCompletionDialogue.id)
+  assert.equal(
+    librarianCompletionDialogue.messages[0].text,
+    'Спасибо за помощь с уборкой! Вот письмо, о котором я говорила.',
+  )
   delete globalThis.localStorage
   delete globalThis.window
 })

@@ -1,3 +1,5 @@
+import { ArcadeDisplay } from '@/shared/ui/ArcadeDisplay'
+import { useArcadeCoin } from '@/shared/lib/arcade/useArcadeCoin'
 import { useEffect, useRef, useState } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import brickImage from '@/shared/assets/games/fruit-basket/brick.png'
@@ -80,7 +82,7 @@ const FULL_BASKET_SPAWN_INTERVAL = ITEM_SPAWN_INTERVAL * 4
 // Скорость притягивания магнитом
 const MAGNET_SPEED_MULTIPLIER = 2
 
-const BONUS_SPAWN_INTERVAL_SECONDS = 12
+const BONUS_SPAWN_INTERVAL_SECONDS = 15
 const MAGNET_DURATION_SECONDS = 8
 
 const BONUS_SPAWN_INTERVAL = BONUS_SPAWN_INTERVAL_SECONDS * 1000
@@ -145,6 +147,7 @@ function dropProgressPercent(game: GameState, side: 'left' | 'right') {
 export function FruitBasketGame({ onComplete }: Props) {
   const [game, setGame] = useState(initialState)
   const [started, setStarted] = useState(false)
+  const { insertCoin, inserting, pawCoins } = useArcadeCoin(`${BASKET_GAME_KEY}:coin-insert`)
   const screenRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -180,8 +183,10 @@ export function FruitBasketGame({ onComplete }: Props) {
 
   const startGame = () => {
     if (started) return
-    setStarted(true)
-    playOneShotSound(START_SOUND, BASKET_GAME_KEY)
+    insertCoin(() => {
+      setStarted(true)
+      playOneShotSound(START_SOUND, BASKET_GAME_KEY)
+    })
   }
 
   useEffect(() => {
@@ -314,8 +319,8 @@ export function FruitBasketGame({ onComplete }: Props) {
       const current = gameRef.current
 
       if (started && !current.gameOver && !current.won) {
-        // 50/50 между x2 и магнитом
-        const bonusType: 'x2' | 'magnet' = Math.random() < 0.5 ? 'x2' : 'magnet'
+        // 60/40 между x2 и магнитом
+        const bonusType: 'x2' | 'magnet' = Math.random() < 0.6 ? 'x2' : 'magnet'
 
         const bonus: FallingItem = {
           id: nextId.current++,
@@ -597,140 +602,143 @@ export function FruitBasketGame({ onComplete }: Props) {
         } as React.CSSProperties
       }
     >
-      <div className="fruit-basket-game__field" aria-label="Игровое поле">
-        <img className="fruit-basket-game__sky" src={skyImage} alt="" aria-hidden="true" />
-        <img
-          className="fruit-basket-game__building"
-          src={buildingImage}
-          alt=""
-          aria-hidden="true"
-        />
-        <img
-          className="fruit-basket-game__ground-image"
-          src={groundImage}
-          alt=""
-          aria-hidden="true"
-        />
+      <ArcadeDisplay>
+        <div className="fruit-basket-game__field" aria-label="Игровое поле">
+          <img className="fruit-basket-game__sky" src={skyImage} alt="" aria-hidden="true" />
+          <img
+            className="fruit-basket-game__building"
+            src={buildingImage}
+            alt=""
+            aria-hidden="true"
+          />
+          <img
+            className="fruit-basket-game__ground-image"
+            src={groundImage}
+            alt=""
+            aria-hidden="true"
+          />
 
-        <div className="fruit-basket-game__hud" aria-label="Состояние игры">
-          <span aria-label={`Сдано ${game.score} из ${TARGET_SCORE}`}>
-            {game.score}/{TARGET_SCORE}
-          </span>
-          <span aria-label={`В корзине ${game.basketLoad} из ${MAX_BASKET_LOAD}`}>
-            {game.basketLoad}/{MAX_BASKET_LOAD}
-          </span>
-          <span
-            className="fruit-basket-game__hearts"
-            aria-label={`${game.lives} из ${MAX_LIVES} жизней`}
-          >
-            {'♥'.repeat(game.lives)}
-            <span className="fruit-basket-game__empty-hearts">
-              {'♡'.repeat(MAX_LIVES - game.lives)}
+          <div className="fruit-basket-game__hud" aria-label="Состояние игры">
+            <span aria-label={`Сдано ${game.score} из ${TARGET_SCORE}`}>
+              {game.score}/{TARGET_SCORE}
             </span>
-          </span>
-          {game.x2Active && <span className="fruit-basket-game__bonus-active">x2</span>}
-        </div>
-
-        {!started && !game.gameOver && !game.won && (
-          <div className="fruit-basket-game__start-screen">
-            <strong>Корзинка удачи</strong>
-            <p>
-              Управление персонажем на A и D или стрелками. Лови ценности, складывай их в корзину и
-              сдавай груз по краям поля. Наручники и кирпичи пропускай. Бонус x2 удваивает все очки
-              в корзине при сдаче, действует один раз.
-            </p>
-            <button type="button" onClick={startGame}>
-              Начать игру
-            </button>
+            <span aria-label={`В корзине ${game.basketLoad} из ${MAX_BASKET_LOAD}`}>
+              {game.basketLoad}/{MAX_BASKET_LOAD}
+            </span>
+            <span
+              className="fruit-basket-game__hearts"
+              aria-label={`${game.lives} из ${MAX_LIVES} жизней`}
+            >
+              {'♥'.repeat(game.lives)}
+              <span className="fruit-basket-game__empty-hearts">
+                {'♡'.repeat(MAX_LIVES - game.lives)}
+              </span>
+            </span>
+            {game.x2Active && <span className="fruit-basket-game__bonus-active">x2</span>}
           </div>
-        )}
 
-        <div
-          className={`fruit-basket-game__drop-zone fruit-basket-game__drop-zone--left ${basketDropZoneClass(
-            game,
-            'left',
-          )}`}
-        >
-          <strong>СДАТЬ</strong>
-          <span>←</span>
+          {!started && !game.gameOver && !game.won && (
+            <div className="fruit-basket-game__start-screen">
+              <strong>Корзинка удачи</strong>
+              <p>
+                Управление персонажем на A и D или стрелками. Лови ценности, складывай их в корзину и
+                сдавай груз по краям поля. Наручники и кирпичи пропускай. Бонус x2 удваивает все очки
+                в корзине при сдаче, действует один раз.
+              </p>
+              <p>Одна партия — 1 монетка. Все 5 жизней включены.</p>
+              <button type="button" onClick={startGame} disabled={inserting || pawCoins < 1}>
+                {inserting ? 'Монетка вставляется…' : pawCoins < 1 ? 'Не хватает монеток' : 'Вставить монетку и играть'}
+              </button>
+            </div>
+          )}
 
-          <i
+          <div
+            className={`fruit-basket-game__drop-zone fruit-basket-game__drop-zone--left ${basketDropZoneClass(
+              game,
+              'left',
+            )}`}
+          >
+            <strong>СДАТЬ</strong>
+            <span>←</span>
+
+            <i
+              style={{
+                height: `${dropProgressPercent(game, 'left')}%`,
+              }}
+            />
+          </div>
+
+          <div
+            className={`fruit-basket-game__drop-zone fruit-basket-game__drop-zone--right ${basketDropZoneClass(
+              game,
+              'right',
+            )}`}
+          >
+            <strong>СДАТЬ</strong>
+            <span>→</span>
+
+            <i
+              style={{
+                height: `${dropProgressPercent(game, 'right')}%`,
+              }}
+            />
+          </div>
+
+          {game.items.map((item) => (
+            <span
+              key={item.id}
+              className={[
+                'fruit-basket-game__item',
+                `fruit-basket-game__item--${item.kind}`,
+                item.magnetized ? 'fruit-basket-game__item--magnetized' : '',
+                item.bonusType ? `fruit-basket-game__item--bonus-${item.bonusType}` : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              style={{
+                left: `${item.x}%`,
+                top: `${item.y}%`,
+              }}
+              aria-hidden="true"
+            >
+              <img src={item.image} alt="" />
+            </span>
+          ))}
+
+          <div
+            className={`fruit-basket-game__basket ${
+              game.basketLoad >= MAX_BASKET_LOAD ? 'is-full' : ''
+            }`}
             style={{
-              height: `${dropProgressPercent(game, 'left')}%`,
-            }}
-          />
-        </div>
-
-        <div
-          className={`fruit-basket-game__drop-zone fruit-basket-game__drop-zone--right ${basketDropZoneClass(
-            game,
-            'right',
-          )}`}
-        >
-          <strong>СДАТЬ</strong>
-          <span>→</span>
-
-          <i
-            style={{
-              height: `${dropProgressPercent(game, 'right')}%`,
-            }}
-          />
-        </div>
-
-        {game.items.map((item) => (
-          <span
-            key={item.id}
-            className={[
-              'fruit-basket-game__item',
-              `fruit-basket-game__item--${item.kind}`,
-              item.magnetized ? 'fruit-basket-game__item--magnetized' : '',
-              item.bonusType ? `fruit-basket-game__item--bonus-${item.bonusType}` : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            style={{
-              left: `${item.x}%`,
-              top: `${item.y}%`,
+              left: `${game.basketX}%`,
             }}
             aria-hidden="true"
           >
-            <img src={item.image} alt="" />
-          </span>
-        ))}
-
-        <div
-          className={`fruit-basket-game__basket ${
-            game.basketLoad >= MAX_BASKET_LOAD ? 'is-full' : ''
-          }`}
-          style={{
-            left: `${game.basketX}%`,
-          }}
-          aria-hidden="true"
-        >
-          <img src={playerImage} alt="" />
-          <i>●</i>
-        </div>
-
-        <div className="fruit-basket-game__ground" aria-hidden="true" />
-
-        {(game.gameOver || game.won) && (
-          <div className="fruit-basket-game__result">
-            <span className="fruit-basket-game__result-icon">{game.won ? '🌟' : '🍂'}</span>
-
-            <h2>{game.won ? 'Ценности собраны!' : 'Попытка окончена'}</h2>
-
-            <p>
-              {game.won
-                ? 'Отличная работа: всё ценное у тебя.'
-                : 'Попробуй ещё раз и береги жизни.'}
-            </p>
-
-            <button type="button" onClick={restart}>
-              Сыграть снова
-            </button>
+            <img src={playerImage} alt="" />
+            <i>●</i>
           </div>
-        )}
-      </div>
+
+          <div className="fruit-basket-game__ground" aria-hidden="true" />
+
+          {(game.gameOver || game.won) && (
+            <div className="fruit-basket-game__result">
+              <span className="fruit-basket-game__result-icon">{game.won ? '🌟' : '🍂'}</span>
+
+              <h2>{game.won ? 'Ценности собраны!' : 'Попытка окончена'}</h2>
+
+              <p>
+                {game.won
+                  ? 'Отличная работа: всё ценное у тебя.'
+                  : 'Попробуй ещё раз и береги жизни.'}
+              </p>
+
+              <button type="button" onClick={restart}>
+                Сыграть снова
+              </button>
+            </div>
+          )}
+        </div>
+      </ArcadeDisplay>
     </div>
   )
 }
