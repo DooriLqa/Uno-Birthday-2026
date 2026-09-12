@@ -538,7 +538,7 @@ h1 {
 .arkanoid-page .page-top {
   position: fixed;
   z-index: 3;
-  top: max(14px, env(safe-area-inset-top));
+  bottom: max(16px, env(safe-area-inset-bottom));
   left: max(14px, env(safe-area-inset-left));
   margin: 0;
 }
@@ -611,13 +611,11 @@ h1 {
   z-index: auto;
 }
 .fruit-basket-page .page-top {
-  position: relative;
+  position: fixed;
   z-index: 3;
-  width: min(1120px, 100%);
-  margin: 0 auto;
-}
-.fruit-basket-page .page-top {
-  margin-bottom: 14px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: max(16px, env(safe-area-inset-left));
+  margin: 0;
 }
 .fruit-basket-page .game-overlay__background {
   z-index: 2;
@@ -632,9 +630,6 @@ h1 {
 @media (max-width: 760px) {
   .game-overlay.fruit-basket-page {
     padding: 72px 10px 14px;
-  }
-  .fruit-basket-page .page-top {
-    margin-bottom: 10px;
   }
 }
 @media (max-width: 760px) {
