@@ -115,7 +115,7 @@ function InventorySlot({ item, onOpenRadio }: { item: InventoryItem; onOpenRadio
         aria-label={item.name}
         onClick={() => togglePage(item.id)}
       >
-        {PAGE_ASSETS[item.id] ? (
+        {PAGE_ASSETS[item.id]?.src ? (
           <img
             src={PAGE_ASSETS[item.id].src}
             alt=""
