@@ -1,6 +1,12 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { playSegmentTurnSound } from '@/features/totem-code/model/segmentSound'
+import {
+  useTotemCodeStore,
+  type TotemDrum,
+  type TotemValue,
+} from '@/features/totem-code/model/store'
+import { useProgressStore } from '@/features/game-progress/model/store'
 import totemCorgi from '@/shared/assets/games/totem-code/totem-corgi-three-slot-v4.png'
 import totemDachshund from '@/shared/assets/games/totem-code/totem-dachshund-three-slot-v4.png'
 import totemHusky from '@/shared/assets/games/totem-code/totem-husky-three-slot-v4.png'
@@ -24,8 +30,7 @@ import moonQuarter from '@/shared/assets/games/totem-code/glyphs/moon-quarter.pn
 import './TotemCodeGame.css'
 
 type Props = { onComplete: () => void }
-type Drum = 'moon' | 'concept' | 'letter'
-type TotemValue = Record<Drum, number>
+type Drum = TotemDrum
 type SymbolOption = { name: string; glyph?: string; image?: string }
 
 const symbols = {
@@ -70,11 +75,15 @@ const targetCode: TotemValue[] = [
   { moon: 1, concept: 0, letter: 5 },
   
 ]
-const initialValues = (): TotemValue[] =>
-  totems.map(() => ({ moon: 0, concept: 0, letter: 0 }))
 export function TotemCodeGame({ onComplete }: Props) {
-  const [values, setValues] = useState<TotemValue[]>(initialValues)
-  const [isSolved, setIsSolved] = useState(false)
+  const values = useTotemCodeStore((state) => state.values)
+  const setValues = useTotemCodeStore((state) => state.setValues)
+  const wasCompleted = useProgressStore((state) => state.completedGameIds.includes('totem-code'))
+  const isSolved = wasCompleted || values.every((totem, index) =>
+    (Object.keys(targetCode[index]) as Drum[]).every(
+      (drum) => totem[drum] === targetCode[index][drum],
+    ),
+  )
 
   const spinDrum = (totemIndex: number, drum: Drum, direction: -1 | 1) => {
     if (isSolved) return
@@ -88,14 +97,11 @@ export function TotemCodeGame({ onComplete }: Props) {
     )
     setValues(nextValues)
 
-    if (
-      nextValues.every((totem, index) =>
-        (Object.keys(targetCode[index]) as Drum[]).every(
-          (drum) => totem[drum] === targetCode[index][drum],
-        ),
-      )
-    ) {
-      setIsSolved(true)
+    if (nextValues.every((totem, index) =>
+      (Object.keys(targetCode[index]) as Drum[]).every(
+        (drum) => totem[drum] === targetCode[index][drum],
+      ),
+    )) {
       onComplete()
     }
   }
@@ -154,7 +160,7 @@ export function TotemCodeGame({ onComplete }: Props) {
           )
         })}
       </div>
-      {isSolved && <p className="totem-code-game__solved">Код принят! Тотемы засияли ✨</p>}
+      {isSolved && <p className="totem-code-game__solved">Код принят! Костер зажжен!</p>}
     </section>
   )
 }
