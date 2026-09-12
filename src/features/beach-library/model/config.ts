@@ -107,9 +107,10 @@ export const BOOKS = BOOK_TITLES.flatMap((titles, row) =>
     direction: row % 3,
     title,
     // Fixed scatter and colours do not reveal either classification.
-    x: 12 + ((((row * 5 + index) * 17) % 45) % 15) * 4.9 + Math.sin(row * 13 + index * 5) * 0.5,
+    // Keep the right window clear, including rotated and hovered book edges.
+    x: 12 + ((((row * 5 + index) * 17) % 45) % 15) * 3.8 + Math.sin(row * 13 + index * 5) * 0.5,
     y:
-      68 +
+      62 +
       Math.floor((((row * 5 + index) * 17) % 45) / 15) * 8 +
       Math.cos(row * 7 + index * 9) * 0.8,
     angle: ((row * 29 + index * 17) % 55) - 27,
@@ -136,7 +137,7 @@ export function isBookCorrect(book: number, slot: number) {
 }
 // Текст CSS-страницы: редактируйте здесь.
 export const INSTRUCTION =
-  'Найденные страницы помогут открыть код. Положи лист с текстом под страницы из книг и совмещай их: сквозь отверстия видны подсказки. Используй их, чтобы разгадать код.'
+  'Привет, путешественник! Если ты уже закончил с уборкой, то ты нашел 4 страницы из разных книг. Как видишь, не понятно из какой книги каждая страница, т.к. на странице не хватает ключевых фраз или слов-подсказок. Используй особую страницу и попробуй наложить найденные страницы на неё, чтобы понять из какой книги каждая страница. Что делать с найденными названиями книг? Думаю это - ключ к сокровищу.'
 export const LETTER_PAGE = 'beach-library-letters'
 export const NOTE_PAGE = 'beach-library-note'
 export const pageId = (index: number) => `beach-library-page-${index}`

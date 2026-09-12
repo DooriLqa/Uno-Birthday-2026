@@ -114,7 +114,7 @@ export const questions: QuizQuestion[] = [
     id: 'q15',
     text: 'Из какой игры отрывок стрима?',
     audioSrc: anotherCrabsTreasureStream,
-    answers: ['GTA: Vise City', 'Mixtape', 'Hades', 'Another Crab ́s Treasure'],
+    answers: ['GTA: Vice City', 'Mixtape', 'Hades', 'Another Crab ́s Treasure'],
     correctIndex: 3,
   },
   {
