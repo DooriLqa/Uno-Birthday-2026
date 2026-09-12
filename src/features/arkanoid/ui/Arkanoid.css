@@ -193,3 +193,18 @@
     font-size: 14px;
   }
 }
+
+.arkanoid__background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+}
+
+.arkanoid__overlay button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

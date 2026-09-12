@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-/* import type { CSSProperties } from 'react'
-import { ARKANOID_LAYOUT } from '../model/layout' */
+import type { CSSProperties } from 'react'
+import { ARKANOID_LAYOUT } from '../model/layout'
+import { ArcadeDisplay } from '@/shared/ui/ArcadeDisplay'
+import { useArcadeCoin } from '@/shared/lib/arcade/useArcadeCoin'
 import arkanoidSound1 from '@/shared/assets/games/arkanoid/Arkanoid_1.wav'
 import arkanoidSound2 from '@/shared/assets/games/arkanoid/Arkanoid_2.wav'
 import arkanoidSound3 from '@/shared/assets/games/arkanoid/Arkanoid_3.wav'
@@ -401,6 +403,32 @@ function saveProgress(currentLevel: number, unlockedLevel: number, completed: bo
 }
 
 export function Arkanoid({ onComplete }: Props) {
+  const layout = ARKANOID_LAYOUT
+  const stageRef = useRef<HTMLDivElement>(null)
+  const [stageScale, setStageScale] = useState(1)
+  const [sessionPaid, setSessionPaid] = useState(false)
+  const { insertCoin, inserting, pawCoins } = useArcadeCoin('arkanoid:coin-insert')
+  const horizontalExtent = Math.max(
+    Math.abs(layout.screen.x - layout.artwork.width / 2),
+    Math.abs(layout.screen.x + layout.screen.width - layout.artwork.width / 2),
+  )
+  const verticalExtent = Math.max(
+    Math.abs(layout.screen.y - layout.artwork.height / 2),
+    Math.abs(layout.screen.y + layout.screen.height - layout.artwork.height / 2),
+  )
+
+  useEffect(() => {
+    const stage = stageRef.current
+    if (!stage) return
+    const observer = new ResizeObserver(([entry]) => {
+      setStageScale(
+        Math.min(entry.contentRect.width / CANVAS_WIDTH, entry.contentRect.height / CANVAS_HEIGHT),
+      )
+    })
+    observer.observe(stage)
+    return () => observer.disconnect()
+  }, [])
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
   const animationRef = useRef<number | null>(null)
@@ -935,6 +963,8 @@ export function Arkanoid({ onComplete }: Props) {
         playSound('gameOver')
         setGameOver(true)
 
+        setSessionPaid(false)
+
         // После потери всех жизней прогресс полностью сбрасывается.
         saveProgress(1, 1, false)
         setUnlockedLevel(1)
@@ -1463,7 +1493,7 @@ export function Arkanoid({ onComplete }: Props) {
     [unlockedLevel],
   )
 
-  const launchBall = useCallback(() => {
+  const launchPaidBall = useCallback(() => {
     const game = gameRef.current
 
     if (!game || game.gameOver || game.won || game.running) {
@@ -1490,6 +1520,19 @@ export function Arkanoid({ onComplete }: Props) {
     game.started = true
     setStarted(true)
   }, [playSound])
+
+  const launchBall = useCallback(() => {
+    const game = gameRef.current
+    if (!game || game.gameOver || game.won || game.running || inserting) return
+    if (sessionPaid) {
+      launchPaidBall()
+      return
+    }
+    insertCoin(() => {
+      setSessionPaid(true)
+      launchPaidBall()
+    })
+  }, [insertCoin, inserting, launchPaidBall, sessionPaid])
 
   const nextLevel = useCallback(() => {
     if (level >= TOTAL_LEVELS) {
@@ -1592,74 +1635,123 @@ export function Arkanoid({ onComplete }: Props) {
   }, [draw, update])
 
   return (
-    <div className="arkanoid">
-      <div className="arkanoid__canvas-wrap">
+    <div
+      className="arkanoid"
+      style={
+        {
+          '--arkanoid-artwork-ratio': layout.artwork.width / layout.artwork.height,
+          '--arkanoid-scene-max-width': `${((layout.maxScreenViewportWidth * layout.artwork.width) / (2 * horizontalExtent)) * 100}vw`,
+          '--arkanoid-scene-height-limit': `${((layout.maxScreenViewportHeight * layout.artwork.width) / (2 * verticalExtent)) * 100}dvh`,
+          '--arkanoid-screen-x': `${(layout.screen.x / layout.artwork.width) * 100}%`,
+          '--arkanoid-screen-y': `${(layout.screen.y / layout.artwork.height) * 100}%`,
+          '--arkanoid-screen-width': `${(layout.screen.width / layout.artwork.width) * 100}%`,
+          '--arkanoid-screen-height': `${(layout.screen.height / layout.artwork.height) * 100}%`,
+          '--arkanoid-screen-radius': `${(layout.screen.radius / layout.screen.width) * 100}% / ${(layout.screen.radius / layout.screen.height) * 100}%`,
+          '--arkanoid-world-width': `${CANVAS_WIDTH}px`,
+          '--arkanoid-world-height': `${CANVAS_HEIGHT}px`,
+        } as CSSProperties
+      }
+    >
+      <div className="arkanoid__cabinet">
         <img
-          src={arkanoidBackgroundImage}
+          className="arkanoid__cabinet-image"
+          src={layout.image}
           alt=""
-          className="arkanoid__background"
+          aria-hidden="true"
           draggable={false}
         />
+        <div className="arkanoid__stage" ref={stageRef}>
+          <ArcadeDisplay>
+            <img
+              src={arkanoidBackgroundImage}
+              alt=""
+              className="arkanoid__background"
+              draggable={false}
+            />
 
-        <canvas
-          ref={canvasRef}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
-          className="arkanoid__canvas"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 1,
-            width: '100%',
-            height: '100%',
-            background: 'transparent',
-          }}
-        />
+            <div
+              className="arkanoid__world"
+              style={{ transform: `translate(-50%, -50%) scale(${stageScale})` }}
+            >
+              <canvas
+                ref={canvasRef}
+                width={CANVAS_WIDTH}
+                height={CANVAS_HEIGHT}
+                className="arkanoid__canvas"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  zIndex: 1,
+                  width: '100%',
+                  height: '100%',
+                  background: 'transparent',
+                }}
+              />
 
-        {!started && !won && !gameOver && (
-          <div
-            className="arkanoid__overlay arkanoid__overlay--ready"
-            style={{ background: 'transparent', pointerEvents: 'none' }}
-          >
-            <p>Нажмите Space, чтобы запустить шар</p>
-          </div>
-        )}
+              {!started && !won && !gameOver && (
+                <div
+                  className="arkanoid__overlay arkanoid__overlay--ready"
+                  style={{ background: 'transparent' }}
+                >
+                  <p>
+                    {inserting
+                      ? 'Монетка вставляется…'
+                      : sessionPaid
+                        ? 'Нажмите Space, чтобы запустить шар'
+                        : pawCoins < 1
+                          ? 'Не хватает монеток'
+                          : 'Одна партия — 1 монетка. Нажмите Space'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={launchBall}
+                    disabled={inserting || (!sessionPaid && pawCoins < 1)}
+                  >
+                    {sessionPaid ? 'Запустить шар' : 'Вставить монетку и играть'}
+                  </button>
+                </div>
+              )}
 
-        {gameOver && (
-          <div className="arkanoid__overlay">
-            <h2>Игра окончена</h2>
+              {gameOver && (
+                <div className="arkanoid__overlay">
+                  <h2>Игра окончена</h2>
 
-            <p>Очки: {score}</p>
-            <p>
-              Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}
-            </p>
+                  <p>Очки: {score}</p>
+                  <p>
+                    Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}
+                  </p>
 
-            <button type="button" onClick={() => startGame(1)}>
-              Попробовать снова
-            </button>
-          </div>
-        )}
+                  <button type="button" onClick={() => startGame(1)}>
+                    Попробовать снова
+                  </button>
+                </div>
+              )}
 
-        {won && (
-          <div className="arkanoid__overlay">
-            <h2>{level >= TOTAL_LEVELS ? 'Все уровни пройдены!' : `Уровень ${level} пройден!`}</h2>
+              {won && (
+                <div className="arkanoid__overlay">
+                  <h2>
+                    {level >= TOTAL_LEVELS ? 'Все уровни пройдены!' : `Уровень ${level} пройден!`}
+                  </h2>
 
-            <p>Очки: {score}</p>
-            <p>
-              Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}
-            </p>
+                  <p>Очки: {score}</p>
+                  <p>
+                    Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}
+                  </p>
 
-            {level < TOTAL_LEVELS ? (
-              <button type="button" onClick={nextLevel}>
-                Следующий уровень
-              </button>
-            ) : (
-              <button type="button" onClick={onComplete}>
-                Завершить
-              </button>
-            )}
-          </div>
-        )}
+                  {level < TOTAL_LEVELS ? (
+                    <button type="button" onClick={nextLevel}>
+                      Следующий уровень
+                    </button>
+                  ) : (
+                    <button type="button" onClick={onComplete}>
+                      Завершить
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </ArcadeDisplay>
+        </div>
       </div>
     </div>
   )

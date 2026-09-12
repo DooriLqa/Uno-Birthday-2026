@@ -139,6 +139,7 @@ function InventorySlot({
   onInspect: () => void
 }) {
   const presentation = getInventoryItemPresentation(item)
+  const togglePage = useLibraryPages((state) => state.toggle)
   const isRadio = item.id === RADIO_ITEM_ID
   const isKeychain = isArcadeKeychain(item.id)
   const artwork = getInventoryItemArtwork(item.id)
