@@ -317,7 +317,7 @@ export function FishingGame({ onClose }: Props) {
     rarityRef.current = pickRarity(distance)
     setCastDistance(distance)
     setBobberX(58)
-    setBobberTop(distance === 'near' ? 65 : distance === 'mid' ? 47 : 39)
+    setBobberTop(distance === 'near' ? 65 : distance === 'mid' ? 50 : 42)
     setPhase('casting')
     window.setTimeout(() => {
       if (phaseRef.current !== 'casting') return

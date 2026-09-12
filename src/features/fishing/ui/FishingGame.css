@@ -49,6 +49,10 @@
   text-shadow: 3px 3px 0 #68452d;
   pointer-events: none;
 }
+.fishing-rod-image {
+  width: 811px;
+  height: 1260px;
+}
 .fishing-title span {
   font-size: 0.78rem;
   font-weight: 900;
@@ -1143,7 +1147,10 @@
   45% {
     transform: rotate(-12deg) translateY(-5px);
   }
-  100% {
+  80% {
     transform: rotate(3deg) translateY(0);
+  }
+  100% {
+    transform: rotate(0deg) translateY(0);
   }
 }
