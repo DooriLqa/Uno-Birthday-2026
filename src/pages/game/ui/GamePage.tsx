@@ -2,7 +2,6 @@ import type { GameDefinition } from '@/entities/game/model/types'
 import { useProgressStore } from '@/features/game-progress/model/store'
 import { useInventoryStore } from '@/features/inventory/model/store'
 import { GAME_REWARDS_BY_GAME_ID } from '@/features/inventory/model/items'
-import { audioController } from '@/shared/lib/audio/audioController'
 type Props = { game: GameDefinition; onBack: () => void; onOpenRadio?: () => void }
 
 export function GamePage({ game, onBack, onOpenRadio }: Props) {
@@ -20,7 +19,6 @@ export function GamePage({ game, onBack, onOpenRadio }: Props) {
       : false
     if ((isFirstVictory || game.id === 'japonsk') && reward && !rewardAlreadyOwned) {
       addItem(reward)
-      audioController.playVendingDrop()
     }
   }
 

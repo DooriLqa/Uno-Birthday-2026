@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import inventoryPickupSound from '@/shared/assets/common/audio/camping-tent-straightening.mp3'
+import { audioController } from '@/shared/lib/audio/audioController'
 import { BOOK_ITEMS } from './items'
 
 export type InventoryRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
@@ -49,6 +51,7 @@ export const useInventoryStore = create<InventoryState>()(
             : [...state.items, { ...item, quantity: item.quantity ?? 1 }],
           previewItemId: shouldInspect ? item.id : state.previewItemId,
         }))
+        audioController.playOneShot(inventoryPickupSound)
         return nextQuantity
       },
       removeItem: (itemId, amount = 1) =>
