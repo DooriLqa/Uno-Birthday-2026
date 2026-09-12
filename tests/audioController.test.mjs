@@ -171,6 +171,17 @@ test('radio signal, noise and synthesized effects share the same master and cont
   for (const gain of context.gains.slice(1)) assert.equal(master.gain.value * gain.gain.value, 0)
 })
 
+test('vending reward sound is synthesized through the shared master output', () => {
+  controller.setMasterVolume(0.5)
+  controller.playVendingDrop()
+  const context = Context.instances[0]
+  const master = context.gains[0]
+
+  assert.equal(context.oscillators.length, 3)
+  assert.ok(context.gains.slice(1).every((gain) => gain.connections.includes(master)))
+  assert.ok(context.oscillators.every((oscillator) => oscillator.stopped))
+})
+
 test('replacing an exclusive one-shot stops its predecessor without stopping other effects', async () => {
   controller.playOneShot('first.wav', { key: 'dialogue' })
   controller.playOneShot('shot.wav', { key: 'shot' })

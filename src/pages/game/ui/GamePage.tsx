@@ -3,6 +3,7 @@ import type { GameDefinition } from '@/entities/game/model/types'
 import { useProgressStore } from '@/features/game-progress/model/store'
 import { useInventoryStore } from '@/features/inventory/model/store'
 import { ARCADE_REWARDS_BY_GAME_ID } from '@/features/inventory/model/items'
+import { audioController } from '@/shared/lib/audio/audioController'
 type Props = { game: GameDefinition; onBack: () => void; onOpenRadio?: () => void }
 
 export function GamePage({ game, onBack, onOpenRadio }: Props) {
@@ -18,7 +19,10 @@ export function GamePage({ game, onBack, onOpenRadio }: Props) {
     const rewardAlreadyOwned = reward
       ? useInventoryStore.getState().items.some((item) => item.id === reward.id)
       : false
-    if (isFirstVictory && reward && !rewardAlreadyOwned) addItem(reward)
+    if (isFirstVictory && reward && !rewardAlreadyOwned) {
+      addItem(reward)
+      audioController.playVendingDrop()
+    }
   }
 
   return (

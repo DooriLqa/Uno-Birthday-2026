@@ -2,9 +2,13 @@ import type { InventoryItem } from './store'
 import collieRedKeychain from '@/shared/assets/features/inventory/arcade-keychains/collie-red-keychain.png'
 import shepherdGreenKeychain from '@/shared/assets/features/inventory/arcade-keychains/shepherd-green-keychain.png'
 import beagleBlueKeychain from '@/shared/assets/features/inventory/arcade-keychains/beagle-blue-keychain.png'
-import tropicalFieldJournalSpread from '@/shared/assets/features/inventory/books/tropical-field-journal-spread.png'
-import sailorLogbookSpread from '@/shared/assets/features/inventory/books/sailor-logbook-spread.png'
-import treasureAtlasSpread from '@/shared/assets/features/inventory/books/treasure-atlas-spread.png'
+import tropicalFieldJournalSpreadOne from '@/shared/assets/features/inventory/books/tropical-field-journal-spread-v3-1.png'
+import tropicalFieldJournalSpreadTwo from '@/shared/assets/features/inventory/books/tropical-field-journal-spread-v3-2.png'
+import sailorLogbookSpread from '@/shared/assets/features/inventory/books/sailor-logbook-spread-v3.png'
+import treasureAtlasSpread from '@/shared/assets/features/inventory/books/treasure-atlas-spread-v3.png'
+import tropicalFieldJournalPickup from '@/shared/assets/features/inventory/books/pickups/tropical-field-journal.png'
+import sailorLogbookPickup from '@/shared/assets/features/inventory/books/pickups/sailor-logbook.png'
+import treasureAtlasPickup from '@/shared/assets/features/inventory/books/pickups/treasure-atlas.png'
 import coffeeArtwork from '@/shared/assets/features/inventory/drinks/coffee.png'
 import bubbleTeaArtwork from '@/shared/assets/features/inventory/drinks/bubble-tea.png'
 
@@ -63,7 +67,7 @@ export const BOOK_ITEMS: readonly InventoryItem[] = [
     kind: 'book',
     rarity: 'uncommon',
     inspectable: true,
-    pages: [tropicalFieldJournalSpread],
+    pages: [tropicalFieldJournalSpreadOne, tropicalFieldJournalSpreadTwo],
   },
   {
     id: 'sailor-logbook',
@@ -112,13 +116,17 @@ export const ARCADE_REWARDS_BY_GAME_ID: Readonly<Record<string, InventoryItem>> 
   },
 }
 
+const BOOK_PICKUP_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
+  'tropical-field-journal': tropicalFieldJournalPickup,
+  'sailor-logbook': sailorLogbookPickup,
+  'treasure-hunter-atlas': treasureAtlasPickup,
+}
+
 const ITEM_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
   'arcade-pin-dachshund-red': collieRedKeychain,
   'arcade-pin-shiba-green': shepherdGreenKeychain,
   'arcade-pin-aussie-blue': beagleBlueKeychain,
-  'tropical-field-journal': tropicalFieldJournalSpread,
-  'sailor-logbook': sailorLogbookSpread,
-  'treasure-hunter-atlas': treasureAtlasSpread,
+  ...BOOK_PICKUP_ARTWORK_BY_ID,
   espresso: coffeeArtwork,
   cappuccino: coffeeArtwork,
   'vanilla-latte': coffeeArtwork,
@@ -140,6 +148,8 @@ const ITEM_DEFINITIONS_BY_ID: Readonly<Record<string, InventoryItem>> = {
 }
 
 export const getInventoryItemArtwork = (itemId: string) => ITEM_ARTWORK_BY_ID[itemId]
+
+export const getBookPickupArtwork = (itemId: string) => BOOK_PICKUP_ARTWORK_BY_ID[itemId]
 
 export const getInventoryItemPresentation = (item: InventoryItem): InventoryItem => {
   const currentDefinition = ITEM_DEFINITIONS_BY_ID[item.id]

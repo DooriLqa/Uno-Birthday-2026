@@ -1,4 +1,4 @@
-import arcadeImage from '@/shared/assets/games/flappy-bird/niche-stream-arcade-v2.png'
+import arcadeImage from '@/shared/assets/games/flappy-bird/niche-stream-arcade-v4.png'
 
 export type FlappyBirdLayout = {
   image: string

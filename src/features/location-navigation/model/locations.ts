@@ -6,9 +6,9 @@ import lounger from '@/shared/assets/locations/tourist/lounger.png'
 import beach from '@/shared/assets/locations/tourist/beach.png'
 import shop from '@/shared/assets/locations/tourist/shop.png'
 import arcades from '@/shared/assets/locations/tourist/arcades.png'
-import wildBeach from '@/shared/assets/locations/wild/overview.png'
+import wildBeach from '@/shared/assets/locations/wild/overview-v3.png'
 import fisherHut from '@/shared/assets/locations/wild/fisher-hut.png'
-import totemCamp from '@/shared/assets/locations/wild/totem-camp.png'
+import totemCamp from '@/shared/assets/locations/wild/totem-cape-closeup-extinguished-v3.png'
 import pirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
 import jungleOverview from '@/shared/assets/locations/jungle/overview.png'
 import jungleCave from '@/shared/assets/locations/jungle/cave.png'
@@ -239,8 +239,8 @@ export const locations: Record<LocationId, LocationDefinition> = {
       },
       {
         id: 'totem-camp',
-        label: 'Кострище с тотемами',
-        area: area(31, 19, 38, 52),
+        label: 'Мыс с тотемами',
+        area: area(40, 13, 20, 46),
         cursor: 'magnify',
         action: { type: 'location', locationId: 'totem-camp' },
       },

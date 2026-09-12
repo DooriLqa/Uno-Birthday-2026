@@ -1,12 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  ChevronLeft,
-  ChevronRight,
   Map as MapIcon,
   Radio as RadioIcon,
   Volume2,
-  X,
 } from 'lucide-react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
@@ -17,8 +14,6 @@ import {
 } from '@/features/inventory/model/items'
 import { useRadioStore } from '@/features/beach-radio/model/radioStore'
 import './GameHud.css'
-import { useLibraryPages } from '@/features/beach-library/model/pagesStore'
-import { PAGE_ASSETS } from '@/features/beach-library/model/pageAssets'
 
 const INVENTORY_COLUMNS = 2
 const RADIO_ITEM_ID = 'beach-radio'
@@ -33,7 +28,9 @@ type Props = {
 export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
   const pawCoins = usePawCoinStore((state) => state.pawCoins)
   const inventory = useInventoryStore((state) => state.items)
-  const [previewItem, setPreviewItem] = useState<InventoryItem | null>(null)
+  const previewItemId = useInventoryStore((state) => state.previewItemId)
+  const openItemPreview = useInventoryStore((state) => state.openItemPreview)
+  const closeItemPreview = useInventoryStore((state) => state.closeItemPreview)
   const isPowered = useRadioStore((state) => state.isPowered)
   const discoveredStationIds = useRadioStore((state) => state.discoveredStationIds)
   const volume = useRadioStore((state) => state.volume)
@@ -45,6 +42,7 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
     inventory.length + (inventory.length % INVENTORY_COLUMNS),
   )
   const emptySlotCount = renderedSlotCount - inventory.length
+  const previewItem = inventory.find((item) => item.id === previewItemId) ?? null
 
   return (
     <div className="game-hud" aria-label="Игровой интерфейс">
@@ -74,7 +72,7 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
                 key={item.id}
                 item={item}
                 onOpenRadio={onOpenRadio}
-                onInspect={() => setPreviewItem(item)}
+                onInspect={() => openItemPreview(item.id)}
               />
             ))}
             {Array.from({ length: emptySlotCount }, (_, index) => (
@@ -124,7 +122,7 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
           </div>
         )}
       </div>
-      {previewItem && <InventoryPreview item={previewItem} onClose={() => setPreviewItem(null)} />}
+      {previewItem && <InventoryPreview item={previewItem} onClose={closeItemPreview} />}
     </div>
   )
 }
@@ -198,7 +196,6 @@ function InventorySlot({
 }
 
 function InventoryPreview({ item, onClose }: { item: InventoryItem; onClose: () => void }) {
-  const closeButtonRef = useRef<HTMLButtonElement>(null)
   const [pageIndex, setPageIndex] = useState(0)
   const presentation = getInventoryItemPresentation(item)
   const artwork = getInventoryItemArtwork(item.id)
@@ -211,7 +208,6 @@ function InventoryPreview({ item, onClose }: { item: InventoryItem; onClose: () 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    closeButtonRef.current?.focus()
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
@@ -231,28 +227,19 @@ function InventoryPreview({ item, onClose }: { item: InventoryItem; onClose: () 
 
   return createPortal(
     <div
-      className={`inventory-preview ${isBook ? 'inventory-preview--book' : ''}`}
+      className={`inventory-preview ${isBook ? 'inventory-preview--book' : 'inventory-preview--item'}`}
       role="dialog"
       aria-modal="true"
-      aria-label={isBook ? presentation.name : undefined}
-      aria-labelledby={isBook ? undefined : 'inventory-preview-title'}
+      aria-label={presentation.name}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose()
       }}
     >
       <article
-        className={`inventory-preview__card ${isBook ? 'inventory-preview__card--book' : ''}`}
+        className={`inventory-preview__card ${
+          isBook ? 'inventory-preview__card--book' : 'inventory-preview__card--item'
+        }`}
       >
-        <button
-          ref={closeButtonRef}
-          type="button"
-          className="inventory-preview__close"
-          onClick={onClose}
-          aria-label="Закрыть просмотр предмета"
-          title="Закрыть"
-        >
-          <X size={30} />
-        </button>
         {isBook ? (
           <div className="inventory-book">
             <div className="inventory-book__page">
@@ -268,9 +255,7 @@ function InventoryPreview({ item, onClose }: { item: InventoryItem; onClose: () 
                 disabled={pageIndex === 0}
                 aria-label="Предыдущая страница"
                 title="Предыдущая страница"
-              >
-                <ChevronLeft size={48} />
-              </button>
+              />
               <button
                 type="button"
                 className="inventory-book__turn-zone inventory-book__turn-zone--next"
@@ -278,9 +263,7 @@ function InventoryPreview({ item, onClose }: { item: InventoryItem; onClose: () 
                 disabled={pageIndex === bookPages.length - 1}
                 aria-label="Следующая страница"
                 title="Следующая страница"
-              >
-                <ChevronRight size={48} />
-              </button>
+              />
             </div>
             <nav className="inventory-book__pagination" aria-label="Страницы книги">
               {bookPages.map((page, index) => (
@@ -304,12 +287,6 @@ function InventoryPreview({ item, onClose }: { item: InventoryItem; onClose: () 
           <span className="inventory-preview__fallback" aria-hidden="true">
             {presentation.icon}
           </span>
-        )}
-        {!isBook && (
-          <div className="inventory-preview__caption">
-            <h2 id="inventory-preview-title">{presentation.name}</h2>
-            {presentation.description && <p>{presentation.description}</p>}
-          </div>
         )}
       </article>
     </div>,
