@@ -13,6 +13,8 @@ import {
   isArcadeKeychain,
 } from '@/features/inventory/model/items'
 import { useRadioStore } from '@/features/beach-radio/model/radioStore'
+import { useLibraryPages } from '@/features/beach-library/model/pagesStore'
+import { MAP_ITEM_ID } from '@/features/location-navigation/model/merchantDialogues'
 import './GameHud.css'
 import coin from '@/shared/assets/common/branding/coin.png'
 
@@ -32,6 +34,7 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
   const previewItemId = useInventoryStore((state) => state.previewItemId)
   const openItemPreview = useInventoryStore((state) => state.openItemPreview)
   const closeItemPreview = useInventoryStore((state) => state.closeItemPreview)
+  const toggleLibraryPage = useLibraryPages((state) => state.toggle)
   const isPowered = useRadioStore((state) => state.isPowered)
   const discoveredStationIds = useRadioStore((state) => state.discoveredStationIds)
   const volume = useRadioStore((state) => state.volume)
@@ -73,7 +76,9 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
                 key={item.id}
                 item={item}
                 onOpenRadio={onOpenRadio}
+                onOpenMap={onOpenMap}
                 onInspect={() => openItemPreview(item.id)}
+                onToggleLibraryPage={() => toggleLibraryPage(item.id)}
               />
             ))}
             {Array.from({ length: emptySlotCount }, (_, index) => (
@@ -131,22 +136,28 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
 function InventorySlot({
   item,
   onOpenRadio,
+  onOpenMap,
   onInspect,
+  onToggleLibraryPage,
 }: {
   item: InventoryItem
   onOpenRadio?: () => void
+  onOpenMap?: () => void
   onInspect: () => void
+  onToggleLibraryPage: () => void
 }) {
   const presentation = getInventoryItemPresentation(item)
   const isRadio = item.id === RADIO_ITEM_ID
+  const isMap = item.id === MAP_ITEM_ID
   const isKeychain = isArcadeKeychain(item.id)
+  const isLibraryPage = item.id.startsWith('beach-library-')
   const artwork = getInventoryItemArtwork(item.id)
   const className = [
     'game-hud__slot',
     presentation.rarity ? 'game-hud__slot--rarity' : '',
     presentation.rarity ? `game-hud__slot--${presentation.rarity}` : '',
     isKeychain ? 'game-hud__slot--keychain' : '',
-    isRadio || presentation.inspectable ? 'game-hud__slot--button' : '',
+    isRadio || isMap || presentation.inspectable || isLibraryPage ? 'game-hud__slot--button' : '',
   ]
     .filter(Boolean)
     .join(' ')
@@ -171,6 +182,34 @@ function InventorySlot({
         aria-label="Открыть радиоприёмник"
       >
         <RadioIcon size={28} />
+      </button>
+    )
+  }
+
+  if (isMap && onOpenMap) {
+    return (
+      <button
+        type="button"
+        className={className}
+        onClick={onOpenMap}
+        title="Открыть карту острова"
+        aria-label="Открыть карту острова"
+      >
+        {content}
+      </button>
+    )
+  }
+
+  if (isLibraryPage) {
+    return (
+      <button
+        type="button"
+        className={className}
+        onClick={onToggleLibraryPage}
+        title={`Открыть: ${presentation.name}`}
+        aria-label={`Открыть: ${presentation.name}`}
+      >
+        {content}
       </button>
     )
   }

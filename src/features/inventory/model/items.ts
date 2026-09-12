@@ -11,6 +11,10 @@ import sailorLogbookPickup from '@/shared/assets/features/inventory/books/pickup
 import treasureAtlasPickup from '@/shared/assets/features/inventory/books/pickups/treasure-atlas.png'
 import coffeeArtwork from '@/shared/assets/features/inventory/drinks/coffee.png'
 import bubbleTeaArtwork from '@/shared/assets/features/inventory/drinks/bubble-tea.png'
+import islandMapIcon from '@/shared/assets/features/inventory/paper-icons/island-map.png'
+import libraryPageIcon from '@/shared/assets/features/inventory/paper-icons/library-page.png'
+import libraryHintIcon from '@/shared/assets/features/inventory/paper-icons/library-hint.png'
+import libraryNoteIcon from '@/shared/assets/features/inventory/paper-icons/library-note.png'
 
 export type CafeDrinkId =
   | 'espresso'
@@ -123,6 +127,13 @@ const BOOK_PICKUP_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
 }
 
 const ITEM_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
+  'shiba-treasure-map': islandMapIcon,
+  'beach-library-page-0': libraryPageIcon,
+  'beach-library-page-1': libraryPageIcon,
+  'beach-library-page-2': libraryPageIcon,
+  'beach-library-page-3': libraryPageIcon,
+  'beach-library-letters': libraryHintIcon,
+  'beach-library-note': libraryNoteIcon,
   'arcade-pin-dachshund-red': collieRedKeychain,
   'arcade-pin-shiba-green': shepherdGreenKeychain,
   'arcade-pin-aussie-blue': beagleBlueKeychain,

@@ -1,7 +1,7 @@
 import { openDialogue, type Dialogue } from '@/features/dialogues'
 import librarianSprite from '@/shared/assets/features/dialogues/poodle-librarian.png'
 
-const speaker = { id: 'library-poodle', name: 'Библиотекарша', sprite: librarianSprite }
+const speaker = { id: 'library-poodle', name: 'Библиотекарь', sprite: librarianSprite }
 const yuni = { id: 'yuni', name: 'Юни', isMain: true }
 
 export const librarianDialogue: Dialogue = {

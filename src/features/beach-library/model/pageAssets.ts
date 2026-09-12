@@ -1,8 +1,8 @@
-import book1 from '../assets/pages/book1.png'
-import book2 from '../assets/pages/book2.png'
-import book3 from '../assets/pages/book3.png'
-import book4 from '../assets/pages/book4.png'
-import text from '../assets/pages/text.png'
+import book1 from '@/shared/assets/games/beach-library/book1.png'
+import book2 from '@/shared/assets/games/beach-library/book2.png'
+import book3 from '@/shared/assets/games/beach-library/book3.png'
+import book4 from '@/shared/assets/games/beach-library/book4.png'
+import text from '@/shared/assets/games/beach-library/text.png'
 import { INSTRUCTION, LETTER_PAGE, NOTE_PAGE, pageId } from './config'
 export const PAGE_ASSETS: Record<string, { src?: string; title: string; description: string }> = {
   ...Object.fromEntries(

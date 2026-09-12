@@ -3,7 +3,7 @@
 Инструмент: встроенный image_gen. Изображения скопированы в проект без изменения альфа-канала.
 
 Фон: `src/shared/assets/locations/tourist/library.png`.
-Спрайты: `floor-book-teal.png`, `floor-book-rust.png`, `floor-book-blue.png`, `floor-book-gold.png`, `floor-book-purple.png` в этой папке.
+Спрайты: `src/shared/assets/games/beach-library/floor-book-teal.png`, `floor-book-rust.png`, `floor-book-blue.png`, `floor-book-gold.png`, `floor-book-purple.png`.
 
 ## Фон
 

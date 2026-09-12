@@ -6,12 +6,24 @@ import { resetGameState } from '@/features/game-progress/model/resetGameState'
 import { ARCADE_REWARDS_BY_GAME_ID, BOOK_ITEMS } from '@/features/inventory/model/items'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
+import { LETTER_PAGE, NOTE_PAGE, pageId } from '@/features/beach-library/model/config'
 import coin from '@/shared/assets/common/branding/coin.png'
 import './DevCoinControls.css'
+
+const LIBRARY_PAGE_ITEMS: InventoryItem[] = [
+  ...Array.from({ length: 4 }, (_, index) => ({
+    id: pageId(index),
+    name: `Страница из книги ${index + 1}`,
+    icon: '📄',
+  })),
+  { id: LETTER_PAGE, name: 'Лист с текстом (буквы)', icon: '🔤' },
+  { id: NOTE_PAGE, name: 'Записка библиотекаря (подсказка)', icon: '📜' },
+]
 
 const DEV_ITEMS: InventoryItem[] = [
   { id: 'beach-radio', name: 'Радиоприёмник', icon: '📻' },
   { id: 'oil-lantern', name: 'Масляный фонарь', icon: '🏮' },
+  ...LIBRARY_PAGE_ITEMS,
   ...BOOK_ITEMS,
   ...Object.values(ARCADE_REWARDS_BY_GAME_ID),
 ]
