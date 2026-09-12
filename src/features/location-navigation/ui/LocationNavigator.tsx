@@ -4,6 +4,7 @@ import { useWorldStore, type SceneSnapshot } from '../model/worldStore'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import { useDialogueStore } from '@/features/dialogues'
 import { BeachLibrary } from '@/features/beach-library/ui/BeachLibrary'
+import { talkToLibrarian } from '@/features/beach-library/model/librarianDialogue'
 import './LocationNavigator.css'
 
 type Props = {
@@ -135,6 +136,7 @@ export function LocationNavigator({
     if (item.type === 'game') onOpenGame(item.gameId)
     if (item.type === 'merchant') onMerchant()
     if (item.type === 'sailor') onSailor()
+    if (item.type === 'librarian') talkToLibrarian()
     if (item.type === 'map') onOpenMap()
     if (item.type === 'jungle-cave') onEnterJungleCave()
     if (item.type === 'barista') onBarista()

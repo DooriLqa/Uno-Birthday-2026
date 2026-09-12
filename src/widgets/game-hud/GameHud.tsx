@@ -178,11 +178,12 @@ function InventorySlot({
   }
 
   if (item.id.startsWith('beach-library-')) {
+    const pageTitle = PAGE_ASSETS[item.id]?.title ?? item.name
     return (
       <button
         className="game-hud__slot game-hud__slot--button"
-        title={item.name}
-        aria-label={item.name}
+        title={pageTitle}
+        aria-label={pageTitle}
         onClick={() => togglePage(item.id)}
       >
         {PAGE_ASSETS[item.id]?.src ? (
@@ -194,7 +195,6 @@ function InventorySlot({
         ) : (
           <span>{item.icon}</span>
         )}
-        {item.id.includes('-page-') && <small>{Number(item.id.split('-').at(-1)) + 1}</small>}
       </button>
     )
   }

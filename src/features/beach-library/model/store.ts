@@ -26,10 +26,10 @@ function syncRewards(state: State) {
   inventory.items
     .filter((item) => item.id.startsWith('beach-library-') && !valid.has(item.id))
     .forEach((item) => inventory.removeItem(item.id, item.quantity ?? 1))
-  state.rewarded.forEach((page) => award(pageId(page), `Страница ${page + 1}`))
+  state.rewarded.forEach((page) => award(pageId(page), 'Страница из книги'))
   if (state.finished) {
     award(LETTER_PAGE, 'Лист с текстом', '🔤')
-    award(NOTE_PAGE, 'Записка библиотекаря', '📜')
+    award(NOTE_PAGE, 'Письмо из библиотеки', '📜')
   }
 }
 type State = {
@@ -37,6 +37,8 @@ type State = {
   rewarded: number[]
   discovered: number[]
   finished: boolean
+  librarianIntroduced: boolean
+  introduceLibrarian: () => void
   enter: () => void
   place: (book: number, slot: number) => string[] | null
 }
@@ -47,6 +49,8 @@ export const useLibraryStore = create<State>()(
       rewarded: [],
       discovered: [],
       finished: false,
+      librarianIntroduced: false,
+      introduceLibrarian: () => set({ librarianIntroduced: true }),
       enter: () => {
         if (completedCabinets(get().slots).length === 3) {
           set({ rewarded: [0, 1, 2, 3], finished: true })

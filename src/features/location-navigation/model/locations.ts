@@ -37,6 +37,7 @@ export type LocationAction =
   | { type: 'game'; gameId: string }
   | { type: 'merchant' }
   | { type: 'sailor' }
+  | { type: 'librarian' }
   | { type: 'map' }
   | { type: 'jungle-cave' }
   | { type: 'barista' }
@@ -161,7 +162,15 @@ export const locations: Record<LocationId, LocationDefinition> = {
     title: 'Пляжная библиотека',
     image: library,
     ambienceVolume: 0.3,
-    hotspots: [],
+    hotspots: [
+      {
+        id: 'librarian',
+        label: 'Поговорить с библиотекаршей',
+        area: area(80, 26, 19, 70),
+        cursor: 'dialogue',
+        action: { type: 'librarian' },
+      },
+    ],
   },
   lounger: { ...base, id: 'lounger', title: 'Вид с лежака', image: lounger, hotspots: [] },
   'tourist-beach': {
