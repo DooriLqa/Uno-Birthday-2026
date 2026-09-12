@@ -1254,3 +1254,7 @@
     flex: 1 0 100%;
   }
 }
+.coin {
+  width: 30px;
+  height: 30px;
+}
