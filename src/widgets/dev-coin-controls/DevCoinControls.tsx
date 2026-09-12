@@ -6,6 +6,7 @@ import { resetGameState } from '@/features/game-progress/model/resetGameState'
 import { ARCADE_REWARDS_BY_GAME_ID, BOOK_ITEMS } from '@/features/inventory/model/items'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
+import coin from '@/shared/assets/common/branding/coin.png'
 import './DevCoinControls.css'
 
 const DEV_ITEMS: InventoryItem[] = [
@@ -36,7 +37,10 @@ export function DevCoinControls() {
     <div className="dev-coin-controls">
       {open && (
         <div className="dev-coin-controls__panel">
-          <strong>🐾 Монетки: {pawCoins}</strong>
+          <strong>
+            <img className="dev-coin" src={coin} alt="" />
+            Монетки: {pawCoins}
+          </strong>
           <div className="dev-coin-controls__coin-actions">
             <button type="button" onClick={() => spendPawCoins(10)} title="Убавить 10">
               <Minus size={15} /> 10

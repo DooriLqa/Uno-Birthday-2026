@@ -808,3 +808,7 @@
     transition: none;
   }
 }
+.coin {
+  width: 30px;
+  height: 30px;
+}

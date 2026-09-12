@@ -18,6 +18,7 @@ import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
 import type { QuizQuestion } from '@/features/beach-radio/model/types'
 import { VolumeKnob } from './VolumeKnob/VolumeKnob'
 import radio from '@/shared/assets/games/beach-radio/radio.png'
+import coin from '@/shared/assets/common/branding/coin.png'
 import './BeachRadioGame.css'
 
 type Props = { onComplete: () => void; onOpenRadio?: () => void; onClose?: () => void }
@@ -115,7 +116,7 @@ export function BeachRadioGame({ onComplete, onOpenRadio, onClose }: Props) {
             <div className="beach-radio-dialog__name">Пончик, продавец</div>
             <p>
               {hasRadio
-                ? 'Радио уже твоё. Но я всегда готов ещё поиграть, если хочешь! Попытка стоит всего 1 🐾.'
+                ? 'Радио уже твоё. Но я всегда готов ещё поиграть, если хочешь! Попытка стоит всего 1 монетку.'
                 : 'Привет! Хочешь забрать этот старенький радиоприёмник? Просто так не отдам — сыграем в квиз.'}
             </p>
             <div className="beach-radio-dialog__actions">
@@ -124,7 +125,7 @@ export function BeachRadioGame({ onComplete, onOpenRadio, onClose }: Props) {
                 className="radio-action radio-action--primary"
                 onClick={startQuiz}
               >
-                <Coins size={18} /> Играть за 1 🐾
+                <Coins size={18} /> Играть за 1 <img className="coin" src={coin} alt="" />
               </button>
               {hasRadio && (
                 <button type="button" className="radio-action" onClick={openRadio}>

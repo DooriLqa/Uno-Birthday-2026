@@ -57,7 +57,6 @@ export function LibraryPages() {
               className="library-pages__return"
               onClick={() => toggle(page.id)}
               aria-label="Убрать страницу в инвентарь"
-              title="Убрать страницу в инвентарь"
             >
               ↩
             </button>

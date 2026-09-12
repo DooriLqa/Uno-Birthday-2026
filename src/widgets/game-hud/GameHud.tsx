@@ -14,6 +14,9 @@ import {
 } from '@/features/inventory/model/items'
 import { useRadioStore } from '@/features/beach-radio/model/radioStore'
 import './GameHud.css'
+import { useLibraryPages } from '@/features/beach-library/model/pagesStore'
+import { PAGE_ASSETS } from '@/features/beach-library/model/pageAssets'
+import coin from '@/shared/assets/common/branding/coin.png'
 
 const INVENTORY_COLUMNS = 2
 const RADIO_ITEM_ID = 'beach-radio'
@@ -59,7 +62,7 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
           </button>
         )}
         <div className="game-hud__coins" title="Монетки с лапкой">
-          <span className="game-hud__coin-icon">🐾</span>
+          <img className="game-hud__coin" src={coin} alt="" />
           <strong>{pawCoins}</strong>
         </div>
       </div>

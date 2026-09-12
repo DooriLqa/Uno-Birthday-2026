@@ -70,6 +70,10 @@
   font-size: 1.05rem;
 }
 
+.game-hud__coin {
+  width: 30px;
+  height: 30px;
+}
 .game-hud__right {
   display: grid;
   justify-items: end;
