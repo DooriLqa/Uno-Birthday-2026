@@ -1,4 +1,4 @@
-import arkanoidImage from '@/shared/assets/games/arkanoid/background.png'
+import arkanoidImage from '@/shared/assets/games/arkanoid/raccoon-arcade-background.png'
 
 export type ArkanoidLayout = {
   image: string
@@ -32,16 +32,16 @@ export const ARKANOID_LAYOUT: ArkanoidLayout = {
   image: arkanoidImage,
 
   artwork: {
-    width: 1672,
-    height: 941,
+    width: 1536,
+    height: 1024,
   },
 
   screen: {
-    x: 386,
-    y: 170,
-    width: 900,
-    height: 600,
-    radius: 40,
+    x: 404,
+    y: 264,
+    width: 728,
+    height: 344,
+    radius: 24,
   },
 
   maxScreenViewportWidth: 0.94,

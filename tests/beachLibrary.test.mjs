@@ -78,6 +78,7 @@ test('awards four random pages before completion and two final sheets exactly on
   }
   globalThis.window = { localStorage: globalThis.localStorage }
   const inventoryUrl = compile('../src/features/inventory/model/store.ts', {
+    "import { BOOK_ITEMS } from './items'": 'const BOOK_ITEMS = []',
     "'zustand'": `'${import.meta.resolve('zustand')}'`,
     "'zustand/middleware'": `'${import.meta.resolve('zustand/middleware')}'`,
   })
@@ -90,6 +91,8 @@ test('awards four random pages before completion and two final sheets exactly on
   const { useLibraryStore } = await import(storeUrl)
   const { useInventoryStore } = await import(inventoryUrl)
   const state = useLibraryStore.getState()
+  assert.equal(state.librarianIntroduced, false)
+  state.introduceLibrarian()
   state.enter()
   state.enter()
   assert.equal(useInventoryStore.getState().items.length, 0)
@@ -115,8 +118,64 @@ test('awards four random pages before completion and two final sheets exactly on
   useLibraryStore.setState({ slots: Array(45).fill(null), rewarded: [] })
   memory.set('beach-library-v1', saved)
   await useLibraryStore.persist.rehydrate()
+  assert.equal(useLibraryStore.getState().librarianIntroduced, true)
   assert.deepEqual(completedCabinets(useLibraryStore.getState().slots), [0, 1, 2])
   assert.deepEqual([...useLibraryStore.getState().rewarded].sort(), [0, 1, 2, 3])
+  delete globalThis.localStorage
+  delete globalThis.window
+})
+
+test('scattered books stay left of the librarian even when rotated and hovered', () => {
+  for (const book of BOOKS) {
+    const angle = Math.abs(book.angle) * Math.PI / 180
+    const width = 12
+    const heightInWidthPercent = 13.5 * 941 / 1672
+    const halfRotatedWidth = (width * Math.cos(angle) + heightInWidthPercent * Math.sin(angle)) / 2
+    assert.ok(book.x + width / 2 + halfRotatedWidth * 1.1 < 81)
+    assert.ok(book.y + 13.5 < 93)
+  }
+})
+
+test('librarian repeats from the start after dismissal and completion; other dialogues resume', async () => {
+  globalThis.localStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} }
+  globalThis.window = { localStorage: globalThis.localStorage }
+  const storeUrl = compile('../src/features/dialogues/model/store.ts', {
+    "'zustand'": `'${import.meta.resolve('zustand')}'`,
+    "'zustand/middleware'": `'${import.meta.resolve('zustand/middleware')}'`,
+  })
+  const { useDialogueStore } = await import(storeUrl)
+  const dialogueUrl = compile('../src/features/beach-library/model/librarianDialogue.ts', {
+    "import librarianSprite from '@/shared/assets/features/dialogues/poodle-librarian.png'":
+      "const librarianSprite = 'poodle-librarian.png'",
+    "'@/features/dialogues'": `'${storeUrl}'`,
+  })
+  const { librarianCompletionDialogue, librarianDialogue, finishLibrarianCleanup, talkToLibrarian } =
+    await import(dialogueUrl)
+  const store = useDialogueStore.getState()
+  talkToLibrarian()
+  store.nextMessage()
+  store.closeDialogue()
+  talkToLibrarian()
+  assert.equal(useDialogueStore.getState().activeMessageIndex, 0)
+  store.closeDialogue()
+  store.openDialogueById(librarianDialogue.id)
+  assert.equal(useDialogueStore.getState().activeMessageIndex, 0)
+  librarianDialogue.messages.forEach(() => store.nextMessage())
+  assert.equal(useDialogueStore.getState().activeDialogueId, null)
+  talkToLibrarian()
+  assert.equal(useDialogueStore.getState().activeMessageIndex, 0)
+  const ordinary = { ...librarianDialogue, id: 'ordinary', restartOnOpen: false }
+  store.openDialogue(ordinary)
+  store.nextMessage()
+  store.closeDialogue()
+  store.openDialogue(ordinary)
+  assert.equal(useDialogueStore.getState().activeMessageIndex, 1)
+  finishLibrarianCleanup()
+  assert.equal(useDialogueStore.getState().activeDialogueId, librarianCompletionDialogue.id)
+  assert.equal(
+    librarianCompletionDialogue.messages[0].text,
+    'Спасибо за помощь с уборкой! Вот письмо, о котором я говорила.',
+  )
   delete globalThis.localStorage
   delete globalThis.window
 })

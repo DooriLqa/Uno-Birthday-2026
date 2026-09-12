@@ -9,7 +9,8 @@
 
   flex: 0 0 auto;
 
-  cursor: grab;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-open.png') 20 10, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
   user-select: none;
   touch-action: none;
 
@@ -17,7 +18,8 @@
 }
 
 .volume-knob:active {
-  cursor: grabbing;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-grab.png') 20 10, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .volume-knob:focus-visible {

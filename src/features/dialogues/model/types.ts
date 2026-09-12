@@ -29,6 +29,7 @@ export const getDialogueMessageSprite = (message: DialogueMessage) =>
 
 export type Dialogue = {
   id: string
+  restartOnOpen?: boolean
   messages: DialogueMessage[]
 }
 

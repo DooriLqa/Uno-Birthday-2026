@@ -18,6 +18,7 @@ type DialogueState = {
 }
 
 const getFirstUnreadIndex = (dialogue: Dialogue, readMessageIds: string[]) => {
+  if (dialogue.restartOnOpen) return 0
   const index = dialogue.messages.findIndex((message) => !readMessageIds.includes(message.id))
   return index === -1 ? 0 : index
 }
