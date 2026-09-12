@@ -6,6 +6,7 @@ const GAME_STORAGE_KEYS = [
   'beach-party-progress',
   'beach-party-quiz-progress-v2',
   'beach-party-radio',
+  'beach-party-totem-code',
   'fishing_catches',
   'robotMazeProgress',
   'tourist-world-v1',
