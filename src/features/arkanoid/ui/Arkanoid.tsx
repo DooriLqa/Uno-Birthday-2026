@@ -1,15 +1,41 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+/* import type { CSSProperties } from 'react'
+import { ARKANOID_LAYOUT } from '../model/layout' */
+import arkanoidSound1 from '@/shared/assets/games/arkanoid/Arkanoid_1.wav'
+import arkanoidSound2 from '@/shared/assets/games/arkanoid/Arkanoid_2.wav'
+import arkanoidSound3 from '@/shared/assets/games/arkanoid/Arkanoid_3.wav'
+import arkanoidSound4 from '@/shared/assets/games/arkanoid/Arkanoid_4.wav'
+import arkanoidSound5 from '@/shared/assets/games/arkanoid/Arkanoid_5.wav'
+import arkanoidSound6 from '@/shared/assets/games/arkanoid/Arkanoid_6.wav'
+import arkanoidSound7 from '@/shared/assets/games/arkanoid/Arkanoid_7.wav'
+import arkanoidSound8 from '@/shared/assets/games/arkanoid/Arkanoid_8.wav'
+
+import brickHp1Image from '@/shared/assets/games/arkanoid/brick-hp-1.png'
+import brickHp2Image from '@/shared/assets/games/arkanoid/brick-hp-2.png'
+import brickHp3Image from '@/shared/assets/games/arkanoid/brick-hp-3.png'
+import brickIndestructibleImage from '@/shared/assets/games/arkanoid/brick-indestructible.png'
+import barrelImage from '@/shared/assets/games/arkanoid/barrel.png'
+import paddleImage from '@/shared/assets/games/arkanoid/paddle.png'
+import paddleWideImage from '@/shared/assets/games/arkanoid/paddle-wide.png'
+import arkanoidBackgroundImage from '@/shared/assets/games/arkanoid/background.png'
+import ballImage from '@/shared/assets/games/arkanoid/ball.png'
+import powerUpWideImage from '@/shared/assets/games/arkanoid/powerup-wide.png'
+import powerUpTripleImage from '@/shared/assets/games/arkanoid/powerup-triple.png'
+import powerUpFireImage from '@/shared/assets/games/arkanoid/powerup-fire.png'
+import powerUpFallWideImage from '@/shared/assets/games/arkanoid/fallpowerup-wide.png'
+import powerUpFallTripleImage from '@/shared/assets/games/arkanoid/fallpowerup-triple.png'
+import powerUpFallFireImage from '@/shared/assets/games/arkanoid/fallpowerup-fire.png'
+import fireBallImage from '@/shared/assets/games/arkanoid/fire-ball.png'
+
 import './Arkanoid.css'
 
 type Props = {
   onComplete: () => void
 }
 
-type BrickType = 'normal' | 'hard' | 'strong' | 'indestructible'
+type BrickType = 'normal' | 'hard' | 'strong' | 'barrel' | 'indestructible'
 
-type BrickColor = 'green' | 'blue' | 'red' | 'brown' | 'black'
-
-type PowerUpType = 'wide' | 'triple' | 'shot' | 'fire'
+type PowerUpType = 'wide' | 'triple' | 'fire'
 
 type Brick = {
   x: number
@@ -19,8 +45,8 @@ type Brick = {
   type: BrickType
   hp: number
   maxHp: number
-  color: BrickColor
   powerUp?: PowerUpType
+  destroyTimer: number
 }
 
 type Ball = {
@@ -60,6 +86,8 @@ type GameState = {
   powerUps: FallingPowerUp[]
 
   wideTimer: number
+  wideBlinkTimer: number
+  wideBlinkVisible: boolean
 
   fireShotsRemaining: number
   fireShotTimer: number
@@ -77,26 +105,33 @@ const STORAGE_KEY = 'arkanoid-progress-v1'
 
 const TOTAL_LEVELS = 5
 
-const PADDLE_BASE_WIDTH = 110
-const PADDLE_HEIGHT = 16
+const PADDLE_BASE_WIDTH = 165
+const PADDLE_HEIGHT = 33
+const WIDE_PADDLE_MULTIPLIER = 1.5
 
-const BALL_RADIUS = 8
+// Все обычные кирпичи имеют соотношение ширины к высоте 2.25 : 1.
+const BRICK_ASPECT_RATIO = 2.25
+
+const BALL_RADIUS = 10
 
 const POWERUP_SIZE = 28
 const POWERUP_SPEED = 2.1
+const POWERUP_BRICK_ICON_SIZE = 24
 
-const WIDE_DURATION = 600
+// Время действия увеличенной платформы: 10 секунд.
+const WIDE_DURATION = 10_000
+
+// Последняя секунда действия бафа.
+const WIDE_WARNING_DURATION = 1_000
+
+// Частота мигания платформы в предупреждающую секунду.
+const WIDE_BLINK_INTERVAL = 120
 
 const FIRE_SHOT_INTERVAL = 500
 const FIRE_SHOT_COUNT = 10
 
-const colors = {
-  green: '#5A8D3E',
-  blue: '#0346FD',
-  red: '#C80651',
-  brown: '#6E4125',
-  black: '#010101',
-}
+// Время, пока после разрушения показывается последний кадр спрайта.
+const BRICK_DESTRUCTION_DURATION = 500
 
 /*
  * =========================================================
@@ -106,6 +141,7 @@ const colors = {
  * 1 = обычный кирпич, 1 HP
  * 2 = крепкий кирпич, 2 HP
  * 3 = крепкий кирпич, 3 HP
+ * 8 = взрывающаяся бочка, 2 HP
  * 9 = неразрушимый кирпич
  * =========================================================
  */
@@ -116,7 +152,7 @@ const LEVEL_LAYOUTS: number[][][] = [
     [0, 0, 1, 1, 1, 1, 1, 0, 0],
     [0, 1, 1, 1, 1, 1, 1, 1, 0],
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 2, 8, 3, 1, 1, 1, 1],
   ],
 
   // Уровень 2
@@ -142,7 +178,7 @@ const LEVEL_LAYOUTS: number[][][] = [
     [9, 9, 2, 3, 1, 3, 2, 9, 9],
     [9, 2, 3, 1, 9, 1, 3, 2, 9],
     [2, 3, 1, 9, 9, 9, 1, 3, 2],
-    [9, 2, 3, 1, 9, 1, 3, 2, 9],
+    [9, 2, 3, 8, 9, 8, 3, 2, 9],
     [9, 9, 2, 3, 1, 3, 2, 9, 9],
   ],
 
@@ -153,69 +189,6 @@ const LEVEL_LAYOUTS: number[][][] = [
     [2, 1, 9, 3, 1, 1, 3, 9, 1, 2],
     [3, 2, 1, 9, 2, 2, 9, 1, 2, 3],
     [9, 3, 2, 1, 9, 9, 1, 2, 3, 9],
-  ],
-]
-
-/*
- * =========================================================
- * ЦВЕТА КИРПИЧЕЙ
- *
- * Здесь НЕ хранится HP.
- * Здесь только рисунок.
- *
- * null = пустое место
- * green = зелёный
- * blue = синий
- * red = красный
- * black = чёрный
- *
- * Цвет не изменяется при повреждении кирпича.
- * =========================================================
- */
-
-const LEVEL_COLOR_LAYOUTS: (BrickColor | null)[][][] = [
-  // Уровень 1
-  [
-    [null, null, 'red', 'red', 'blue', null, null, null, null],
-    [null, 'green', 'green', 'green', 'green', 'green', 'green', 'green', null],
-    ['red', 'blue', 'green', 'green', 'green', 'green', 'green', 'blue', 'red'],
-    ['red', 'blue', 'green', 'green', 'green', 'green', 'green', 'blue', 'red'],
-  ],
-
-  // Уровень 2
-  [
-    ['black', null, 'red', 'blue', 'red', 'blue', 'red', null, 'black'],
-    ['green', 'green', 'blue', 'green', 'green', 'green', 'blue', 'green', 'green'],
-    [null, 'blue', 'red', 'black', 'red', 'black', 'red', 'blue', null],
-    ['green', 'green', 'blue', 'red', 'green', 'red', 'blue', 'green', 'green'],
-    ['black', 'red', 'green', 'green', 'green', 'green', 'green', 'green', 'black'],
-  ],
-
-  // Уровень 3
-  [
-    ['black', 'red', 'blue', 'red', 'green', 'red', 'green', 'blue', 'black'],
-    ['red', 'blue', 'green', 'red', 'black', 'red', 'green', 'blue', 'red'],
-    ['blue', 'green', 'red', 'black', 'black', 'black', 'red', 'green', 'blue'],
-    ['red', 'blue', 'green', 'red', 'black', 'red', 'green', 'blue', 'red'],
-    ['black', 'red', 'blue', 'red', 'green', 'red', 'green', 'blue', 'black'],
-  ],
-
-  // Уровень 4
-  [
-    ['black', 'black', 'blue', 'red', 'green', 'red', 'blue', 'black', 'black'],
-    ['black', 'blue', 'red', 'green', 'black', 'green', 'red', 'blue', 'black'],
-    ['blue', 'red', 'green', 'black', 'black', 'black', 'green', 'red', 'blue'],
-    ['black', 'blue', 'red', 'green', 'black', 'green', 'red', 'blue', 'black'],
-    ['black', 'black', 'blue', 'red', 'green', 'red', 'blue', 'black', 'black'],
-  ],
-
-  // Уровень 5
-  [
-    ['black', 'red', 'blue', 'green', 'black', 'black', 'green', 'blue', 'red', 'black'],
-    ['red', 'blue', 'green', 'black', 'blue', 'blue', 'black', 'green', 'blue', 'red'],
-    ['blue', 'green', 'black', 'red', 'green', 'green', 'red', 'black', 'green', 'blue'],
-    ['red', 'blue', 'green', 'black', 'blue', 'blue', 'black', 'green', 'blue', 'red'],
-    ['black', 'red', 'blue', 'green', 'black', 'black', 'green', 'blue', 'red', 'black'],
   ],
 ]
 
@@ -234,6 +207,12 @@ function getBrickStats(value: number): {
       return {
         type: 'indestructible',
         hp: Infinity,
+      }
+
+    case 8:
+      return {
+        type: 'barrel',
+        hp: 2,
       }
 
     case 3:
@@ -267,14 +246,9 @@ function randomPowerUp(): PowerUpType | undefined {
     return 'wide'
   }
 
-  if (roll < 0.7) {
+  if (roll < 0.8) {
     return 'triple'
   }
-
-  if (roll < 0.9) {
-    return 'shot'
-  }
-
   return 'fire'
 }
 
@@ -282,8 +256,6 @@ function createBricks(level: number): Brick[] {
   const levelIndex = Math.min(level - 1, LEVEL_LAYOUTS.length - 1)
 
   const layout = LEVEL_LAYOUTS[levelIndex]
-
-  const colorLayout = LEVEL_COLOR_LAYOUTS[levelIndex]
 
   const gap = 6
   const marginX = 65
@@ -294,7 +266,7 @@ function createBricks(level: number): Brick[] {
 
   const brickWidth = (CANVAS_WIDTH - marginX * 2 - gap * (columns - 1)) / columns
 
-  const brickHeight = 28
+  const brickHeight = brickWidth / BRICK_ASPECT_RATIO
 
   const bricks: Brick[] = []
 
@@ -307,8 +279,6 @@ function createBricks(level: number): Brick[] {
       }
 
       const stats = getBrickStats(value)
-
-      const color = colorLayout?.[row]?.[column] ?? 'blue'
 
       bricks.push({
         x: marginX + column * (brickWidth + gap),
@@ -323,9 +293,14 @@ function createBricks(level: number): Brick[] {
         hp: stats.hp,
         maxHp: stats.hp,
 
-        color,
-
-        powerUp: stats.type !== 'indestructible' ? randomPowerUp() : undefined,
+        powerUp:
+          stats.type !== 'indestructible' &&
+          stats.type !== 'barrel' &&
+          stats.type !== 'hard' &&
+          stats.type !== 'strong'
+            ? randomPowerUp()
+            : undefined,
+        destroyTimer: 0,
       })
     }
   }
@@ -379,6 +354,8 @@ function createInitialGame(level: number): GameState {
     powerUps: [],
 
     wideTimer: 0,
+    wideBlinkTimer: 0,
+    wideBlinkVisible: true,
 
     fireShotsRemaining: 0,
     fireShotTimer: 0,
@@ -428,7 +405,19 @@ export function Arkanoid({ onComplete }: Props) {
 
   const animationRef = useRef<number | null>(null)
 
-  const gameRef = useRef<GameState | null>(null)
+  const audioRef = useRef({
+    launch: null as HTMLAudioElement | null,
+    hit: null as HTMLAudioElement | null,
+    destroy: null as HTMLAudioElement | null,
+    powerUp: null as HTMLAudioElement | null,
+    levelComplete: null as HTMLAudioElement | null,
+    gameOver: null as HTMLAudioElement | null,
+    lifeLost: null as HTMLAudioElement | null,
+    platformBounce: null as HTMLAudioElement | null,
+  })
+
+  const gameRef = useRef<GameState | null>(createInitialGame(loadProgress().currentLevel))
+  const imageCacheRef = useRef<Record<string, HTMLImageElement>>({})
 
   const keysRef = useRef({
     left: false,
@@ -437,240 +426,400 @@ export function Arkanoid({ onComplete }: Props) {
 
   const [unlockedLevel, setUnlockedLevel] = useState(() => loadProgress().unlockedLevel)
 
-  const [selectedLevel, setSelectedLevel] = useState(() => loadProgress().currentLevel)
+  const [, setSelectedLevel] = useState(() => loadProgress().currentLevel)
 
   const [level, setLevel] = useState(() => loadProgress().currentLevel)
 
   const [score, setScore] = useState(0)
 
-  const [lives, setLives] = useState(3)
+  const [, setLives] = useState(3)
 
   const [won, setWon] = useState(false)
 
   const [gameOver, setGameOver] = useState(false)
 
   const [started, setStarted] = useState(false)
+  const [completedLevels, setCompletedLevels] = useState(0)
 
-  const [activePowerUps, setActivePowerUps] = useState<PowerUpType[]>([])
+  const [, setActivePowerUps] = useState<PowerUpType[]>([])
 
-  const drawPowerUpIcon = useCallback((ctx: CanvasRenderingContext2D, powerUp: FallingPowerUp) => {
-    const centerX = powerUp.x + powerUp.width / 2
+  useEffect(() => {
+    audioRef.current.launch = new Audio(arkanoidSound1)
+    audioRef.current.hit = new Audio(arkanoidSound2)
+    audioRef.current.destroy = new Audio(arkanoidSound3)
+    audioRef.current.powerUp = new Audio(arkanoidSound4)
+    audioRef.current.levelComplete = new Audio(arkanoidSound5)
+    audioRef.current.gameOver = new Audio(arkanoidSound6)
+    audioRef.current.lifeLost = new Audio(arkanoidSound7)
+    audioRef.current.platformBounce = new Audio(arkanoidSound8)
 
-    const centerY = powerUp.y + powerUp.height / 2
-
-    ctx.save()
-
-    ctx.beginPath()
-
-    ctx.arc(centerX, centerY, powerUp.width / 2, 0, Math.PI * 2)
-
-    if (powerUp.type === 'wide') {
-      ctx.fillStyle = '#39d98a'
-    } else if (powerUp.type === 'triple') {
-      ctx.fillStyle = '#4d9cff'
-    } else if (powerUp.type === 'shot') {
-      ctx.fillStyle = '#ffbd3d'
-    } else {
-      ctx.fillStyle = '#ff553d'
+    for (const audio of Object.values(audioRef.current)) {
+      if (audio) {
+        audio.preload = 'auto'
+      }
     }
 
-    ctx.fill()
+    const audioElements = Object.values(audioRef.current)
 
-    ctx.strokeStyle = '#ffffff'
-
-    ctx.lineWidth = 2
-
-    ctx.stroke()
-
-    ctx.fillStyle = '#ffffff'
-
-    ctx.font = 'bold 17px Arial'
-
-    ctx.textAlign = 'center'
-
-    ctx.textBaseline = 'middle'
-
-    if (powerUp.type === 'wide') {
-      ctx.fillText('W', centerX, centerY)
+    return () => {
+      for (const audio of audioElements) {
+        audio?.pause()
+      }
     }
-
-    if (powerUp.type === 'triple') {
-      ctx.fillText('3', centerX, centerY)
-    }
-
-    if (powerUp.type === 'shot') {
-      ctx.fillText('S', centerX, centerY)
-    }
-
-    if (powerUp.type === 'fire') {
-      ctx.fillText('F', centerX, centerY)
-    }
-
-    ctx.restore()
   }, [])
 
-  const drawBrick = useCallback((ctx: CanvasRenderingContext2D, brick: Brick) => {
-    ctx.save()
+  useEffect(() => {
+    const images = [
+      brickHp1Image,
+      brickHp2Image,
+      brickHp3Image,
+      brickIndestructibleImage,
+      barrelImage,
+      paddleImage,
+      paddleWideImage,
+      arkanoidBackgroundImage,
+      ballImage,
+      powerUpWideImage,
+      powerUpTripleImage,
+      powerUpFireImage,
+    ]
 
-    /*
-     * Цвет теперь полностью независим
-     * от HP кирпича.
-     */
-
-    if (brick.type === 'indestructible') {
-      ctx.fillStyle = '#565b63'
-      ctx.strokeStyle = '#9ba1a8'
-    } else {
-      ctx.fillStyle = colors[brick.color]
-
-      ctx.strokeStyle = '#ffffff'
+    for (const src of images) {
+      const image = new Image()
+      image.decoding = 'sync'
+      image.src = src
+      imageCacheRef.current[src] = image
     }
-
-    ctx.lineWidth = 2
-
-    ctx.fillRect(brick.x, brick.y, brick.width, brick.height)
-
-    ctx.strokeRect(brick.x, brick.y, brick.width, brick.height)
-
-    /*
-     * Неразрушимый кирпич
-     */
-    if (brick.type === 'indestructible') {
-      ctx.strokeStyle = '#d7dbe0'
-
-      ctx.lineWidth = 3
-
-      ctx.beginPath()
-
-      ctx.moveTo(brick.x + 7, brick.y + 7)
-
-      ctx.lineTo(brick.x + brick.width - 7, brick.y + brick.height - 7)
-
-      ctx.moveTo(brick.x + brick.width - 7, brick.y + 7)
-
-      ctx.lineTo(brick.x + 7, brick.y + brick.height - 7)
-
-      ctx.stroke()
-    }
-
-    /*
-     * Показываем HP только у
-     * крепких кирпичей.
-     */
-    if (brick.type !== 'normal' && brick.type !== 'indestructible') {
-      ctx.fillStyle = '#ffffff'
-
-      ctx.font = 'bold 14px Arial'
-
-      ctx.textAlign = 'center'
-
-      ctx.textBaseline = 'middle'
-
-      ctx.fillText(String(brick.hp), brick.x + brick.width / 2, brick.y + brick.height / 2)
-    }
-
-    /*
-     * Точка показывает наличие
-     * Power Up.
-     */
-    if (brick.powerUp) {
-      ctx.fillStyle = '#ffffff'
-
-      ctx.beginPath()
-
-      ctx.arc(brick.x + brick.width - 8, brick.y + 8, 4, 0, Math.PI * 2)
-
-      ctx.fill()
-    }
-
-    ctx.restore()
   }, [])
+
+  const playSound = useCallback((key: keyof typeof audioRef.current) => {
+    const audio = audioRef.current[key]
+
+    if (!audio) {
+      return
+    }
+
+    audio.currentTime = 0
+    void audio.play().catch(() => undefined)
+  }, [])
+
+  const getPowerUpImage = useCallback((type: PowerUpType): string => {
+    switch (type) {
+      case 'wide':
+        return powerUpWideImage
+      case 'triple':
+        return powerUpTripleImage
+      case 'fire':
+        return powerUpFireImage
+    }
+  }, [])
+
+  const getPowerUpFallImage = useCallback((type: PowerUpType): string => {
+    switch (type) {
+      case 'wide':
+        return powerUpFallWideImage
+      case 'triple':
+        return powerUpFallTripleImage
+      case 'fire':
+        return powerUpFallFireImage
+    }
+  }, [])
+
+  const drawImage = useCallback(
+    (
+      ctx: CanvasRenderingContext2D,
+      src: string,
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+    ) => {
+      let image = imageCacheRef.current[src]
+
+      if (!image) {
+        image = new Image()
+        image.decoding = 'sync'
+        image.src = src
+        imageCacheRef.current[src] = image
+      }
+
+      if (!image.complete || image.naturalWidth === 0) {
+        return
+      }
+
+      ctx.imageSmoothingEnabled = true
+      ctx.drawImage(image, x, y, width, height)
+    },
+    [],
+  )
+
+  const drawPowerUpIcon = useCallback(
+    (ctx: CanvasRenderingContext2D, powerUp: FallingPowerUp) => {
+      drawImage(
+        ctx,
+        getPowerUpFallImage(powerUp.type),
+        powerUp.x,
+        powerUp.y,
+        powerUp.width,
+        powerUp.height,
+      )
+    },
+    [drawImage, getPowerUpFallImage],
+  )
+
+  const drawSpriteFrame = useCallback(
+    (
+      ctx: CanvasRenderingContext2D,
+      src: string,
+      frame: number,
+      frameCount: number,
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+    ) => {
+      let image = imageCacheRef.current[src]
+
+      if (!image) {
+        image = new Image()
+        image.decoding = 'sync'
+        image.src = src
+        imageCacheRef.current[src] = image
+      }
+
+      if (!image.complete || image.naturalWidth === 0) {
+        return
+      }
+
+      const safeFrame = Math.max(0, Math.min(frameCount - 1, frame))
+      const frameWidth = image.naturalWidth / frameCount
+
+      ctx.imageSmoothingEnabled = true
+      ctx.drawImage(
+        image,
+        frameWidth * safeFrame,
+        0,
+        frameWidth,
+        image.naturalHeight,
+        x,
+        y,
+        width,
+        height,
+      )
+    },
+    [],
+  )
+
+  const drawBrick = useCallback(
+    (ctx: CanvasRenderingContext2D, brick: Brick) => {
+      if (brick.type === 'indestructible') {
+        drawImage(ctx, brickIndestructibleImage, brick.x, brick.y, brick.width, brick.height)
+        return
+      }
+      if (brick.powerUp === 'wide') {
+        const frame = brick.destroyTimer > 0 ? 1 : 0
+
+        drawSpriteFrame(
+          ctx,
+          powerUpWideImage,
+          frame,
+          2,
+          brick.x,
+          brick.y,
+          brick.width,
+          brick.height,
+        )
+
+        return
+      }
+
+      if (brick.powerUp === 'fire') {
+        const frame = brick.destroyTimer > 0 ? 1 : 0
+
+        drawSpriteFrame(
+          ctx,
+          powerUpFireImage,
+          frame,
+          2,
+          brick.x,
+          brick.y,
+          brick.width,
+          brick.height,
+        )
+
+        return
+      }
+
+      if (brick.powerUp === 'triple') {
+        const frame = brick.destroyTimer > 0 ? 1 : 0
+
+        drawSpriteFrame(
+          ctx,
+          powerUpTripleImage,
+          frame,
+          2,
+          brick.x,
+          brick.y,
+          brick.width,
+          brick.height,
+        )
+
+        return
+      }
+
+      /*
+       * Отдельная картинка соответствует отдельной крепости:
+       *
+       * 3 HP — капитан: 4 кадра
+       *   0 = целый, 1 = слегка повреждён, 2 = сильно повреждён, 3 = взрыв
+       *
+       * 2 HP — боцман: 3 кадра
+       *   0 = целый, 1 = повреждён, 2 = взрыв
+       *
+       * 1 HP — морячок: 2 кадра
+       *   0 = целый, 1 = взрыв
+       *
+       * Взрывная бочка — отдельная картинка: 3 кадра
+       *   0 = целая, 1 = повреждённая, 2 = взрыв
+       */
+      if (brick.type === 'barrel') {
+        const frame = brick.destroyTimer > 0 ? 2 : brick.hp <= 1 ? 1 : 0
+
+        drawSpriteFrame(ctx, barrelImage, frame, 3, brick.x, brick.y, brick.width, brick.height)
+      } else if (brick.maxHp === 3) {
+        const frame = brick.destroyTimer > 0 ? 3 : brick.hp === 3 ? 0 : brick.hp === 2 ? 1 : 2
+
+        drawSpriteFrame(ctx, brickHp3Image, frame, 4, brick.x, brick.y, brick.width, brick.height)
+      } else if (brick.maxHp === 2) {
+        const frame = brick.destroyTimer > 0 ? 2 : brick.hp === 2 ? 0 : 1
+
+        drawSpriteFrame(ctx, brickHp2Image, frame, 3, brick.x, brick.y, brick.width, brick.height)
+      } else {
+        const image = brickHp1Image
+        const frameCount = 2
+        const frame = brick.destroyTimer > 0 ? 1 : 0
+
+        drawSpriteFrame(ctx, image, frame, frameCount, brick.x, brick.y, brick.width, brick.height)
+      }
+
+      /*
+       * Баф, назначенный кирпичу, показываем прямо на самом кирпиче.
+       * При разрушении этот же баф отдельно выпадает вниз.
+       */
+      if (brick.powerUp && brick.destroyTimer <= 0) {
+        const iconSize = Math.min(POWERUP_BRICK_ICON_SIZE, brick.height * 0.72)
+
+        drawImage(
+          ctx,
+          getPowerUpImage(brick.powerUp),
+          brick.x + brick.width / 2 - iconSize / 2,
+          brick.y + brick.height / 2 - iconSize / 2,
+          iconSize,
+          iconSize,
+        )
+      }
+    },
+    [drawImage, drawSpriteFrame, getPowerUpImage],
+  )
+
+  const drawPaddle = useCallback(
+    (ctx: CanvasRenderingContext2D, src: string, centerX: number, centerY: number) => {
+      let image = imageCacheRef.current[src]
+
+      if (!image) {
+        image = new Image()
+        image.decoding = 'sync'
+        image.src = src
+        imageCacheRef.current[src] = image
+      }
+
+      if (!image.complete || image.naturalWidth === 0 || image.naturalHeight === 0) {
+        return
+      }
+
+      // Увеличенный размер спрайта.
+      // Не даём картинке визуально выйти за границы canvas.
+      const visualHeight = 72
+      const visualWidth = visualHeight * (image.naturalWidth / image.naturalHeight)
+
+      const drawX = Math.max(0, Math.min(CANVAS_WIDTH - visualWidth, centerX - visualWidth / 2))
+      const drawY = centerY - visualHeight / 2
+
+      ctx.imageSmoothingEnabled = true
+      ctx.drawImage(image, drawX, drawY, visualWidth, visualHeight)
+    },
+    [],
+  )
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, game: GameState) => {
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
-      const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT)
-
-      gradient.addColorStop(0, '#101827')
-
-      gradient.addColorStop(1, '#05080d')
-
-      ctx.fillStyle = gradient
-
-      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-      ctx.strokeStyle = 'rgba(255,255,255,0.04)'
-
-      ctx.lineWidth = 1
-
-      for (let x = 0; x < CANVAS_WIDTH; x += 45) {
-        ctx.beginPath()
-
-        ctx.moveTo(x, 0)
-
-        ctx.lineTo(x, CANVAS_HEIGHT)
-
-        ctx.stroke()
-      }
-
-      for (let y = 0; y < CANVAS_HEIGHT; y += 45) {
-        ctx.beginPath()
-
-        ctx.moveTo(0, y)
-
-        ctx.lineTo(CANVAS_WIDTH, y)
-
-        ctx.stroke()
-      }
-
       for (const brick of game.bricks) {
         drawBrick(ctx, brick)
       }
 
-      ctx.save()
+      const isWide = game.wideTimer > 0
+      const paddleSprite = isWide ? paddleWideImage : paddleImage
 
-      ctx.fillStyle = game.wideTimer > 0 ? '#39d98a' : '#f2f2f2'
+      // В последнюю секунду платформы мигает, предупреждая о завершении бафа.
+      const shouldBlink =
+        isWide && game.wideTimer <= WIDE_WARNING_DURATION && !game.wideBlinkVisible
 
-      ctx.shadowColor = game.wideTimer > 0 ? '#39d98a' : 'transparent'
+      if (!shouldBlink) {
+        drawPaddle(
+          ctx,
+          paddleSprite,
+          game.paddle.x + game.paddle.width / 2,
+          game.paddle.y + game.paddle.height / 2,
+        )
+      }
 
-      ctx.shadowBlur = game.wideTimer > 0 ? 12 : 0
+      // Индикатор оставшихся жизней: на одну меньше текущего значения.
+      const remainingLives = Math.max(0, game.lives - 1)
+      const lifeRadius = 4
+      const lifeGap = 13
+      const lifeCenterY = game.paddle.y + game.paddle.height / 2
+      const lifeStartX =
+        game.paddle.x + game.paddle.width / 2 - ((remainingLives - 1) * lifeGap) / 2
 
-      ctx.fillRect(game.paddle.x, game.paddle.y, game.paddle.width, game.paddle.height)
-
-      ctx.restore()
-
-      for (const ball of game.balls) {
+      if (remainingLives > 0) {
         ctx.save()
 
-        ctx.beginPath()
+        ctx.fillStyle = '#ff2f5f'
+        ctx.strokeStyle = '#5a071c'
+        ctx.lineWidth = 3
+        ctx.shadowColor = '#ff69b4'
+        ctx.shadowBlur = 12
 
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2)
+        for (let index = 0; index < remainingLives; index++) {
+          const centerX = lifeStartX + index * lifeGap
 
-        if (ball.fire) {
-          ctx.fillStyle = '#ff4b2b'
-
-          ctx.shadowColor = '#ff4b2b'
-
-          ctx.shadowBlur = 15
-        } else {
-          ctx.fillStyle = '#ffffff'
-
-          ctx.shadowColor = '#ffffff'
-
-          ctx.shadowBlur = 10
+          ctx.beginPath()
+          ctx.arc(centerX, lifeCenterY, lifeRadius, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.stroke()
         }
 
-        ctx.fill()
-
         ctx.restore()
+      }
+
+      for (const ball of game.balls) {
+        drawImage(
+          ctx,
+          ball.fire ? fireBallImage : ballImage,
+          ball.x - ball.radius,
+          ball.y - ball.radius,
+          ball.radius * 2,
+          ball.radius * 2,
+        )
       }
 
       for (const powerUp of game.powerUps) {
         drawPowerUpIcon(ctx, powerUp)
       }
     },
-    [drawBrick, drawPowerUpIcon],
+    [drawBrick, drawPaddle, drawImage, drawPowerUpIcon],
   )
 
   const updateHud = useCallback((game: GameState) => {
@@ -704,207 +853,264 @@ export function Arkanoid({ onComplete }: Props) {
     })
   }, [])
 
-  const activatePowerUp = useCallback((game: GameState, type: PowerUpType) => {
-    if (type === 'wide') {
-      game.wideTimer = WIDE_DURATION
+  const activatePowerUp = useCallback(
+    (game: GameState, type: PowerUpType) => {
+      playSound('powerUp')
 
-      game.paddle.width = game.paddle.baseWidth * 1.65
+      if (type === 'wide') {
+        game.wideTimer = WIDE_DURATION
 
-      return
-    }
+        game.paddle.width = game.paddle.baseWidth * WIDE_PADDLE_MULTIPLIER
+        game.paddle.x = Math.max(0, Math.min(CANVAS_WIDTH - game.paddle.width, game.paddle.x))
 
-    if (type === 'triple') {
-      if (game.balls.length >= 6) {
         return
       }
 
-      if (game.balls.length === 0) {
+      if (type === 'triple') {
+        if (game.balls.length >= 6) {
+          return
+        }
+
+        if (game.balls.length === 0) {
+          return
+        }
+
+        const source = game.balls[Math.floor(Math.random() * game.balls.length)]
+
+        if (!source) {
+          return
+        }
+
+        const speed = Math.sqrt(source.vx * source.vx + source.vy * source.vy)
+
+        const fire = source.fire === true
+
+        game.balls.push(
+          {
+            x: source.x,
+            y: source.y,
+            radius: BALL_RADIUS,
+            vx: -speed * 0.75,
+            vy: -speed * 0.66,
+            fire,
+          },
+          {
+            x: source.x,
+            y: source.y,
+            radius: BALL_RADIUS,
+            vx: 0,
+            vy: -speed,
+            fire,
+          },
+        )
+
         return
       }
 
-      const source = game.balls[Math.floor(Math.random() * game.balls.length)]
+      if (type === 'fire') {
+        game.fireShotsRemaining = FIRE_SHOT_COUNT
 
-      if (!source) {
+        game.fireShotTimer = FIRE_SHOT_INTERVAL
+      }
+    },
+    [playSound],
+  )
+
+  const loseLife = useCallback(
+    (game: GameState) => {
+      game.lives -= 1
+
+      setLives(game.lives)
+
+      game.fireShotsRemaining = 0
+      game.fireShotTimer = 0
+
+      if (game.lives <= 0) {
+        const passedLevels = Math.max(0, game.level - 1)
+
+        game.running = false
+        game.gameOver = true
+
+        setCompletedLevels(passedLevels)
+        playSound('gameOver')
+        setGameOver(true)
+
+        // После потери всех жизней прогресс полностью сбрасывается.
+        saveProgress(1, 1, false)
+        setUnlockedLevel(1)
+        setSelectedLevel(1)
+        setLevel(1)
+
         return
       }
 
-      const speed = Math.sqrt(source.vx * source.vx + source.vy * source.vy)
+      playSound('lifeLost')
 
-      const fire = source.fire === true
-
-      game.balls.push(
-        {
-          x: source.x,
-          y: source.y,
-          radius: BALL_RADIUS,
-          vx: -speed * 0.75,
-          vy: -speed * 0.66,
-          fire,
-        },
-        {
-          x: source.x,
-          y: source.y,
-          radius: BALL_RADIUS,
-          vx: 0,
-          vy: -speed,
-          fire,
-        },
-      )
-
-      return
-    }
-
-    if (type === 'shot') {
       const speed = getBallSpeed(game.level)
 
-      const centerX = game.paddle.x + game.paddle.width / 2
+      game.paddle.x = CANVAS_WIDTH / 2 - game.paddle.width / 2
 
-      const startY = game.paddle.y - BALL_RADIUS - 4
+      game.balls = [
+        {
+          x: CANVAS_WIDTH / 2,
 
-      game.balls.push(
-        {
-          x: centerX - 22,
-          y: startY,
+          y: game.paddle.y - BALL_RADIUS - 3,
+
           radius: BALL_RADIUS,
-          vx: -speed * 0.75,
-          vy: -speed,
-          fire: false,
-        },
-        {
-          x: centerX,
-          y: startY,
-          radius: BALL_RADIUS,
+
           vx: 0,
+
           vy: -speed,
+
           fire: false,
         },
-        {
-          x: centerX + 22,
-          y: startY,
-          radius: BALL_RADIUS,
-          vx: speed * 0.75,
-          vy: -speed,
-          fire: false,
-        },
-      )
+      ]
 
-      return
-    }
-
-    if (type === 'fire') {
-      game.fireShotsRemaining = FIRE_SHOT_COUNT
-
-      game.fireShotTimer = FIRE_SHOT_INTERVAL
-    }
-  }, [])
-
-  const loseLife = useCallback((game: GameState) => {
-    game.lives -= 1
-
-    setLives(game.lives)
-
-    game.fireShotsRemaining = 0
-    game.fireShotTimer = 0
-
-    if (game.lives <= 0) {
       game.running = false
-      game.gameOver = true
+      game.started = false
+      setStarted(false)
 
-      setGameOver(true)
+      game.powerUps = []
+    },
+    [playSound],
+  )
 
-      return
-    }
+  const hitBrick = useCallback(
+    (game: GameState, brick: Brick, fireBall: boolean) => {
+      if (brick.type === 'indestructible') {
+        if (fireBall) {
+          return false
+        }
 
-    const speed = getBallSpeed(game.level)
-
-    game.paddle.x = CANVAS_WIDTH / 2 - game.paddle.width / 2
-
-    game.balls = [
-      {
-        x: CANVAS_WIDTH / 2,
-
-        y: game.paddle.y - BALL_RADIUS - 3,
-
-        radius: BALL_RADIUS,
-
-        vx: speed * 0.7,
-
-        vy: -speed,
-
-        fire: false,
-      },
-    ]
-
-    game.powerUps = []
-  }, [])
-
-  const hitBrick = useCallback((game: GameState, brick: Brick, fireBall: boolean) => {
-    if (brick.type === 'indestructible') {
-      if (fireBall) {
-        return false
+        return true
       }
 
-      return true
-    }
+      const spawnPowerUp = (target: Brick) => {
+        if (!target.powerUp) {
+          return
+        }
 
-    if (fireBall) {
-      game.score += brick.type === 'strong' ? 30 : brick.type === 'hard' ? 20 : 10
-
-      if (brick.powerUp) {
         game.powerUps.push({
-          x: brick.x + brick.width / 2 - POWERUP_SIZE / 2,
-
-          y: brick.y + brick.height,
-
+          x: target.x + target.width / 2 - POWERUP_SIZE / 2,
+          y: target.y + target.height,
           width: POWERUP_SIZE,
-
           height: POWERUP_SIZE,
-
-          type: brick.powerUp,
-
+          type: target.powerUp,
           speed: POWERUP_SPEED,
         })
       }
 
-      brick.hp = 0
+      const scoreForBrick = (target: Brick) => {
+        if (target.type === 'strong') {
+          return 30
+        }
+
+        if (target.type === 'hard' || target.type === 'barrel') {
+          return 20
+        }
+
+        return 10
+      }
+
+      const destroyBrick = (target: Brick, giveScore = true) => {
+        if (target.destroyTimer > 0) {
+          return
+        }
+
+        if (giveScore) {
+          game.score += scoreForBrick(target)
+        }
+
+        spawnPowerUp(target)
+        target.hp = 0
+        target.destroyTimer = BRICK_DESTRUCTION_DURATION
+      }
+
+      const explodeBarrel = (center: Brick) => {
+        playSound('destroy')
+        game.score += scoreForBrick(center)
+
+        center.hp = 0
+        center.destroyTimer = BRICK_DESTRUCTION_DURATION
+
+        const explosionPadding = 8
+
+        const explosionLeft = center.x - center.width - explosionPadding
+        const explosionRight = center.x + center.width * 2 + explosionPadding
+        const explosionTop = center.y - center.height - explosionPadding
+        const explosionBottom = center.y + center.height * 2 + explosionPadding
+
+        for (const target of game.bricks) {
+          if (
+            target === center ||
+            target.type === 'indestructible' ||
+            target.hp <= 0 ||
+            target.destroyTimer > 0
+          ) {
+            continue
+          }
+
+          const targetRight = target.x + target.width
+          const targetBottom = target.y + target.height
+
+          const overlapsExplosion =
+            target.x < explosionRight &&
+            targetRight > explosionLeft &&
+            target.y < explosionBottom &&
+            targetBottom > explosionTop
+
+          if (overlapsExplosion) {
+            destroyBrick(target)
+          }
+        }
+      }
+
+      if (fireBall) {
+        playSound('destroy')
+
+        if (brick.type === 'barrel') {
+          explodeBarrel(brick)
+        } else {
+          destroyBrick(brick)
+        }
+
+        return true
+      }
+
+      if (brick.type === 'barrel') {
+        brick.hp -= 1
+
+        if (brick.hp > 0) {
+          playSound('hit')
+          game.score += 5
+          return true
+        }
+
+        explodeBarrel(brick)
+        return true
+      }
+
+      brick.hp -= 1
+
+      if (brick.hp > 0) {
+        playSound('hit')
+        game.score += 5
+        return true
+      }
+
+      playSound('destroy')
+      destroyBrick(brick)
 
       return true
-    }
-
-    brick.hp -= 1
-
-    if (brick.hp > 0) {
-      game.score += 5
-
-      return true
-    }
-
-    game.score += brick.type === 'strong' ? 30 : brick.type === 'hard' ? 20 : 10
-
-    if (brick.powerUp) {
-      game.powerUps.push({
-        x: brick.x + brick.width / 2 - POWERUP_SIZE / 2,
-
-        y: brick.y + brick.height,
-
-        width: POWERUP_SIZE,
-
-        height: POWERUP_SIZE,
-
-        type: brick.powerUp,
-
-        speed: POWERUP_SPEED,
-      })
-    }
-
-    brick.hp = 0
-
-    return true
-  }, [])
+    },
+    [playSound],
+  )
 
   const checkLevelComplete = useCallback(
     (game: GameState) => {
-      const remaining = game.bricks.some((brick) => brick.type !== 'indestructible' && brick.hp > 0)
+      const remaining = game.bricks.some(
+        (brick) => brick.type !== 'indestructible' && (brick.hp > 0 || brick.destroyTimer > 0),
+      )
 
       if (remaining) {
         return false
@@ -914,6 +1120,8 @@ export function Arkanoid({ onComplete }: Props) {
       game.won = true
 
       setWon(true)
+      setCompletedLevels(game.level)
+      playSound('levelComplete')
 
       if (game.level >= TOTAL_LEVELS) {
         saveProgress(TOTAL_LEVELS, TOTAL_LEVELS, true)
@@ -933,16 +1141,18 @@ export function Arkanoid({ onComplete }: Props) {
 
       return true
     },
-    [unlockedLevel],
+    [playSound, unlockedLevel],
   )
 
   const update = useCallback(
     (game: GameState, deltaTime: number) => {
-      if (!game.running) {
-        return
-      }
-
       const dt = Math.min(deltaTime, 50)
+
+      for (const brick of game.bricks) {
+        if (brick.destroyTimer > 0) {
+          brick.destroyTimer = Math.max(0, brick.destroyTimer - dt)
+        }
+      }
 
       if (keysRef.current.left) {
         game.paddle.x -= game.paddle.speed
@@ -954,13 +1164,46 @@ export function Arkanoid({ onComplete }: Props) {
 
       game.paddle.x = Math.max(0, Math.min(CANVAS_WIDTH - game.paddle.width, game.paddle.x))
 
-      if (game.wideTimer > 0) {
-        game.wideTimer--
+      if (!game.running) {
+        const waitingBall = game.balls[0]
 
-        game.paddle.width = game.paddle.baseWidth * 1.65
+        if (waitingBall) {
+          waitingBall.x = game.paddle.x + game.paddle.width / 2
+          waitingBall.y = game.paddle.y - BALL_RADIUS - 3
+          waitingBall.vx = 0
+          waitingBall.vy = 0
+        }
+
+        return
+      }
+
+      if (game.wideTimer > 0) {
+        game.wideTimer = Math.max(0, game.wideTimer - dt)
+        game.paddle.width = game.paddle.baseWidth * WIDE_PADDLE_MULTIPLIER
+
+        if (game.wideTimer <= WIDE_WARNING_DURATION) {
+          game.wideBlinkTimer -= dt
+
+          if (game.wideBlinkTimer <= 0) {
+            game.wideBlinkVisible = !game.wideBlinkVisible
+            game.wideBlinkTimer = WIDE_BLINK_INTERVAL
+          }
+        } else {
+          game.wideBlinkTimer = 0
+          game.wideBlinkVisible = true
+        }
+
+        if (game.wideTimer === 0) {
+          game.wideBlinkTimer = 0
+          game.wideBlinkVisible = true
+        }
       } else {
         game.paddle.width = game.paddle.baseWidth
+        game.wideBlinkTimer = 0
+        game.wideBlinkVisible = true
       }
+
+      game.paddle.x = Math.max(0, Math.min(CANVAS_WIDTH - game.paddle.width, game.paddle.x))
 
       if (game.fireShotsRemaining > 0) {
         game.fireShotTimer -= dt
@@ -1009,6 +1252,7 @@ export function Arkanoid({ onComplete }: Props) {
           ball.x >= game.paddle.x &&
           ball.x <= game.paddle.x + game.paddle.width
         ) {
+          playSound('platformBounce')
           const hit = (ball.x - (game.paddle.x + game.paddle.width / 2)) / (game.paddle.width / 2)
 
           const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy)
@@ -1023,7 +1267,7 @@ export function Arkanoid({ onComplete }: Props) {
         for (let brickIndex = 0; brickIndex < game.bricks.length; brickIndex++) {
           const brick = game.bricks[brickIndex]
 
-          if (brick.hp <= 0) {
+          if (brick.hp <= 0 || brick.destroyTimer > 0) {
             continue
           }
 
@@ -1141,7 +1385,9 @@ export function Arkanoid({ onComplete }: Props) {
         }
       }
 
-      game.bricks = game.bricks.filter((brick) => brick.hp > 0 || brick.type === 'indestructible')
+      game.bricks = game.bricks.filter(
+        (brick) => brick.type === 'indestructible' || brick.hp > 0 || brick.destroyTimer > 0,
+      )
 
       game.balls = game.balls.filter((ball) => ball.y - ball.radius <= CANVAS_HEIGHT)
 
@@ -1177,7 +1423,15 @@ export function Arkanoid({ onComplete }: Props) {
 
       updateHud(game)
     },
-    [activatePowerUp, checkLevelComplete, hitBrick, loseLife, spawnFireBallFromPaddle, updateHud],
+    [
+      activatePowerUp,
+      checkLevelComplete,
+      hitBrick,
+      loseLife,
+      playSound,
+      spawnFireBallFromPaddle,
+      updateHud,
+    ],
   )
 
   const startGame = useCallback(
@@ -1188,8 +1442,8 @@ export function Arkanoid({ onComplete }: Props) {
 
       const game = createInitialGame(selected)
 
-      game.running = true
-      game.started = true
+      game.running = false
+      game.started = false
 
       gameRef.current = game
 
@@ -1198,19 +1452,44 @@ export function Arkanoid({ onComplete }: Props) {
 
       setScore(0)
       setLives(3)
+      setCompletedLevels(Math.max(0, selected - 1))
 
       setWon(false)
       setGameOver(false)
-      setStarted(true)
+      setStarted(false)
 
       setActivePowerUps([])
     },
     [unlockedLevel],
   )
 
-  const resetCurrentLevel = useCallback(() => {
-    startGame(level)
-  }, [level, startGame])
+  const launchBall = useCallback(() => {
+    const game = gameRef.current
+
+    if (!game || game.gameOver || game.won || game.running) {
+      return
+    }
+
+    const ball = game.balls[0]
+
+    if (!ball) {
+      return
+    }
+
+    const speed = getBallSpeed(game.level)
+
+    playSound('launch')
+
+    ball.x = game.paddle.x + game.paddle.width / 2
+    ball.y = game.paddle.y - BALL_RADIUS - 3
+    ball.vx = 0
+    ball.vy = -speed
+    ball.fire = false
+
+    game.running = true
+    game.started = true
+    setStarted(true)
+  }, [playSound])
 
   const nextLevel = useCallback(() => {
     if (level >= TOTAL_LEVELS) {
@@ -1227,43 +1506,46 @@ export function Arkanoid({ onComplete }: Props) {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+      const key = event.key.toLowerCase()
+
+      if (event.key === 'ArrowLeft' || key === 'a' || key === 'ф') {
         keysRef.current.left = true
-
         event.preventDefault()
       }
 
-      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
+      if (event.key === 'ArrowRight' || key === 'd' || key === 'в') {
         keysRef.current.right = true
-
         event.preventDefault()
       }
 
-      if (event.code === 'Space' && !started) {
-        startGame(selectedLevel)
+      if (event.code === 'Space') {
+        event.preventDefault()
+        if (!event.repeat) {
+          launchBall()
+        }
       }
     }
 
     const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+      const key = event.key.toLowerCase()
+
+      if (event.key === 'ArrowLeft' || key === 'a' || key === 'ф') {
         keysRef.current.left = false
       }
 
-      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
+      if (event.key === 'ArrowRight' || key === 'd' || key === 'в') {
         keysRef.current.right = false
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
-
     window.addEventListener('keyup', handleKeyUp)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
-
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [selectedLevel, startGame, started])
+  }, [launchBall])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -1309,97 +1591,37 @@ export function Arkanoid({ onComplete }: Props) {
     }
   }, [draw, update])
 
-  const getPowerUpName = (type: PowerUpType) => {
-    switch (type) {
-      case 'wide':
-        return 'Широкая палочка'
-
-      case 'triple':
-        return 'Разделение шара'
-
-      case 'shot':
-        return 'Три обычных шара'
-
-      case 'fire':
-        return 'Огненная стрельба'
-
-      default:
-        return ''
-    }
-  }
-
   return (
     <div className="arkanoid">
-      <div className="arkanoid__header">
-        <div>
-          <strong>
-            Уровень {level} / {TOTAL_LEVELS}
-          </strong>
-
-          <span>Очки: {score}</span>
-
-          <span>Жизни: {lives}</span>
-        </div>
-
-        <div className="arkanoid__levels">
-          {Array.from(
-            {
-              length: TOTAL_LEVELS,
-            },
-            (_, index) => {
-              const current = index + 1
-
-              const unlocked = current <= unlockedLevel
-
-              return (
-                <button
-                  key={current}
-                  type="button"
-                  disabled={!unlocked}
-                  className={
-                    current === level
-                      ? 'arkanoid__level arkanoid__level--active'
-                      : 'arkanoid__level'
-                  }
-                  onClick={() => {
-                    if (unlocked) {
-                      startGame(current)
-                    }
-                  }}
-                >
-                  {current}
-                </button>
-              )
-            },
-          )}
-        </div>
-      </div>
-
-      <div className="arkanoid__powerups">
-        {activePowerUps.map((powerUp) => (
-          <span key={powerUp} className="arkanoid__powerup-active">
-            {getPowerUpName(powerUp)}
-          </span>
-        ))}
-      </div>
-
       <div className="arkanoid__canvas-wrap">
+        <img
+          src={arkanoidBackgroundImage}
+          alt=""
+          className="arkanoid__background"
+          draggable={false}
+        />
+
         <canvas
           ref={canvasRef}
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
           className="arkanoid__canvas"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
+            width: '100%',
+            height: '100%',
+            background: 'transparent',
+          }}
         />
 
         {!started && !won && !gameOver && (
-          <div className="arkanoid__overlay">
-            <h2>Арканоид</h2>
-
-            <p>Управление: ← → или A / D</p>
-
-            <button type="button" onClick={() => startGame(selectedLevel)}>
-              Играть
-            </button>
+          <div
+            className="arkanoid__overlay arkanoid__overlay--ready"
+            style={{ background: 'transparent', pointerEvents: 'none' }}
+          >
+            <p>Нажмите Space, чтобы запустить шар</p>
           </div>
         )}
 
@@ -1408,8 +1630,11 @@ export function Arkanoid({ onComplete }: Props) {
             <h2>Игра окончена</h2>
 
             <p>Очки: {score}</p>
+            <p>
+              Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}
+            </p>
 
-            <button type="button" onClick={resetCurrentLevel}>
+            <button type="button" onClick={() => startGame(1)}>
               Попробовать снова
             </button>
           </div>
@@ -1420,6 +1645,9 @@ export function Arkanoid({ onComplete }: Props) {
             <h2>{level >= TOTAL_LEVELS ? 'Все уровни пройдены!' : `Уровень ${level} пройден!`}</h2>
 
             <p>Очки: {score}</p>
+            <p>
+              Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}
+            </p>
 
             {level < TOTAL_LEVELS ? (
               <button type="button" onClick={nextLevel}>
@@ -1432,24 +1660,6 @@ export function Arkanoid({ onComplete }: Props) {
             )}
           </div>
         )}
-      </div>
-
-      <div className="arkanoid__legend">
-        <span>
-          <b>W</b> — широкая палочка
-        </span>
-
-        <span>
-          <b>3</b> — текущий шар разделяется на 3
-        </span>
-
-        <span>
-          <b>S</b> — из палочки вылетают 3 обычных шара
-        </span>
-
-        <span>
-          <b>F</b> — 10 огненных шаров по одному каждые 0,5 сек.
-        </span>
       </div>
     </div>
   )
