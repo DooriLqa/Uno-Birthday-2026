@@ -37,10 +37,10 @@ export const ARKANOID_LAYOUT: ArkanoidLayout = {
   },
 
   screen: {
-    x: 420,
-    y: 280,
-    width: 696,
-    height: 316,
+    x: 404,
+    y: 264,
+    width: 728,
+    height: 344,
     radius: 24,
   },
 

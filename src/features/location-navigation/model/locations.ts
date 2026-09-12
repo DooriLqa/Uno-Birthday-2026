@@ -214,13 +214,6 @@ export const locations: Record<LocationId, LocationDefinition> = {
         cursor: 'projected-forward',
         action: { type: 'game', gameId: 'fruit-basket' },
       },
-      {
-        id: 'arkanoid',
-        label: 'Арканоид',
-        area: area(60, 15, 21, 73),
-        cursor: 'projected-forward',
-        action: { type: 'game', gameId: 'arkanoid' },
-      },
     ],
   },
   'wild-beach': {
@@ -295,6 +288,13 @@ export const locations: Record<LocationId, LocationDefinition> = {
         area: area(3, 43, 85, 52),
         cursor: 'hand-grab',
         action: { type: 'game', gameId: 'robot-maze' },
+      },
+      {
+        id: 'arkanoid',
+        label: 'Сыграть в «Арканоид»',
+        area: area(77, 30.5, 11, 30),
+        cursor: 'projected-forward',
+        action: { type: 'game', gameId: 'arkanoid' },
       },
     ],
   },

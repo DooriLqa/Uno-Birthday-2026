@@ -421,8 +421,13 @@ export function Arkanoid({ onComplete }: Props) {
     const stage = stageRef.current
     if (!stage) return
     const observer = new ResizeObserver(([entry]) => {
+      // Preserve object/text proportions and leave room above the lower cabinet trim.
+      // The sea background fills the stage independently of this playable world.
       setStageScale(
-        Math.min(entry.contentRect.width / CANVAS_WIDTH, entry.contentRect.height / CANVAS_HEIGHT),
+        Math.min(
+          entry.contentRect.width / CANVAS_WIDTH,
+          (entry.contentRect.height * 0.86) / CANVAS_HEIGHT,
+        ),
       )
     })
     observer.observe(stage)
