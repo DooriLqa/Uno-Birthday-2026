@@ -32,12 +32,14 @@ export function GamePage({ game, onBack, onOpenRadio }: Props) {
         />
       )}
       <div className="game-overlay__content">
-        <div className="page-top">
-          <button type="button" className="back" onClick={onBack}>
-            <ArrowLeft size={18} /> Вернуться в локацию
-          </button>
-          <span>{game.emoji}</span>
-        </div>
+        {game.id !== 'beach-radio' && (
+          <div className="page-top">
+            <button type="button" className="back" onClick={onBack}>
+              <ArrowLeft size={18} /> Вернуться в локацию
+            </button>
+            <span>{game.emoji}</span>
+          </div>
+        )}
         <GameScreen onComplete={handleComplete} onOpenRadio={onOpenRadio} onClose={onBack} />
       </div>
     </main>

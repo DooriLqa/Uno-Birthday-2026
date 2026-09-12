@@ -651,9 +651,9 @@ h1 {
   }
 }
 .game-overlay.beach-radio-page {
-  padding: 16px;
-  overflow: hidden;
-  background: linear-gradient(180deg, #67cde9 0 54%, #f6d18b 54% 100%);
+  padding: 0;
+  overflow: auto;
+  background: linear-gradient(180deg, rgba(11, 35, 46, 0.08), rgba(8, 25, 34, 0.56));
 }
 .beach-radio-page .page-top {
   position: absolute;
