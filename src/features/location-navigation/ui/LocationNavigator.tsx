@@ -4,11 +4,11 @@ import { useWorldStore, type SceneSnapshot } from '../model/worldStore'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import { useDialogueStore } from '@/features/dialogues'
 import { useProgressStore } from '@/features/game-progress/model/store'
+import { BOOK_ITEMS, getBookPickupArtwork } from '@/features/inventory/model/items'
+import { useInventoryStore } from '@/features/inventory/model/store'
 import { BeachLibrary } from '@/features/beach-library/ui/BeachLibrary'
-import ritualSiteExtinguished from '@/shared/assets/locations/wild/ritual-site-extinguished-v4.png'
-import ritualSiteLit from '@/shared/assets/locations/wild/ritual-site-lit-v4.png'
-import totemCloseupExtinguished from '@/shared/assets/locations/wild/totem-cape-closeup-extinguished-v3.png'
-import totemCloseupLit from '@/shared/assets/locations/wild/totem-cape-closeup-lit-v3.png'
+import ritualSiteExtinguished from '@/shared/assets/locations/wild/ritual-site-extinguished-v2.png'
+import ritualSiteLit from '@/shared/assets/locations/wild/ritual-site-lit-v2.png'
 import { talkToLibrarian } from '@/features/beach-library/model/librarianDialogue'
 import './LocationNavigator.css'
 
@@ -52,13 +52,8 @@ export function LocationNavigator({
   const { scene, history, setScene, setHistory } = useWorldStore()
   const location = locations[scene.locationId] ?? locations.pier
   const dialogueOpen = useDialogueStore((state) => state.activeDialogueId !== null)
+  const inventory = useInventoryStore((state) => state.items)
   const totemCodeSolved = useProgressStore((state) => state.completedGameIds.includes('totem-code'))
-  const sceneImage =
-    location.id === 'totem-camp'
-      ? totemCodeSolved
-        ? totemCloseupLit
-        : totemCloseupExtinguished
-      : location.image
   const [size, setSize] = useState<Size | null>(null)
   const [viewport, setViewport] = useState({ width: window.innerWidth, height: window.innerHeight })
   const [error, setError] = useState('')
@@ -143,6 +138,10 @@ export function LocationNavigator({
     if (lock.current || dialogueOpen) return
     if (item.type === 'location') navigate(item.locationId)
     if (item.type === 'game') onOpenGame(item.gameId)
+    if (item.type === 'pickup') {
+      const book = BOOK_ITEMS.find((entry) => entry.id === item.itemId)
+      if (book) useInventoryStore.getState().addItem(book)
+    }
     if (item.type === 'merchant') onMerchant()
     if (item.type === 'sailor') onSailor()
     if (item.type === 'librarian') talkToLibrarian()
@@ -183,7 +182,7 @@ export function LocationNavigator({
       inert={!active || dialogueOpen}
     >
       <div className="location-navigator__scene">
-        <img className="location-navigator__image" style={layout} src={sceneImage} alt="" />
+        <img className="location-navigator__image" style={layout} src={location.image} alt="" />
         <div className="location-navigator__hotspot-layer">
           <div className="location-navigator__hotspot-canvas is-wide" style={layout}>
             {location.id === 'library' && active && !dialogueOpen && <BeachLibrary />}
@@ -196,20 +195,35 @@ export function LocationNavigator({
                 draggable="false"
               />
             )}
-            {location.hotspots.map((hotspot) => (
-              <button
-                key={hotspot.id}
-                type="button"
-                className={
-                  'location-navigator__hotspot cursor-' + (hotspot.cursor ?? 'projected-forward')
-                }
-                style={hotspot.area}
-                onClick={() => action(hotspot.action)}
-                aria-label={hotspot.label}
-              >
-                <span>{hotspot.label}</span>
-              </button>
-            ))}
+            {location.hotspots
+              .filter((hotspot) => {
+                if (hotspot.action.type !== 'pickup') return true
+                const { itemId } = hotspot.action
+                return !inventory.some((item) => item.id === itemId)
+              })
+              .map((hotspot) => {
+                const pickup = hotspot.action.type === 'pickup' ? hotspot.action : null
+                const artwork = pickup ? getBookPickupArtwork(pickup.itemId) : undefined
+
+                return (
+                  <button
+                    key={hotspot.id}
+                    type="button"
+                    className={
+                      'location-navigator__hotspot' +
+                      (pickup ? ' location-navigator__pickup' : '') +
+                      ' cursor-' +
+                      (hotspot.cursor ?? 'projected-forward')
+                    }
+                    style={hotspot.area}
+                    onClick={() => action(hotspot.action)}
+                    /* aria-label={hotspot.label} */
+                  >
+                    {artwork && <img src={artwork} alt="" draggable="false" />}
+                    {/* <span>{hotspot.label}</span> */}
+                  </button>
+                )
+              })}
           </div>
         </div>
         {location.isWide &&
@@ -229,11 +243,11 @@ export function LocationNavigator({
                 if (event.key === 'Enter' || event.key === ' ') pan(side)
               }}
               onKeyUp={stop}
-              aria-label={side < 0 ? 'Посмотреть влево' : 'Посмотреть вправо'}
+              /* aria-label={side < 0 ? 'Посмотреть влево' : 'Посмотреть вправо'} */
             />
           ))}
       </div>
-      <div className="location-navigator__caption">{location.title}</div>
+      {/* <div className="location-navigator__caption">{location.title}</div> */}
       {error && (
         <div className="location-navigator__error" role="alert">
           {error}

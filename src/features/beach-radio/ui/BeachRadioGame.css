@@ -40,7 +40,8 @@
   border-radius: 4px;
   overflow: hidden;
   background: transparent;
-
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, pointer;
+  cursor: var(--cursor-pointer);
   /* чтобы свечение не влияло на соседние элементы */
   isolation: isolate;
 }
@@ -104,6 +105,12 @@
   margin: 0;
   padding: 0;
   z-index: 10;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-open.png') 20 10, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
+}
+.radio-frequency:active {
+  --cursor-image: url('@/shared/assets/common/cursors/hand-grab.png') 20 10, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .radio-frequency::-webkit-slider-runnable-track {
   width: 100%;
@@ -414,7 +421,6 @@
   width: 100%;
   margin: 0;
   accent-color: #ffe09a;
-  cursor: grab;
 }
 .radio-device__frequency-markers {
   margin-top: 2px;

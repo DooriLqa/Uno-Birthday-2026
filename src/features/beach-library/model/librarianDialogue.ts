@@ -1,7 +1,7 @@
 import { openDialogue, type Dialogue } from '@/features/dialogues'
 import librarianSprite from '@/shared/assets/features/dialogues/poodle-librarian.png'
 
-const speaker = { id: 'library-poodle', name: 'Библиотекарша', sprite: librarianSprite }
+const speaker = { id: 'library-poodle', name: 'Библиотекарь', sprite: librarianSprite }
 const yuni = { id: 'yuni', name: 'Юни', isMain: true }
 
 export const librarianDialogue: Dialogue = {
@@ -36,13 +36,13 @@ export const librarianDialogue: Dialogue = {
       id: 'hint',
       speaker,
       emotion: 'neutral',
-      text: 'Также я нашла какое-то странное письмо, отдам его когда мы закончим с уборкой, возможно ты поймешь что всё это значит.',
+      text: 'Также я должна была передать тебе письмо, но оно затерялось в этом бардкаке, возможно оно под какой-то из книг.',
     },
     {
       id: 'letter-response',
       speaker: yuni,
       emotion: 'surprised',
-      text: 'Странное письмо? Теперь мне ещё любопытнее. Скорее наведём порядок!',
+      text: 'Письмо? Теперь мне ещё любопытнее. Скорее наведём порядок!',
     },
     {
       id: 'thanks',
@@ -61,7 +61,7 @@ export const librarianCompletionDialogue: Dialogue = {
       id: 'letter',
       speaker,
       emotion: 'happy',
-      text: 'Спасибо за помощь с уборкой! Вот письмо, о котором я говорила.',
+      text: 'Спасибо за помощь с уборкой! Теперь здесь полный "порядок".Вот письмо, о котором я говорила.',
     },
     {
       id: 'letter-response',

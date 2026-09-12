@@ -1,5 +1,7 @@
 import treasureOpen from '@/shared/assets/games/robot-maze/treasure-open.png'
 import treasurePile from '@/shared/assets/games/robot-maze/treasure-pile.png'
+import victorySound from '@/shared/assets/common/audio/the-sound-of-victory-winning.mp3'
+import { audioController } from '@/shared/lib/audio/audioController'
 
 import wall1 from '@/shared/assets/games/robot-maze/wall.png'
 import wall2 from '@/shared/assets/games/robot-maze/wall2.png'
@@ -567,6 +569,7 @@ export function RobotMazeGame({ onComplete }: Props) {
   }
 
   const finishCurrentLevel = (collectedOnLevel: number) => {
+    audioController.playOneShot(victorySound)
     const updatedPlayedLevels = playedLevels.includes(levelIndex)
       ? playedLevels
       : [...playedLevels, levelIndex]

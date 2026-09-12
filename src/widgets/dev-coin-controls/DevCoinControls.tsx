@@ -1,22 +1,43 @@
-import { MessageCircle, Minus, PackagePlus, Plus, RotateCcw, Trash2, Wrench } from 'lucide-react'
+import {
+  Clapperboard,
+  MessageCircle,
+  Minus,
+  PackagePlus,
+  Plus,
+  RotateCcw,
+  Trash2,
+  Wrench,
+} from 'lucide-react'
 import { useState } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { dialogueTestSamples, openDialogue } from '@/features/dialogues'
 import { resetGameState } from '@/features/game-progress/model/resetGameState'
-import { ARCADE_REWARDS_BY_GAME_ID, BOOK_ITEMS } from '@/features/inventory/model/items'
+import { GAME_REWARDS_BY_GAME_ID, BOOK_ITEMS } from '@/features/inventory/model/items'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import { useQuizProgressStore } from '@/features/beach-radio/model/quizStore'
+import { LETTER_PAGE, NOTE_PAGE, pageId } from '@/features/beach-library/model/config'
 import coin from '@/shared/assets/common/branding/coin.png'
 import './DevCoinControls.css'
+
+const LIBRARY_PAGE_ITEMS: InventoryItem[] = [
+  ...Array.from({ length: 4 }, (_, index) => ({
+    id: pageId(index),
+    name: `Страница из книги ${index + 1}`,
+    icon: '📄',
+  })),
+  { id: LETTER_PAGE, name: 'Лист с текстом (буквы)', icon: '🔤' },
+  { id: NOTE_PAGE, name: 'Письмо из библиотеки (подсказка)', icon: '📜' },
+]
 
 const DEV_ITEMS: InventoryItem[] = [
   { id: 'beach-radio', name: 'Радиоприёмник', icon: '📻' },
   { id: 'oil-lantern', name: 'Масляный фонарь', icon: '🏮' },
+  ...LIBRARY_PAGE_ITEMS,
   ...BOOK_ITEMS,
-  ...Object.values(ARCADE_REWARDS_BY_GAME_ID),
+  ...Object.values(GAME_REWARDS_BY_GAME_ID),
 ]
 
-export function DevCoinControls() {
+export function DevCoinControls({ onOpenCredits }: { onOpenCredits: () => void }) {
   const pawCoins = usePawCoinStore((state) => state.pawCoins)
   const addPawCoins = usePawCoinStore((state) => state.addPawCoins)
   const spendPawCoins = usePawCoinStore((state) => state.spendPawCoins)
@@ -112,6 +133,10 @@ export function DevCoinControls() {
             title="Сбросить веса всех вопросов квиза"
           >
             <RotateCcw size={15} /> Стереть память квиза
+          </button>
+
+          <button type="button" onClick={onOpenCredits} title="Показать титры">
+            <Clapperboard size={15} /> Показать титры
           </button>
 
           <button

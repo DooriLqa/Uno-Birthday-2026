@@ -8,11 +8,10 @@ import shop from '@/shared/assets/locations/tourist/shop.png'
 import arcades from '@/shared/assets/locations/tourist/arcades.png'
 import wildBeach from '@/shared/assets/locations/wild/overview-v3.png'
 import fisherHut from '@/shared/assets/locations/wild/fisher-hut.png'
-import totemCamp from '@/shared/assets/locations/wild/totem-cape-closeup-extinguished-v3.png'
 import pirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
 import jungleOverview from '@/shared/assets/locations/jungle/overview.png'
 import jungleCave from '@/shared/assets/locations/jungle/cave.png'
-import jungleWaterfall from '@/shared/assets/locations/jungle/waterfall.png'
+import jungleWaterfall from '@/shared/assets/locations/jungle/waterfall-v2.png'
 import nicheStream from '@/shared/assets/locations/jungle/niche-stream.png'
 import locationFootstepsSound from '@/shared/assets/common/audio/location-footsteps.ogg'
 
@@ -26,7 +25,6 @@ export type LocationId =
   | 'arcades'
   | 'wild-beach'
   | 'fisher-hut'
-  | 'totem-camp'
   | 'pirate-shore'
   | 'jungle'
   | 'jungle-cave'
@@ -35,6 +33,7 @@ export type LocationId =
 export type LocationAction =
   | { type: 'location'; locationId: LocationId }
   | { type: 'game'; gameId: string }
+  | { type: 'pickup'; itemId: string }
   | { type: 'merchant' }
   | { type: 'sailor' }
   | { type: 'librarian' }
@@ -141,6 +140,13 @@ export const locations: Record<LocationId, LocationDefinition> = {
     image: cove,
     hotspots: [
       {
+        id: 'tropical-field-journal',
+        label: 'Подобрать тропический путевой дневник',
+        area: area(26, 49, 6, 6),
+        cursor: 'hand-point',
+        action: { type: 'pickup', itemId: 'tropical-field-journal' },
+      },
+      {
         id: 'library',
         label: 'Войти в библиотеку',
         area: area(63, 17, 36, 49),
@@ -165,7 +171,7 @@ export const locations: Record<LocationId, LocationDefinition> = {
     hotspots: [
       {
         id: 'librarian',
-        label: 'Поговорить с библиотекаршей',
+        label: 'Поговорить с библиотекарем',
         area: area(80, 26, 19, 70),
         cursor: 'dialogue',
         action: { type: 'librarian' },
@@ -233,6 +239,13 @@ export const locations: Record<LocationId, LocationDefinition> = {
     isWide: true,
     hotspots: [
       {
+        id: 'treasure-hunter-atlas',
+        label: 'Подобрать атлас искателя сокровищ среди бутылок',
+        area: area(79, 72, 7, 6),
+        cursor: 'hand-point',
+        action: { type: 'pickup', itemId: 'treasure-hunter-atlas' },
+      },
+      {
         id: 'fisher-hut',
         label: 'Рыбацкий домик',
         area: area(0, 8, 30, 57),
@@ -244,7 +257,7 @@ export const locations: Record<LocationId, LocationDefinition> = {
         label: 'Мыс с тотемами',
         area: area(40, 13, 20, 46),
         cursor: 'magnify',
-        action: { type: 'location', locationId: 'totem-camp' },
+        action: { type: 'game', gameId: 'totem-code' },
       },
       {
         id: 'pirate-shore',
@@ -267,21 +280,6 @@ export const locations: Record<LocationId, LocationDefinition> = {
         area: area(34, 27, 43, 36),
         cursor: 'projected-forward',
         action: { type: 'game', gameId: 'fishing' },
-      },
-    ],
-  },
-  'totem-camp': {
-    ...wildBase,
-    id: 'totem-camp',
-    title: 'Кострище четырёх тотемов',
-    image: totemCamp,
-    hotspots: [
-      {
-        id: 'totems',
-        label: 'Разгадать код тотемов',
-        area: area(9, 10, 82, 55),
-        cursor: 'hand-point',
-        action: { type: 'game', gameId: 'totem-code' },
       },
     ],
   },
@@ -368,6 +366,13 @@ export const locations: Record<LocationId, LocationDefinition> = {
     ambience: 'niche-stream',
     ambienceVolume: 1,
     hotspots: [
+      {
+        id: 'sailor-logbook',
+        label: 'Подобрать морской журнал',
+        area: area(10, 68, 10, 6),
+        cursor: 'hand-point',
+        action: { type: 'pickup', itemId: 'sailor-logbook' },
+      },
       {
         id: 'coffee-bar',
         label: 'Поговорить с баристой',

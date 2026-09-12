@@ -198,6 +198,8 @@
 .game-hud__radio-open {
   --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
   cursor: var(--cursor-rendering, var(--cursor-image));
+  align-content: center;
+
 }
 
 .game-hud__slot--button:hover,

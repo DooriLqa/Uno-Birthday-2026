@@ -28,9 +28,9 @@
 .totem-code-game__campfire {
   position: absolute;
   z-index: 1;
-  bottom: 7%;
+  bottom: 9%;
   left: 50%;
-  width: clamp(190px, 23vw, 320px);
+  width: clamp(210px, 33vw, 420px);
   height: auto;
   translate: -50% 0;
   user-select: none;
@@ -47,7 +47,7 @@
 }
 
 .totem-code-game__totem--1 {
-  bottom: 4%;
+  bottom: 13%;
   left: 7%;
 }
 
@@ -63,7 +63,7 @@
 
 .totem-code-game__totem--4 {
   right: 7%;
-  bottom: 4%;
+  bottom: 13%;
 }
 
 .totem-code-game__body {
@@ -96,7 +96,8 @@
   border: 0;
   border-radius: 8%;
   background: transparent;
-  cursor: pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
   touch-action: manipulation;
 }
 
@@ -174,7 +175,8 @@
   background: #75411f;
   color: #fff3cc;
   box-shadow: 0 2px 0 #3d1f0d;
-  cursor: pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
   opacity: 0;
   pointer-events: none;
   scale: 0.82;
@@ -186,11 +188,13 @@
 }
 
 .totem-code-game__switch--left {
-  left: -14px;
+  left: 5px;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-left.png') 13 32, w-resize;
 }
 
 .totem-code-game__switch--right {
-  right: -14px;
+  right: 5px;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-right.png') 51 32, e-resize;
 }
 
 .totem-code-game__drum:hover .totem-code-game__switch,
