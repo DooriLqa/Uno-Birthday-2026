@@ -141,7 +141,6 @@ const syncAudio = (state: Pick<RadioState, 'isPowered' | 'volume' | 'frequency'>
     noise?.setVolume(0)
     stationAudio.forEach((sound) => {
       sound.setVolume(0)
-      sound.pause()
     })
     return
   }
