@@ -40,7 +40,7 @@
 .totem-code-game__totem {
   position: absolute;
   z-index: 2;
-  width: clamp(185px, 20vw, 270px);
+  width: clamp(185px, 20vw, 310px);
   aspect-ratio: 2 / 3;
   isolation: isolate;
   filter: drop-shadow(0 10px 7px rgba(72, 35, 12, 0.34));
@@ -88,6 +88,7 @@
 .totem-code-game__drum {
   position: absolute;
   z-index: 2;
+  display: block;
   left: 22%;
   width: 56%;
   height: 16.5%;
@@ -135,7 +136,7 @@
 }
 
 .totem-code-game__carving--moon {
-  width: 58%;
+  width: 82%;
   height: 72%;
   font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', sans-serif;
   font-size: clamp(1.7rem, 3.6vw, 3.05rem);
@@ -188,17 +189,16 @@
 }
 
 .totem-code-game__switch--left {
-  left: 5px;
+  left: 22px;
   --cursor-image: url('@/shared/assets/common/cursors/arrow-left.png') 13 32, w-resize;
 }
 
 .totem-code-game__switch--right {
-  right: 5px;
+  right: 22px;
   --cursor-image: url('@/shared/assets/common/cursors/arrow-right.png') 51 32, e-resize;
 }
 
-.totem-code-game__drum:hover .totem-code-game__switch,
-.totem-code-game__drum:focus-within .totem-code-game__switch {
+.totem-code-game__drum:is(:hover, :focus-within) > .totem-code-game__switch, .totem-code-game__switch:is(:hover, :focus-within) {
   opacity: 1;
   pointer-events: auto;
   scale: 1;
@@ -271,4 +271,9 @@
     pointer-events: auto;
   }
 
+}
+
+.totem-code-game__drum > .totem-code-game__switch:disabled {
+  opacity: 0;
+  pointer-events: none;
 }

@@ -198,7 +198,11 @@ function DrumControl({
   onChange: (direction: -1 | 1) => void
 }) {
   return (
-    <div className={`totem-code-game__drum ${className}`} aria-label={label}>
+    <span
+      className={`totem-code-game__drum ${className}`}
+      role="group"
+      aria-label={label}
+    >
       {children}
       <button
         type="button"
@@ -206,7 +210,7 @@ function DrumControl({
         onClick={() => onChange(-1)}
         aria-label={`${label}: предыдущее значение`}
       >
-        <ChevronLeft size={18} />
+        <ChevronLeft size={24} />
       </button>
       <button
         type="button"
@@ -214,8 +218,8 @@ function DrumControl({
         onClick={() => onChange(1)}
         aria-label={`${label}: следующее значение`}
       >
-        <ChevronRight size={18} />
+        <ChevronRight size={24} />
       </button>
-    </div>
+    </span>
   )
 }
