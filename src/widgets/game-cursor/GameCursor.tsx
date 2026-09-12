@@ -17,6 +17,12 @@ export function GameCursor() {
   useEffect(() => {
     const layer = layerRef.current
     if (!layer) return
+    const supportsPopover = typeof layer.showPopover === 'function'
+    if (supportsPopover) {
+      layer.showPopover()
+    } else {
+      layer.removeAttribute('popover')
+    }
     const root = document.documentElement
     const images = new Map<string, HTMLImageElement>()
     const failed = new Set<string>()
@@ -29,7 +35,7 @@ export function GameCursor() {
 
     const hide = () => {
       root.style.removeProperty('--cursor-rendering')
-      layer.hidden = true
+      layer.dataset.visible = 'false'
     }
 
     const render = () => {
@@ -78,7 +84,7 @@ export function GameCursor() {
         shown = image
       }
       image.style.transform = `translate3d(${x - Number(match[2] ?? 0)}px, ${y - Number(match[3] ?? 0)}px, 0)`
-      layer.hidden = false
+      layer.dataset.visible = 'true'
       root.style.setProperty('--cursor-rendering', 'none')
     }
 
@@ -149,8 +155,17 @@ export function GameCursor() {
       document.removeEventListener('scroll', schedule, true)
       window.removeEventListener('blur', leave)
       window.removeEventListener('resize', schedule)
+      if (supportsPopover && layer.matches(':popover-open')) layer.hidePopover()
     }
   }, [])
 
-  return <div ref={layerRef} className="game-cursor" aria-hidden="true" hidden />
+  return (
+    <div
+      ref={layerRef}
+      className="game-cursor"
+      aria-hidden="true"
+      data-visible="false"
+      popover="manual"
+    />
+  )
 }
