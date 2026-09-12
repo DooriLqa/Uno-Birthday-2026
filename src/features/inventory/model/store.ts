@@ -19,8 +19,11 @@ export type InventoryItem = {
 
 type InventoryState = {
   items: InventoryItem[]
+  previewItemId: string | null
   addItem: (item: InventoryItem) => number
   removeItem: (itemId: string, amount?: number) => void
+  openItemPreview: (itemId: string) => void
+  closeItemPreview: () => void
 }
 
 const LEGACY_TRAVEL_BOOK_ID = 'dog-island-travel-book'
@@ -35,15 +38,18 @@ export const useInventoryStore = create<InventoryState>()(
   persist(
     (set, get) => ({
       items: withDefaultBooks([]),
+      previewItemId: null,
       addItem: (item) => {
         const current = get().items.find((entry) => entry.id === item.id)
         const nextQuantity = (current?.quantity ?? (current ? 1 : 0)) + (item.quantity ?? 1)
+        const shouldInspect = item.inspectable ?? current?.inspectable ?? false
         set((state) => ({
           items: current
             ? state.items.map((entry) =>
                 entry.id === item.id ? { ...entry, ...item, quantity: nextQuantity } : entry,
               )
             : [...state.items, { ...item, quantity: item.quantity ?? 1 }],
+          previewItemId: shouldInspect ? item.id : state.previewItemId,
         }))
         return nextQuantity
       },
@@ -57,10 +63,13 @@ export const useInventoryStore = create<InventoryState>()(
             )
             .filter((item) => (item.quantity ?? 1) > 0),
         })),
+      openItemPreview: (itemId) => set({ previewItemId: itemId }),
+      closeItemPreview: () => set({ previewItemId: null }),
     }),
     {
       name: 'beach-party-inventory',
       version: 1,
+      partialize: (state) => ({ items: state.items }),
       migrate: (persistedState) => {
         const state = persistedState as Partial<InventoryState>
         return { ...state, items: withDefaultBooks(state.items ?? []) }
