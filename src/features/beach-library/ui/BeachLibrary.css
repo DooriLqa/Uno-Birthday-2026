@@ -71,11 +71,11 @@
   box-shadow: 1px 3px 4px #0007;
 }
 .beach-library__axis--column {
-  top: 24%;
+  top: 17%;
 }
 .beach-library__axis--row {
-  left: 10.5%;
-  width: 12%;
+  left: 13%;
+  width: 7%;
   translate: 0 -50%;
 }
 .beach-library__axis span {
@@ -100,8 +100,8 @@
 }
 .beach-library__floor {
   position: absolute;
-  width: 4.8%;
-  height: 5.4%;
+  width: 12%;
+  height: 13.5%;
   padding: 0;
   border: 0;
   background: transparent;
@@ -114,13 +114,18 @@
   pointer-events: none;
 }
 .beach-library__floor:hover {
+  z-index: 3;
   filter: drop-shadow(0 0 4px #fff2aa);
   scale: 1.1;
 }
+.beach-library__floor:focus-visible {
+  z-index: 3;
+  outline: 2px solid #fff2aa;
+}
 .beach-library__held {
   position: absolute;
-  width: 2.3%;
-  height: 8%;
+  width: 2.8%;
+  height: 12%;
   z-index: 20;
   pointer-events: none;
   translate: -50% -20%;
@@ -141,7 +146,8 @@
 }
 .beach-library__help {
   position: absolute;
-  top: 18%;
+  bottom: 83.5%;
+  z-index: 21;
   left: 25%;
   width: 50%;
   text-align: center;
@@ -201,8 +207,8 @@
 }
 .library-pages__sheet {
   position: absolute;
-  width: 300px;
-  height: 360px;
+  width: 750px;
+  height: 900px;
   color: #4b3826;
   pointer-events: auto;
   touch-action: none;
@@ -236,4 +242,46 @@
   width: 3cqw;
   height: 3.6cqw;
   object-fit: contain;
+}
+
+.beach-library__spine {
+  position: relative;
+}
+.beach-library__book-title {
+  position: absolute;
+  inset: 3% 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  writing-mode: vertical-rl;
+  overflow-wrap: anywhere;
+  font-size: clamp(6px, 0.68cqw, 14px);
+  line-height: 1.1;
+  color: #fff8df;
+  text-shadow: 0 1px 2px #000;
+}
+.library-pages__note {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 42px 26px 24px;
+  overflow: auto;
+  border: 1px solid #b4925d;
+  border-radius: 3px 12px 5px 8px;
+  background: repeating-linear-gradient(0deg, #a77c4008 0 1px, transparent 1px 5px), #fff1ce;
+  box-shadow:
+    2px 5px 12px #0004,
+    inset 0 0 30px #b4925d33;
+  font-family: Georgia, serif;
+}
+.library-pages__note small {
+  letter-spacing: 0.08em;
+}
+.library-pages__note h2 {
+  font-size: 23px;
+}
+.library-pages__note p {
+  font-size: 17px;
+  line-height: 1.5;
+  white-space: pre-wrap;
 }

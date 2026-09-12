@@ -176,6 +176,28 @@ function InventorySlot({
     )
   }
 
+  if (item.id.startsWith('beach-library-')) {
+    return (
+      <button
+        className="game-hud__slot game-hud__slot--button"
+        title={item.name}
+        aria-label={item.name}
+        onClick={() => togglePage(item.id)}
+      >
+        {PAGE_ASSETS[item.id]?.src ? (
+          <img
+            src={PAGE_ASSETS[item.id].src}
+            alt=""
+            style={{ width: 32, height: 36, objectFit: 'contain' }}
+          />
+        ) : (
+          <span>{item.icon}</span>
+        )}
+        {item.id.includes('-page-') && <small>{Number(item.id.split('-').at(-1)) + 1}</small>}
+      </button>
+    )
+  }
+  
   if (!presentation.inspectable) {
     return (
       <span className={className} title={presentation.name} aria-label={presentation.name}>

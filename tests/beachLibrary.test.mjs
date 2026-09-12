@@ -14,10 +14,11 @@ function compile(path, replacements = {}) {
   return `data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`
 }
 const configUrl = compile('../src/features/beach-library/model/config.ts')
-const { BOOKS, GENRES, DIRECTIONS, LETTERS, placeBook, completedCabinets, isBookCorrect } =
-  await import(configUrl)
+const { BOOKS, GENRES, DIRECTIONS, placeBook, completedCabinets, isBookCorrect } = await import(
+  configUrl
+)
 
-test('45 unique books, five per genre × direction, fixed rectangular letter sheet', () => {
+test('45 unique books, five per genre Г— direction', () => {
   assert.equal(BOOKS.length, 45)
   assert.equal(new Set(BOOKS.map((book) => book.id)).size, 45)
   assert.equal(new Set(BOOKS.map((book) => book.title)).size, 45)
@@ -31,8 +32,6 @@ test('45 unique books, five per genre × direction, fixed rectangular letter she
       ),
     ),
   )
-  assert.equal(LETTERS.length, 12)
-  assert.ok(LETTERS.every((line) => line.length === 12))
 })
 
 test('a book must match both its genre column and its direction row', () => {
@@ -70,7 +69,7 @@ test('floor book replaces an occupied slot and displaces its book to the floor',
   assert.equal(next[0], 0)
   assert.equal(next.includes(5), false)
 })
-test('awards 3 + 3 + 2 pages and a final note exactly once, in any cabinet order', async () => {
+test('awards four random pages before completion and two final sheets exactly once', async () => {
   const memory = new Map()
   globalThis.localStorage = {
     getItem: (key) => memory.get(key) ?? null,
@@ -93,29 +92,31 @@ test('awards 3 + 3 + 2 pages and a final note exactly once, in any cabinet order
   const state = useLibraryStore.getState()
   state.enter()
   state.enter()
+  assert.equal(useInventoryStore.getState().items.length, 0)
   const counts = []
   for (const cabinet of [2, 0, 1]) {
     for (let offset = 0; offset < 15; offset++) {
       const id = cabinet * 15 + offset
       const rewards = state.place(id, id)
-      if (offset < 14) assert.equal(rewards.length, 0)
-      else counts.push(rewards.length)
+      counts.push(...rewards)
+      if (counts.length < 5) assert.ok(!counts.includes('beach-library-letters'))
+      if (cabinet === 1 && offset === 13) assert.equal(counts.length, 4)
     }
   }
-  assert.deepEqual(counts, [3, 3, 3])
+  assert.equal(counts.length, 6)
   const items = useInventoryStore.getState().items
-  assert.equal(items.length, 10)
-  assert.equal(items.filter((item) => item.id.includes('-page-')).length, 8)
+  assert.equal(items.length, 6)
+  assert.equal(items.filter((item) => item.id.includes('-page-')).length, 4)
   assert.ok(items.every((item) => item.quantity === 1))
   state.place(0, 5)
   assert.deepEqual(state.place(0, 0), [])
-  assert.equal(useInventoryStore.getState().items.length, 10)
+  assert.equal(useInventoryStore.getState().items.length, 6)
   const saved = memory.get('beach-library-v1')
   useLibraryStore.setState({ slots: Array(45).fill(null), rewarded: [] })
   memory.set('beach-library-v1', saved)
   await useLibraryStore.persist.rehydrate()
   assert.deepEqual(completedCabinets(useLibraryStore.getState().slots), [0, 1, 2])
-  assert.deepEqual(useLibraryStore.getState().rewarded, [2, 0, 1])
+  assert.deepEqual([...useLibraryStore.getState().rewarded].sort(), [0, 1, 2, 3])
   delete globalThis.localStorage
   delete globalThis.window
 })

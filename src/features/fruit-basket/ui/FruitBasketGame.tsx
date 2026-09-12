@@ -80,7 +80,7 @@ const FULL_BASKET_SPAWN_INTERVAL = ITEM_SPAWN_INTERVAL * 4
 // Скорость притягивания магнитом
 const MAGNET_SPEED_MULTIPLIER = 2
 
-const BONUS_SPAWN_INTERVAL_SECONDS = 12
+const BONUS_SPAWN_INTERVAL_SECONDS = 15
 const MAGNET_DURATION_SECONDS = 8
 
 const BONUS_SPAWN_INTERVAL = BONUS_SPAWN_INTERVAL_SECONDS * 1000
@@ -314,8 +314,8 @@ export function FruitBasketGame({ onComplete }: Props) {
       const current = gameRef.current
 
       if (started && !current.gameOver && !current.won) {
-        // 50/50 между x2 и магнитом
-        const bonusType: 'x2' | 'magnet' = Math.random() < 0.5 ? 'x2' : 'magnet'
+        // 60/40 между x2 и магнитом
+        const bonusType: 'x2' | 'magnet' = Math.random() < 0.6 ? 'x2' : 'magnet'
 
         const bonus: FallingItem = {
           id: nextId.current++,

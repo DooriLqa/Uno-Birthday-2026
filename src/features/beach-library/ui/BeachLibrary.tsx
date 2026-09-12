@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { BOOKS, GENRES, DIRECTIONS, ROWS, isBookCorrect } from '../model/config'
+import { BOOKS, GENRES, DIRECTIONS, ROWS, isBookCorrect, completedCabinets } from '../model/config'
 import { useLibraryStore } from '../model/store'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
-import floorBook from '../assets/floor-book.png'
+import { FLOOR_BOOK_ASSETS } from '../model/bookAssets'
 import { PAGE_ASSETS } from '../model/pageAssets'
 import './BeachLibrary.css'
 
 export function BeachLibrary() {
-  const { slots, enter, place, rewarded } = useLibraryStore()
+  const { slots, enter, place } = useLibraryStore()
   const [held, setHeld] = useState<number | null>(null)
   const [pointer, setPointer] = useState({ x: 50, y: 70 })
   const [category, setCategory] = useState<{ name: string; description: string } | null>(null)
@@ -51,7 +51,7 @@ export function BeachLibrary() {
     playOneShotSound(correct ? '/audio/sfx/coin.mp3' : '/audio/sfx/brick.mp3', 'library', 0.45)
     setStatus(
       rewards.length
-        ? `Стеллаж собран! В инвентарь добавлены страницы: ${rewards.length}.`
+        ? `Найдены страницы! Добавлено в инвентарь: ${rewards.length}.`
         : correct
           ? 'Верно! Жанр и направление совпадают.'
           : 'Жанр или направление не совпадает. Книгу можно переставить.',
@@ -87,7 +87,6 @@ export function BeachLibrary() {
             onClick={() => setCategory(genre)}
           >
             <span>{genre.icon.includes('/') ? <img src={genre.icon} alt="" /> : genre.icon}</span>
-            {genre.name}
           </button>
         )
       })}
@@ -102,7 +101,6 @@ export function BeachLibrary() {
           <span>
             {direction.icon.includes('/') ? <img src={direction.icon} alt="" /> : direction.icon}
           </span>
-          {direction.name}
         </button>
       ))}
       {ROWS.map((row) => (
@@ -137,7 +135,9 @@ export function BeachLibrary() {
                   <span
                     className="beach-library__spine"
                     style={{ '--book-color': book.color } as CSSProperties}
-                  />
+                  >
+                    <span className="beach-library__book-title">{book.title}</span>
+                  </span>
                 )}
               </button>
             )
@@ -152,7 +152,7 @@ export function BeachLibrary() {
           style={{ left: `${book.x}%`, top: `${book.y}%`, rotate: `${book.angle}deg` }}
           onClick={(event) => pick(book.id, event.currentTarget)}
         >
-          <img src={floorBook} alt="" draggable={false} />
+          <img src={FLOOR_BOOK_ASSETS[book.color]} alt="" draggable={false} />
         </button>
       ))}
       {held !== null && (
@@ -172,16 +172,21 @@ export function BeachLibrary() {
       )}
       {flight && (
         <span
-          key={`${flight.x}-${flight.y}-${rewarded.length}`}
+          key={`${flight.x}-${flight.y}-${flight.page}`}
           className="beach-library__flight"
           style={{ left: `${flight.x}%`, top: `${flight.y}%` }}
           onAnimationEnd={() => setFlight(null)}
         >
-          <img src={PAGE_ASSETS[flight.page].src} alt="Найденная страница" />
+          {PAGE_ASSETS[flight.page].src ? (
+            <img src={PAGE_ASSETS[flight.page].src} alt="Найденная страница" />
+          ) : (
+            <span>📜</span>
+          )}
         </span>
       )}
       <div className="beach-library__help">
-        <span role="status">{status}</span> <small>Стеллажи: {rewarded.length}/3</small>
+        <span role="status">{status}</span>{' '}
+        <small>Стеллажи: {completedCabinets(slots).length}/3</small>
         {held !== null && <button onClick={() => setHeld(null)}>Вернуть книгу · Esc</button>}
       </div>
       {category !== null && (
