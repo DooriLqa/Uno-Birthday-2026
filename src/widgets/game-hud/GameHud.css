@@ -36,8 +36,8 @@
   place-items: center;
   padding: 0;
   border-radius: 15px;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .game-hud__map-button:hover {
@@ -196,8 +196,8 @@
 .game-hud__slot--button,
 .game-hud__radio-power,
 .game-hud__radio-open {
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .game-hud__slot--button:hover,
@@ -235,15 +235,15 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-open.png') 20 10, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-open.png') 20 10, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .game-hud__radio-volume input {
   width: 105px;
   accent-color: #6b4128;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-open.png') 20 10, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-open.png') 20 10, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .game-hud__radio-volume:active {
@@ -279,8 +279,8 @@
   color: #70421d;
   backdrop-filter: blur(7px);
   pointer-events: auto;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
   transition:
     transform 140ms ease,
     background 140ms ease,
@@ -455,8 +455,8 @@
   background: #fff8dc;
   color: #71401f;
   box-shadow: 0 4px 0 #c88a42;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .inventory-preview__image {
@@ -511,35 +511,18 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: white;
-  opacity: 0;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.72));
-  transition:
-    opacity 140ms ease,
-    background 140ms ease;
 }
 
 .inventory-book__turn-zone--previous {
   left: 0;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-left.png') 13 32, w-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .inventory-book__turn-zone--next {
   right: 0;
-  justify-content: flex-end;
-}
-
-.inventory-book__turn-zone--previous:not(:disabled):hover,
-.inventory-book__turn-zone--previous:not(:disabled):focus-visible {
-  background: linear-gradient(90deg, rgba(24, 20, 16, 0.48), transparent);
-  opacity: 1;
-}
-
-.inventory-book__turn-zone--next:not(:disabled):hover,
-.inventory-book__turn-zone--next:not(:disabled):focus-visible {
-  background: linear-gradient(-90deg, rgba(24, 20, 16, 0.48), transparent);
-  opacity: 1;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-right.png') 51 32, e-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .inventory-book__turn-zone:disabled {
@@ -571,8 +554,8 @@
   border: 2px solid #87522c;
   border-radius: 50%;
   background: transparent;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .inventory-book__pagination button.is-active {
