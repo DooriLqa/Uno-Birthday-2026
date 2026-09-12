@@ -9,6 +9,7 @@ import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import {
   getInventoryItemArtwork,
+  getInventoryItemPreviewArtwork,
   getInventoryItemPresentation,
   isArcadeKeychain,
 } from '@/features/inventory/model/items'
@@ -238,7 +239,7 @@ function InventorySlot({
 function InventoryPreview({ item, onClose }: { item: InventoryItem; onClose: () => void }) {
   const [pageIndex, setPageIndex] = useState(0)
   const presentation = getInventoryItemPresentation(item)
-  const artwork = getInventoryItemArtwork(item.id)
+  const artwork = getInventoryItemPreviewArtwork(item.id)
   const bookPages = presentation.kind === 'book' ? (presentation.pages ?? []) : []
   const isBook = bookPages.length > 0
 
