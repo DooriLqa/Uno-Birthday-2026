@@ -154,7 +154,7 @@
 
 .totem-code-game__carving img {
   display: block;
-  width: 54px;
+  width: 60px;
   height: 100%;
   object-fit: contain;
   pointer-events: none;
@@ -167,8 +167,8 @@
   top: 50%;
   display: grid;
   place-items: center;
-  width: 29px;
-  height: 29px;
+  width: 36px;
+  height: 36px;
   margin: 0;
   padding: 0;
   border: 1px solid rgba(255, 230, 169, 0.84);
@@ -189,16 +189,14 @@
 }
 
 .totem-code-game__switch--left {
-  left: 22px;
-  --cursor-image: url('@/shared/assets/common/cursors/arrow-left.png') 13 32, w-resize;
+  left: 18px;
 }
 
 .totem-code-game__switch--right {
-  right: 22px;
-  --cursor-image: url('@/shared/assets/common/cursors/arrow-right.png') 51 32, e-resize;
+  right: 18px;
 }
 
-.totem-code-game__drum:is(:hover, :focus-within) > .totem-code-game__switch, .totem-code-game__switch:is(:hover, :focus-within) {
+.totem-code-game__drum:is(:hover, :focus-within) > .totem-code-game__switch, .totem-code-game__switch:hover {
   opacity: 1;
   pointer-events: auto;
   scale: 1;
