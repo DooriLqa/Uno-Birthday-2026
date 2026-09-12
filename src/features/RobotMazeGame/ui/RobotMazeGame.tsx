@@ -14,9 +14,13 @@ import corgiLeft from '@/shared/assets/games/robot-maze/corgi-pirate-left.png'
 import cartTracks from '@/shared/assets/games/robot-maze/cart-tracks.png'
 import cartTracksTurn from '@/shared/assets/games/robot-maze/cart-tracks-turn.png'
 
+import WheelSound from '@/shared/assets/games/robot-maze/wheel.mp3'
+import ChestSound from '@/shared/assets/games/robot-maze/open-chest.mp3'
+
 import exitCross from '@/shared/assets/games/robot-maze/exit.png'
 
 import { useEffect, useState } from 'react'
+import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import './RobotMazeGame.css'
 
 type Props = {
@@ -26,6 +30,14 @@ type Props = {
 const WALL = 0
 const EXIT = 3
 const CHEST = 4
+
+const ROBOT_GAME_KEY = 'robot-maze'
+
+const WHEEL_SOUND_KEY = `${ROBOT_GAME_KEY}:coin`
+const CHEST_SOUND_KEY = `${ROBOT_GAME_KEY}:chest`
+
+const WHEEL_SOUND = WheelSound
+const CHEST_SOUND = ChestSound
 
 const STORAGE_KEY = 'robotMazeProgress'
 
@@ -764,6 +776,8 @@ export function RobotMazeGame({ onComplete }: Props) {
 
           setRobot(currentRobot)
 
+          playOneShotSound(WHEEL_SOUND, WHEEL_SOUND_KEY, 10)
+
           addCartTrack(nextRow, nextCol, currentDirection)
 
           const currentCell = maze[currentRobot.row][currentRobot.col]
@@ -775,6 +789,8 @@ export function RobotMazeGame({ onComplete }: Props) {
               collectedChestKeys.add(chestKey)
 
               setOpenedChests(Array.from(collectedChestKeys))
+
+              playOneShotSound(CHEST_SOUND, CHEST_SOUND_KEY, 10)
 
               setMessage('Сундук открыт')
             }
