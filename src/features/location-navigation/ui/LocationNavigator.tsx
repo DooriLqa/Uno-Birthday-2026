@@ -3,7 +3,12 @@ import { locations, type LocationAction, type LocationId } from '../model/locati
 import { useWorldStore, type SceneSnapshot } from '../model/worldStore'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import { useDialogueStore } from '@/features/dialogues'
+import { useProgressStore } from '@/features/game-progress/model/store'
 import { BeachLibrary } from '@/features/beach-library/ui/BeachLibrary'
+import ritualSiteExtinguished from '@/shared/assets/locations/wild/ritual-site-extinguished-v4.png'
+import ritualSiteLit from '@/shared/assets/locations/wild/ritual-site-lit-v4.png'
+import totemCloseupExtinguished from '@/shared/assets/locations/wild/totem-cape-closeup-extinguished-v3.png'
+import totemCloseupLit from '@/shared/assets/locations/wild/totem-cape-closeup-lit-v3.png'
 import { talkToLibrarian } from '@/features/beach-library/model/librarianDialogue'
 import './LocationNavigator.css'
 
@@ -47,6 +52,13 @@ export function LocationNavigator({
   const { scene, history, setScene, setHistory } = useWorldStore()
   const location = locations[scene.locationId] ?? locations.pier
   const dialogueOpen = useDialogueStore((state) => state.activeDialogueId !== null)
+  const totemCodeSolved = useProgressStore((state) => state.completedGameIds.includes('totem-code'))
+  const sceneImage =
+    location.id === 'totem-camp'
+      ? totemCodeSolved
+        ? totemCloseupLit
+        : totemCloseupExtinguished
+      : location.image
   const [size, setSize] = useState<Size | null>(null)
   const [viewport, setViewport] = useState({ width: window.innerWidth, height: window.innerHeight })
   const [error, setError] = useState('')
@@ -174,10 +186,19 @@ export function LocationNavigator({
       inert={!active || dialogueOpen}
     >
       <div className="location-navigator__scene">
-        <img className="location-navigator__image" style={layout} src={location.image} alt="" />
+        <img className="location-navigator__image" style={layout} src={sceneImage} alt="" />
         <div className="location-navigator__hotspot-layer">
           <div className="location-navigator__hotspot-canvas is-wide" style={layout}>
             {location.id === 'library' && active && !dialogueOpen && <BeachLibrary />}
+            {location.id === 'wild-beach' && (
+              <img
+                className="location-navigator__ritual-site"
+                src={totemCodeSolved ? ritualSiteLit : ritualSiteExtinguished}
+                alt=""
+                aria-hidden="true"
+                draggable="false"
+              />
+            )}
             {location.hotspots.map((hotspot) => (
               <button
                 key={hotspot.id}

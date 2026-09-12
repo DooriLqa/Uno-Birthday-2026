@@ -5,6 +5,7 @@ import { AudioSettings } from '@/widgets/audio-settings/AudioSettings'
 import { AssetPreloader } from '@/widgets/asset-preloader/AssetPreloader'
 import { GameCursor } from '@/widgets/game-cursor/GameCursor'
 import { router } from './router'
+import { ProductionAccessGate } from './ProductionAccessGate'
 import { LibraryPages } from '@/features/beach-library/ui/LibraryPages'
 import '@/shared/styles/global.css'
 
@@ -17,12 +18,12 @@ export function App() {
   }
 
   return (
-    <>
+    <ProductionAccessGate>
       <RouterProvider router={router} />
       <LibraryPages />
       <DialogueLayer />
       <AudioSettings />
       <GameCursor />
-    </>
+    </ProductionAccessGate>
   )
 }

@@ -272,6 +272,74 @@ export class AudioController {
     }
   }
 
+  /** A short license-free sequence: metal latch, falling prize and collection-bin thud. */
+  playVendingDrop() {
+    try {
+      const context = this.getContext()
+      void this.unlock()
+      const now = context.currentTime
+      const tones = [
+        {
+          delay: 0,
+          duration: 0.065,
+          frequency: 1180,
+          endFrequency: 690,
+          volume: 0.075,
+          type: 'square',
+        },
+        {
+          delay: 0.085,
+          duration: 0.11,
+          frequency: 430,
+          endFrequency: 185,
+          volume: 0.11,
+          type: 'triangle',
+        },
+        {
+          delay: 0.22,
+          duration: 0.19,
+          frequency: 105,
+          endFrequency: 52,
+          volume: 0.2,
+          type: 'sine',
+        },
+      ] satisfies Array<{
+        delay: number
+        duration: number
+        frequency: number
+        endFrequency: number
+        volume: number
+        type: OscillatorType
+      }>
+
+      tones.forEach(({ delay, duration, frequency, endFrequency, volume, type }) => {
+        const start = now + delay
+        const oscillator = context.createOscillator()
+        const gain = this.createGain(0)
+        oscillator.type = type
+        oscillator.frequency.setValueAtTime(frequency, start)
+        oscillator.frequency.exponentialRampToValueAtTime(endFrequency, start + duration)
+        gain.gain.setValueAtTime(0.0001, start)
+        gain.gain.exponentialRampToValueAtTime(volume, start + Math.min(0.012, duration / 3))
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + duration)
+        oscillator.connect(gain)
+
+        const dispose = () => {
+          oscillator.onended = null
+          oscillator.disconnect()
+          gain.disconnect()
+          this.disposers.delete(dispose)
+        }
+        this.disposers.add(dispose)
+        oscillator.onended = dispose
+        oscillator.start(start)
+        oscillator.stop(start + duration)
+      })
+    } catch {
+      // Reward delivery must still succeed on devices without Web Audio.
+    }
+  }
+
   dispose() {
     this.disposers.forEach((dispose) => dispose())
     this.exclusive.clear()
