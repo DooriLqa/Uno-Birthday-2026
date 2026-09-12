@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './Japonsk.css'
+import JaponskBackground from '@/shared/assets/games/japonsk/japonsk-bg.png'
+import KeyBall from '@/shared/assets/games/japonsk/answer.png'
+import fireSound from '@/shared/assets/games/japonsk/fire.mp3'
+import keyAppearSound from '@/shared/assets/games/japonsk/key-appear.wav'
 
 type Props = {
   onComplete: () => void
@@ -64,7 +68,27 @@ const columnHints = [
 export function Japonsk({ onComplete }: Props) {
   const [board, setBoard] = useState<Cell[][]>(solution.map((row) => row.map(() => 'empty')))
 
+  useEffect(() => {
+    const audio = new Audio(fireSound)
+
+    audio.loop = true
+    audio.volume = 0.25
+
+    const startSound = () => {
+      audio.play().catch(() => {})
+    }
+
+    window.addEventListener('click', startSound, { once: true })
+
+    return () => {
+      audio.pause()
+      audio.currentTime = 0
+      window.removeEventListener('click', startSound)
+    }
+  }, [])
+
   const [showSuccess, setShowSuccess] = useState(false)
+  const [showKeyBall, setShowKeyBall] = useState(false)
 
   const clickCell = (row: number, column: number) => {
     setBoard((current) => {
@@ -89,12 +113,17 @@ export function Japonsk({ onComplete }: Props) {
         const isFilled = board[row][column] === 'filled'
 
         if (shouldBeFilled !== isFilled) {
+          setShowSuccess(true)
           return
         }
       }
     }
 
-    setShowSuccess(true)
+    const sound = new Audio(keyAppearSound)
+    sound.volume = 0.5
+    sound.play().catch(() => {})
+
+    setShowKeyBall(true)
     onComplete()
   }
 
@@ -147,9 +176,24 @@ export function Japonsk({ onComplete }: Props) {
 
   return (
     <div className="Japonsk">
+      {/* =====================================================
+          ФОН
+          ===================================================== */}
+
+      <img className="Japonsk__background" src={JaponskBackground} alt="" />
+
+      {/* =====================================================
+          СЦЕНА
+          ===================================================== */}
+
       <div className="Japonsk__scene">
+        {/* ===================================================
+            КРОССВОРД
+            =================================================== */}
+
         <div className="Japonsk__crossword">
           {/* Подсказки сверху */}
+
           <div className="Japonsk__top-hints">
             <div className="Japonsk__hint-corner" />
 
@@ -178,6 +222,7 @@ export function Japonsk({ onComplete }: Props) {
           </div>
 
           {/* Подсказки слева + поле */}
+
           <div className="Japonsk__board-wrapper">
             <div className="Japonsk__left-hints">
               {rowHints.map((hint, rowIndex) => {
@@ -209,6 +254,7 @@ export function Japonsk({ onComplete }: Props) {
             </div>
 
             {/* Поле */}
+
             <div className="Japonsk__board">
               {board.map((row, rowIndex) =>
                 row.map((cell, columnIndex) => (
@@ -234,17 +280,23 @@ export function Japonsk({ onComplete }: Props) {
           </div>
         </div>
 
-        {/* Кнопка проверки */}
+        {showKeyBall && <img className="Japonsk__key-ball" src={KeyBall} alt="" />}
+
+        {/* ===================================================
+            КНОПКА ПРОВЕРКИ
+            =================================================== */}
+
         <button type="button" className="Japonsk__check" onClick={checkSolution}>
           ПРОВЕРИТЬ
         </button>
 
-        {/* Уведомление о победе */}
+        {/* ===================================================
+            ОКНО ПОБЕДЫ
+            =================================================== */}
+
         {showSuccess && (
           <div className="Japonsk__success">
-            <div className="Japonsk__success-title">ПОБЕДА</div>
-
-            <div className="Japonsk__success-text">Вскрой ему черепушку!</div>
+            <div className="Japonsk__success-title">Неправильно!</div>
 
             <button
               type="button"

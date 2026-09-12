@@ -1,41 +1,99 @@
-.Japonsk {
+/* =========================================================
+   СБРОС
+   ========================================================= */
+
+html,
+body {
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
 
   margin: 0;
   padding: 0;
 
-  background: #120a05;
+  overflow: hidden;
 }
 
 /* =========================================================
-   ФОНОВАЯ СЦЕНА
+   ОСНОВНАЯ СТРАНИЦА
    ========================================================= */
 
-.japonsk-page {
-  padding: 0 !important;
-  margin: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+.Japonsk {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  min-width: 0;
+  min-height: 0;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+
+  background: #0b0806;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  isolation: isolate;
 }
+
+/* =========================================================
+   ФОНОВОЕ ИЗОБРАЖЕНИЕ
+   ========================================================= */
+
+/*
+   Исходное изображение имеет соотношение 3:2.
+   Сохраняем пропорции, поэтому оно НЕ растягивается.
+*/
+
+.Japonsk__background {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: contain;
+  object-position: center center;
+
+  z-index: 0;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+/* =========================================================
+   СЦЕНА
+   ========================================================= */
 
 .Japonsk__scene {
   position: relative;
 
-  width: 100%;
-  max-width: 1536px;
+  /*
+    Сохраняем пропорцию 3:2.
+  */
 
-  margin: 0 auto;
+  width: min(100vw, 150vh);
+  height: min(66.6667vw, 100vh);
 
   aspect-ratio: 3 / 2;
 
-  background-image: url('@/shared/assets/games/japonsk/japonsk-bg.png');
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
+  flex-shrink: 0;
+
+  margin: 0;
+  padding: 0;
 
   overflow: hidden;
+
+  z-index: 1;
 }
 
 /* =========================================================
@@ -45,13 +103,12 @@
 .Japonsk__crossword {
   position: absolute;
 
-  /* Было 6.5% — сдвигаем вправо */
   left: 12%;
+  top: 21%;
 
-  /* Было 24% — сдвигаем вверх */
-  top: 13%;
+  width: 37%;
 
-  width: 43%;
+  z-index: 5;
 }
 
 /* =========================================================
@@ -73,6 +130,10 @@
 .Japonsk__hint-corner {
   width: 100%;
 }
+
+/* =========================================================
+   ПОДСКАЗКИ СВЕРХУ
+   ========================================================= */
 
 .Japonsk__column-hint {
   min-width: 0;
@@ -136,6 +197,7 @@
 
 .Japonsk__row-hint {
   width: 100%;
+
   min-width: 0;
 
   display: flex;
@@ -169,7 +231,7 @@
 }
 
 /* =========================================================
-   КВАДРАТНОЕ ПОЛЕ
+   ПОЛЕ
    ========================================================= */
 
 .Japonsk__board {
@@ -180,6 +242,7 @@
   display: grid;
 
   grid-template-columns: repeat(15, minmax(0, 1fr));
+
   grid-template-rows: repeat(15, minmax(0, 1fr));
 
   gap: 0;
@@ -209,8 +272,6 @@
 
   background: transparent;
 
-  color: #241205;
-
   cursor: pointer;
 
   font-family: Arial, sans-serif;
@@ -224,11 +285,19 @@
     box-shadow 0.08s ease;
 }
 
+/* =========================================================
+   КЛЕТКА — HOVER
+   ========================================================= */
+
 .Japonsk__cell:hover {
   background: rgba(218, 169, 92, 0.16);
 
   box-shadow: inset 0 0 8px rgba(45, 21, 5, 0.2);
 }
+
+/* =========================================================
+   ЗАКРАШЕННАЯ КЛЕТКА
+   ========================================================= */
 
 .Japonsk__cell--filled {
   background: rgba(25, 11, 3, 0.9);
@@ -240,12 +309,20 @@
   background: rgba(25, 11, 3, 0.95);
 }
 
+/* =========================================================
+   КРЕСТИК
+   ========================================================= */
+
 .Japonsk__cell--cross {
   background: transparent;
 
-  color: rgba(45, 23, 8, 0.9);
+  color: rgb(0, 0, 0);
 
   font-size: clamp(10px, 1.4vw, 21px);
+
+  font-weight: bold;
+
+  text-shadow: 0 0 2px rgba(80, 0, 0, 0.45);
 }
 
 /* =========================================================
@@ -261,19 +338,21 @@
 }
 
 /* =========================================================
-   КНОПКА СПРАВА
+   КНОПКА ПРОВЕРКИ
    ========================================================= */
 
 .Japonsk__check {
   position: absolute;
 
   /*
-    Положение кнопки относительно фоновой картинки.
-    Она находится справа от кроссворда.
+    Позиция теперь считается
+    относительно .Japonsk__scene,
+    поэтому при изменении окна
+    кнопка не перескакивает.
   */
 
-  left: 68%;
-  top: 75%;
+  left: 75%;
+  top: 82%;
 
   width: 20%;
 
@@ -301,6 +380,8 @@
 
   cursor: pointer;
 
+  z-index: 10;
+
   box-shadow:
     inset 0 0 0 1px rgba(43, 21, 6, 0.9),
     0 3px 8px rgba(0, 0, 0, 0.45);
@@ -321,50 +402,8 @@
 }
 
 /* =========================================================
-   АДАПТАЦИЯ
+   ВЫПОЛНЕННЫЕ ПОДСКАЗКИ
    ========================================================= */
-
-@media (max-width: 900px) {
-  .Japonsk__crossword {
-    left: 15%;
-    top: 21%;
-    width: 44%;
-  }
-
-  .Japonsk__check {
-    left: 55%;
-    top: 57%;
-
-    width: 15%;
-  }
-}
-
-@media (max-width: 600px) {
-  .Japonsk {
-    min-width: 700px;
-  }
-
-  .Japonsk__crossword {
-    left: 15%;
-    top: 21%;
-    width: 44%;
-  }
-
-  .Japonsk__check {
-    left: 55%;
-    top: 57%;
-    width: 15%;
-  }
-
-  .Japonsk__column-hint,
-  .Japonsk__row-hint {
-    font-size: 9px;
-  }
-
-  .Japonsk__cell {
-    font-size: 11px;
-  }
-}
 
 .Japonsk__hint-number {
   transition:
@@ -375,7 +414,9 @@
 
 .Japonsk__hint-number--completed {
   color: rgba(45, 25, 10, 0.65);
+
   text-decoration: line-through;
+
   text-decoration-thickness: 2px;
 }
 
@@ -388,9 +429,11 @@
 
   top: 50%;
   left: 50%;
+
   transform: translate(-50%, -50%);
 
   width: min(420px, 80vw);
+
   padding: 32px 36px;
 
   box-sizing: border-box;
@@ -413,7 +456,9 @@
   font-family: Georgia, 'Times New Roman', serif;
 }
 
-/* небольшая декоративная линия сверху */
+/* =========================================================
+   ДЕКОРАТИВНАЯ ЛИНИЯ
+   ========================================================= */
 
 .Japonsk__success::before {
   content: '';
@@ -431,7 +476,7 @@
 }
 
 /* =========================================================
-   ЗАГОЛОВОК
+   ЗАГОЛОВОК ПОБЕДЫ
    ========================================================= */
 
 .Japonsk__success-title {
@@ -442,6 +487,7 @@
   font-family: Georgia, 'Times New Roman', serif;
 
   font-size: 28px;
+
   font-weight: bold;
 
   letter-spacing: 0.12em;
@@ -452,7 +498,7 @@
 }
 
 /* =========================================================
-   ТЕКСТ
+   ТЕКСТ ПОБЕДЫ
    ========================================================= */
 
 .Japonsk__success-text {
@@ -463,6 +509,7 @@
   font-family: Georgia, 'Times New Roman', serif;
 
   font-size: 16px;
+
   line-height: 1.5;
 
   text-shadow:
@@ -471,13 +518,14 @@
 }
 
 /* =========================================================
-   КНОПКА
+   КНОПКА ЗАКРЫТИЯ
    ========================================================= */
 
 .Japonsk__success-close {
   padding: 10px 24px;
 
   border: 1px solid rgba(183, 130, 57, 0.9);
+
   border-radius: 3px;
 
   background: linear-gradient(180deg, rgba(112, 66, 25, 0.96), rgba(55, 28, 9, 0.96));
@@ -487,6 +535,7 @@
   font-family: Georgia, 'Times New Roman', serif;
 
   font-size: 14px;
+
   font-weight: bold;
 
   letter-spacing: 0.08em;
@@ -517,4 +566,82 @@
   transform: translateY(2px);
 
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* =========================================================
+   ШАРИК С КЛЮЧОМ ПОСЛЕ ПОБЕДЫ
+   ========================================================= */
+
+.Japonsk__key-ball {
+  position: absolute;
+
+  /*
+    Справа от кроссворда
+  */
+  left: 50%;
+  top: 30%;
+
+  width: 22%;
+  height: auto;
+
+  z-index: 8;
+
+  pointer-events: none;
+  user-select: none;
+
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55));
+
+  animation: keyBallAppear 0.7s ease-out both;
+}
+
+/* =========================================================
+   ПОЯВЛЕНИЕ
+   ========================================================= */
+
+@keyframes keyBallAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(40px) rotate(-15deg);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.08) translateY(-5px) rotate(4deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
+}
+
+/* =========================================================
+   НЕБОЛЬШИЕ ЭКРАНЫ
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .Japonsk__crossword {
+    left: 15%;
+    top: 21%;
+    width: 44%;
+  }
+}
+
+/* =========================================================
+   МОБИЛЬНЫЕ
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .Japonsk__column-hint,
+  .Japonsk__row-hint {
+    font-size: 9px;
+  }
+
+  .Japonsk__cell {
+    font-size: 11px;
+  }
+
+  .Japonsk__cell--cross {
+    font-size: 13px;
+  }
 }

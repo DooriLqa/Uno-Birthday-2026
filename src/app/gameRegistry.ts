@@ -19,6 +19,7 @@ import type { GameDefinition } from '@/entities/game/model/types'
 import arcadeFrameImage from '@/shared/assets/games/flappy-bird/arcade-frame-transparent.png'
 import islandMapImage from '@/shared/assets/features/island-map/tropical-island-map-expanded.png'
 import robotMazeGameBackground from '@/shared/assets/games/robot-maze/background.png'
+import JaponskBackground from '@/shared/assets/games/japonsk/japonsk-bg.png'
 import findAPairBackground from '@/shared/assets/games/find-a-pair/findapairbackground.png'
 import fishingScene from '@/shared/assets/games/fishing/background.png'
 import raccoonArcadeBackground from '@/shared/assets/games/arkanoid/raccoon-arcade-background.png'
@@ -272,20 +273,9 @@ export const games: GameDefinition[] = [
     target: 'японский кроссворд',
     mapPosition: { left: '55%', top: '30%' },
     pageClassName: 'japonsk-page',
-    ...islandGame,
+    backgroundImage: JaponskBackground,
+    ...locationTransition,
     Screen: Japonsk,
-  },
-  {
-    id: 'robot-maze',
-    title: 'Робот-лабиринт',
-    description: 'Помоги роботу найти выход из лабиринта.',
-    emoji: '🤖',
-    color: '#a2c9f0',
-    target: 'выход из лабиринта',
-    mapPosition: { left: '60%', top: '30%' },
-    pageClassName: 'robot-maze-page',
-    backgroundImage: robotMazeGameBackground,
-    Screen: RobotMazeGame,
   },
 ]
 
