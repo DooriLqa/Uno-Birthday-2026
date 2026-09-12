@@ -11,6 +11,14 @@ export type Sound = {
 }
 type SoundOptions = { volume?: number; loop?: boolean }
 type Noise = { setVolume: (volume: number) => void; dispose: () => void }
+type FilteredNoiseOptions = {
+  duration?: number
+  crossfade?: number
+  volume?: number
+  type?: BiquadFilterType
+  frequency?: number
+  q?: number
+}
 
 /** Every source feeds its local gain into one master gain, including synthesized sounds. */
 export class AudioController {
@@ -156,6 +164,61 @@ export class AudioController {
       disposed = true
       source.stop()
       source.disconnect()
+      gain.disconnect()
+      this.disposers.delete(dispose)
+    }
+    this.disposers.add(dispose)
+    return {
+      setVolume: (value) => {
+        if (!disposed) this.setGain(gain, value)
+      },
+      dispose,
+    }
+  }
+
+  /** A soft looping texture for environmental beds such as distant room murmur. */
+  createFilteredNoiseLoop({
+    duration = 9,
+    crossfade = 0.15,
+    volume = 0,
+    type = 'bandpass',
+    frequency = 520,
+    q = 0.72,
+  }: FilteredNoiseOptions = {}): Noise {
+    const context = this.getContext()
+    const length = Math.floor(context.sampleRate * duration)
+    const buffer = context.createBuffer(1, length, context.sampleRate)
+    const data = buffer.getChannelData(0)
+    let brown = 0
+    for (let i = 0; i < length; i++) {
+      brown = (brown + 0.018 * (Math.random() * 2 - 1)) / 1.018
+      data[i] = brown * 3.2
+    }
+    const fadeLength = Math.min(length, Math.floor(context.sampleRate * crossfade))
+    for (let i = 0; i < fadeLength; i++) {
+      const fade = i / fadeLength
+      const tail = length - fadeLength + i
+      data[tail] = data[tail] * (1 - fade) + data[i] * fade
+    }
+
+    const source = context.createBufferSource()
+    const filter = context.createBiquadFilter()
+    const gain = this.createGain(volume)
+    source.buffer = buffer
+    source.loop = true
+    filter.type = type
+    filter.frequency.value = frequency
+    filter.Q.value = q
+    source.connect(filter)
+    filter.connect(gain)
+    source.start()
+    let disposed = false
+    const dispose = () => {
+      if (disposed) return
+      disposed = true
+      source.stop()
+      source.disconnect()
+      filter.disconnect()
       gain.disconnect()
       this.disposers.delete(dispose)
     }

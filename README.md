@@ -35,6 +35,12 @@ npm --version
    npm run dev
    ```
 
+   Для запуска с меню разработчика используйте отдельную команду:
+
+   ```bash
+   npm run dev:tools
+   ```
+
 4. Откройте адрес из вывода команды (обычно `http://localhost:5173`) в браузере.
 
 ### Проверка перед отправкой изменений
@@ -62,6 +68,7 @@ npm run build         # проверить production-сборку
 
 ```bash
 npm run dev
+npm run dev:tools  # запуск с меню разработчика
 npm run lint
 npm run format
 npm run build

@@ -14,6 +14,7 @@ type Props = {
   onMerchant: () => void
   onSailor: () => void
   onEnterJungleCave: () => void
+  onBarista: () => void
 }
 type Size = { width: number; height: number }
 const imageCache = new Map<string, Promise<Size>>()
@@ -40,6 +41,7 @@ export function LocationNavigator({
   onMerchant,
   onSailor,
   onEnterJungleCave,
+  onBarista,
 }: Props) {
   const { scene, history, setScene, setHistory } = useWorldStore()
   const location = locations[scene.locationId] ?? locations.pier
@@ -135,6 +137,7 @@ export function LocationNavigator({
     if (item.type === 'sailor') onSailor()
     if (item.type === 'map') onOpenMap()
     if (item.type === 'jungle-cave') onEnterJungleCave()
+    if (item.type === 'barista') onBarista()
   }
   const back = () => {
     const previous = history.at(-1)
