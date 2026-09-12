@@ -13,6 +13,7 @@ import coinSound from '@/shared/assets/common/audio/coin.mp3'
 import insertCoinSound from '@/shared/assets/common/audio/insert-coin.mp3'
 
 import { FLAPPY_BIRD_LAYOUT, FLAPPY_WORLD, type FlappyBirdLayout } from '../model/layout'
+import { alphaMasksOverlap, loadAlphaMask, type AlphaMask } from '../model/pixelCollision'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import './FlappyBirdGame.css'
@@ -78,6 +79,11 @@ const PIPE_ALPHA_BOUNDS = {
   [pipeImage1]: { left: 362 / 1024, right: 662 / 1024, bottom: 1447 / 1536 },
   [pipeImage2]: { left: 305 / 1024, right: 707 / 1024, bottom: 1450 / 1536 },
 }
+
+type CollisionMasks = {
+  birds: Map<string, AlphaMask>
+  pipes: Map<string, AlphaMask>
+}
 const SCREAM_SOUND = screamSound
 const START_SOUND = startSound
 const WIN_SOUND = winSound
@@ -137,6 +143,33 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
   const holdingRef = useRef(false)
   const deathLockUntilRef = useRef(0)
   const startDelayRef = useRef(false)
+  const collisionMasksRef = useRef<CollisionMasks | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    const birdSources = [playerImage, playerWingsDownImage]
+
+    void Promise.all([
+      Promise.all(
+        birdSources.map(async (source) => [source, await loadAlphaMask(source)] as const),
+      ),
+      Promise.all(
+        PIPE_IMAGES.map(async (source) => [source, await loadAlphaMask(source)] as const),
+      ),
+    ])
+      .then(([birds, pipes]) => {
+        if (!cancelled) collisionMasksRef.current = { birds: new Map(birds), pipes: new Map(pipes) }
+      })
+      .catch(() => {
+        // A failed mask must not reintroduce oversized rectangular collisions.
+        collisionMasksRef.current = null
+      })
+
+    return () => {
+      cancelled = true
+      collisionMasksRef.current = null
+    }
+  }, [])
 
   useEffect(() => {
     const stage = stageRef.current
@@ -241,9 +274,7 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
         ...latest,
         running: true,
         birdVelocity: FLAP_VELOCITY,
-        pipes: latestIsFirstFlap
-          ? [createPipe(1, FIRST_PIPE_X)]
-          : latest.pipes,
+        pipes: latestIsFirstFlap ? [createPipe(1, FIRST_PIPE_X)] : latest.pipes,
         nextPipeId: latestIsFirstFlap ? 2 : latest.nextPipeId,
       })
 
@@ -364,18 +395,46 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
           onCompleteRef.current()
         }
 
-        const birdHitPipe = pipes.some((pipe) => {
-          const alphaBounds = PIPE_ALPHA_BOUNDS[pipe.image]
-          const pipeLeft = pipe.x + PIPE_WIDTH * alphaBounds.left
-          const pipeRight = pipe.x + PIPE_WIDTH * alphaBounds.right
-          if (birdRight <= pipeLeft || birdLeft >= pipeRight) return false
+        const birdAngle = (Math.max(-18, Math.min(76, birdVelocity / 8)) * Math.PI) / 180
+        const collisionMasks = collisionMasksRef.current
+        const birdMask = collisionMasks?.birds.get(
+          holdingRef.current ? playerImage : playerWingsDownImage,
+        )
+        const birdSprite = birdMask
+          ? {
+              mask: birdMask,
+              x: BIRD_X,
+              y: birdY,
+              width: BIRD_WIDTH,
+              height: BIRD_HEIGHT,
+              rotation: birdAngle,
+            }
+          : null
+        const birdHitPipe =
+          birdSprite !== null &&
+          pipes.some((pipe) => {
+            const pipeMask = collisionMasks?.pipes.get(pipe.image)
+            if (!pipeMask) return false
 
-          const topPipeBottom = pipe.gapTop * alphaBounds.bottom
-          const bottomPipeHeight = GAME_HEIGHT - pipe.gapTop - PIPE_GAP + PIPE_VISUAL_EXTENSION
-          const bottomPipeTop = pipe.gapTop + PIPE_GAP + (1 - alphaBounds.bottom) * bottomPipeHeight
+            const topPipeHit = alphaMasksOverlap(birdSprite, {
+              mask: pipeMask,
+              x: pipe.x,
+              y: 0,
+              width: PIPE_WIDTH,
+              height: pipe.gapTop,
+            })
+            if (topPipeHit) return true
 
-          return birdTop < topPipeBottom || birdBottom > bottomPipeTop
-        })
+            const bottomPipeHeight = GAME_HEIGHT - pipe.gapTop - PIPE_GAP + PIPE_VISUAL_EXTENSION
+            return alphaMasksOverlap(birdSprite, {
+              mask: pipeMask,
+              x: pipe.x,
+              y: pipe.gapTop + PIPE_GAP,
+              width: PIPE_WIDTH,
+              height: bottomPipeHeight,
+              rotation: Math.PI,
+            })
+          })
         const hitBoundary = birdBottom >= GAME_HEIGHT
         const gameOver = hitBoundary || birdHitPipe
 
@@ -559,10 +618,7 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
               >
                 {game.collectedCoins}/{COINS_TO_COMPLETE}
               </span>
-              <span
-                className="flappy-bird-game__lives"
-                aria-label={`Жизни: ${game.lives} из 3`}
-              >
+              <span className="flappy-bird-game__lives" aria-label={`Жизни: ${game.lives} из 3`}>
                 {'❤️'.repeat(game.lives)}
               </span>
               <img

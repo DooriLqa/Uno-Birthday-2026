@@ -1,12 +1,9 @@
-import { ArrowLeft } from 'lucide-react'
 import type { GameDefinition } from '@/entities/game/model/types'
 import { useProgressStore } from '@/features/game-progress/model/store'
 import { useInventoryStore } from '@/features/inventory/model/store'
 import { ARCADE_REWARDS_BY_GAME_ID } from '@/features/inventory/model/items'
+import { audioController } from '@/shared/lib/audio/audioController'
 type Props = { game: GameDefinition; onBack: () => void; onOpenRadio?: () => void }
-
-const BOTTOM_EXIT_GAMES = new Set(['flappy-bird', 'arkanoid', 'fruit-basket', 'robot-maze'])
-const GAMES_WITHOUT_BACK_BUTTON = new Set(['flappy-bird', 'arkanoid', 'fruit-basket'])
 
 export function GamePage({ game, onBack, onOpenRadio }: Props) {
   const completeGame = useProgressStore((state) => state.completeGame)
@@ -21,7 +18,10 @@ export function GamePage({ game, onBack, onOpenRadio }: Props) {
     const rewardAlreadyOwned = reward
       ? useInventoryStore.getState().items.some((item) => item.id === reward.id)
       : false
-    if (isFirstVictory && reward && !rewardAlreadyOwned) addItem(reward)
+    if (isFirstVictory && reward && !rewardAlreadyOwned) {
+      addItem(reward)
+      audioController.playVendingDrop()
+    }
   }
 
   return (
@@ -35,24 +35,14 @@ export function GamePage({ game, onBack, onOpenRadio }: Props) {
         />
       )}
       <div className="game-overlay__content">
-        {game.id !== 'beach-radio' && !GAMES_WITHOUT_BACK_BUTTON.has(game.id) && (
-          <div className="page-top">
-            <button type="button" className="back" onClick={onBack}>
-              <ArrowLeft size={18} /> Вернуться в локацию
-            </button>
-            <span>{game.emoji}</span>
-          </div>
-        )}
         <GameScreen onComplete={handleComplete} onOpenRadio={onOpenRadio} onClose={onBack} />
       </div>
-      {BOTTOM_EXIT_GAMES.has(game.id) && (
-        <button
-          type="button"
-          className="game-overlay__bottom-exit"
-          onClick={onBack}
-          aria-label="Вернуться в предыдущую локацию"
-        />
-      )}
+      <button
+        type="button"
+        className="game-overlay__bottom-exit"
+        onClick={onBack}
+        aria-label="Вернуться в предыдущую локацию"
+      />
     </main>
   )
 }

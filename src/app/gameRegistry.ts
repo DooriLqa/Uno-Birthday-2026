@@ -24,7 +24,7 @@ import fishingScene from '@/shared/assets/games/fishing/background.png'
 import pirateShoreEnvironment from '@/shared/assets/games/arkanoid/pirate-shore-environment.png'
 import locationFootstepsSound from '@/shared/assets/common/audio/location-footsteps.ogg'
 import libraryBackground from '@/shared/assets/locations/tourist/library.png'
-import wildTotemCamp from '@/shared/assets/locations/wild/totem-camp.png'
+import wildTotemCamp from '@/shared/assets/locations/wild/totem-cape-closeup-background-v2.png'
 /* import wildPirateShore from '@/shared/assets/locations/wild/pirate-shore.png' */
 
 const locationTransition = {

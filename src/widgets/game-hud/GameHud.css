@@ -36,8 +36,8 @@
   place-items: center;
   padding: 0;
   border-radius: 15px;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .game-hud__map-button:hover {
@@ -70,6 +70,10 @@
   font-size: 1.05rem;
 }
 
+.game-hud__coin {
+  width: 30px;
+  height: 30px;
+}
 .game-hud__right {
   display: grid;
   justify-items: end;
@@ -192,8 +196,8 @@
 .game-hud__slot--button,
 .game-hud__radio-power,
 .game-hud__radio-open {
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .game-hud__slot--button:hover,
@@ -231,15 +235,15 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-open.png') 20 10, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-open.png') 20 10, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .game-hud__radio-volume input {
   width: 105px;
   accent-color: #6b4128;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-open.png') 20 10, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-open.png') 20 10, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .game-hud__radio-volume:active {
@@ -275,8 +279,8 @@
   color: #70421d;
   backdrop-filter: blur(7px);
   pointer-events: auto;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
   transition:
     transform 140ms ease,
     background 140ms ease,
@@ -409,8 +413,8 @@
 }
 
 .inventory-preview__card--book {
-  width: 100%;
-  height: 100%;
+  width: min(100%, 1180px);
+  height: min(100%, 860px);
   padding: clamp(4px, 1vw, 14px);
   border: 0;
   background: transparent;
@@ -418,10 +422,24 @@
 }
 
 .inventory-preview--book {
-  padding: clamp(4px, 1vw, 12px);
-  background: transparent;
+  padding: clamp(24px, 5vw, 64px);
+  background: rgba(9, 16, 22, 0.72);
+  backdrop-filter: blur(6px);
 }
-
+.inventory-preview--item {
+  padding: clamp(4px, 1vw, 12px);
+  background: rgba(9, 16, 22, 0.64);
+  backdrop-filter: blur(8px);
+}
+.inventory-preview__card--item {
+  grid-template-rows: minmax(0, 1fr);
+  width: min(78vw, 980px);
+  height: min(86vh, 900px);
+  padding: clamp(4px, 1vw, 14px);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
 .inventory-preview__close {
   position: absolute;
   z-index: 2;
@@ -437,8 +455,8 @@
   background: #fff8dc;
   color: #71401f;
   box-shadow: 0 4px 0 #c88a42;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .inventory-preview__image {
@@ -489,42 +507,22 @@
   top: 0;
   bottom: 0;
   z-index: 1;
-  display: flex;
   width: 20%;
-  align-items: center;
-  padding: 0 clamp(6px, 2vw, 24px);
+  padding: 0;
   border: 0;
   background: transparent;
-  color: white;
-  opacity: 0;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.72));
-  transition:
-    opacity 140ms ease,
-    background 140ms ease;
 }
 
 .inventory-book__turn-zone--previous {
   left: 0;
-  justify-content: flex-start;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-left.png') 13 32, w-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .inventory-book__turn-zone--next {
   right: 0;
-  justify-content: flex-end;
-}
-
-.inventory-book__turn-zone--previous:not(:disabled):hover,
-.inventory-book__turn-zone--previous:not(:disabled):focus-visible {
-  background: linear-gradient(90deg, rgba(24, 20, 16, 0.48), transparent);
-  opacity: 1;
-}
-
-.inventory-book__turn-zone--next:not(:disabled):hover,
-.inventory-book__turn-zone--next:not(:disabled):focus-visible {
-  background: linear-gradient(-90deg, rgba(24, 20, 16, 0.48), transparent);
-  opacity: 1;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-right.png') 51 32, e-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .inventory-book__turn-zone:disabled {
@@ -537,8 +535,16 @@
   align-items: center;
   justify-content: center;
   gap: 9px;
+  width: max-content;
+  margin: 0 auto;
+  padding: 6px 12px;
+  border: 1px solid rgba(117, 74, 45, 0.7);
+  border-radius: 999px;
+  background: rgba(255, 244, 206, 0.94);
   color: #70421d;
+  box-shadow: 0 4px 12px rgba(24, 15, 9, 0.28);
   font-weight: 900;
+  backdrop-filter: blur(5px);
 }
 
 .inventory-book__pagination button {
@@ -548,8 +554,8 @@
   border: 2px solid #87522c;
   border-radius: 50%;
   background: transparent;
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
-  cursor: var(--cursor-pointer);
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .inventory-book__pagination button.is-active {
@@ -645,7 +651,14 @@
   .inventory-preview__card--book {
     padding: 4px;
   }
-
+  .inventory-preview--book {
+    padding:
+      calc(env(safe-area-inset-top, 0px) + 18px)
+      calc(env(safe-area-inset-right, 0px) + 24px)
+      calc(env(safe-area-inset-bottom, 0px) + 18px)
+      calc(env(safe-area-inset-left, 0px) + 24px);
+  }
+  
   .inventory-preview__close {
     top: 12px;
     right: 12px;

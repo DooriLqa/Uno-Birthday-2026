@@ -7,8 +7,6 @@
   color: #fff3c9;
 }
 
-.totem-code-game__heading,
-.totem-code-game__hint,
 .totem-code-game__solved {
   position: absolute;
   z-index: 3;
@@ -19,59 +17,8 @@
   text-shadow: 0 2px 4px rgba(61, 34, 16, 0.8);
 }
 
-.totem-code-game__heading {
-  top: 8px;
-  max-width: min(680px, calc(100% - 32px));
-  padding: 8px 15px;
-  border: 1px solid rgba(86, 45, 18, 0.4);
-  border-radius: 18px;
-  background: rgba(102, 57, 25, 0.68);
-}
-
-.totem-code-game__heading h2,
-.totem-code-game__heading p {
-  margin: 0;
-}
-
-.totem-code-game__style-switch {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  margin-top: 6px;
-  font-size: 0.72rem;
-  font-weight: 800;
-}
-
-.totem-code-game__style-switch button {
-  margin: 0;
-  padding: 3px 8px;
-  border: 1px solid rgba(255, 228, 160, 0.6);
-  border-radius: 999px;
-  background: rgba(61, 32, 15, 0.55);
-  color: #ffeec2;
-  cursor: pointer;
-}
-
-.totem-code-game__style-switch button:hover,
-.totem-code-game__style-switch button.is-active {
-  background: #b96d31;
-}
-
-.totem-code-game__heading h2 {
-  font-size: clamp(1.15rem, 2.4vw, 1.65rem);
-}
-
-.totem-code-game__heading p {
-  margin-top: 4px;
-  font-size: clamp(0.75rem, 1.6vw, 0.9rem);
-  font-weight: 800;
-  line-height: 1.35;
-}
-
 .totem-code-game__totems {
   position: absolute;
-  bottom: 0;
   left: 50%;
   width: min(100%, 1280px);
   height: min(100%, 760px);
@@ -81,9 +28,9 @@
 .totem-code-game__campfire {
   position: absolute;
   z-index: 1;
-  bottom: 12%;
+  bottom: 7%;
   left: 50%;
-  width: clamp(175px, 20vw, 285px);
+  width: clamp(190px, 23vw, 320px);
   height: auto;
   translate: -50% 0;
   user-select: none;
@@ -93,43 +40,30 @@
 .totem-code-game__totem {
   position: absolute;
   z-index: 2;
-  width: clamp(132px, 14vw, 196px);
+  width: clamp(185px, 20vw, 270px);
   aspect-ratio: 2 / 3;
   isolation: isolate;
   filter: drop-shadow(0 10px 7px rgba(72, 35, 12, 0.34));
 }
 
 .totem-code-game__totem--1 {
-  bottom: 18%;
-  left: 6%;
+  bottom: 4%;
+  left: 7%;
 }
 
 .totem-code-game__totem--2 {
-  bottom: 40%;
+  bottom: 27%;
   left: 23%;
 }
 
 .totem-code-game__totem--3 {
   right: 23%;
-  bottom: 40%;
+  bottom: 27%;
 }
 
 .totem-code-game__totem--4 {
-  right: 6%;
-  bottom: 18%;
-}
-
-.totem-code-game__base {
-  position: absolute;
-  z-index: 0;
-  bottom: -32%;
-  left: 50%;
-  width: 150%;
-  max-width: none;
-  height: auto;
-  translate: -50% 0;
-  user-select: none;
-  -webkit-user-drag: none;
+  right: 7%;
+  bottom: 4%;
 }
 
 .totem-code-game__body {
@@ -146,11 +80,17 @@
   inset: 0;
 }
 
+.totem-code-game__totem--3 .totem-code-game__body,
+.totem-code-game__totem--4 .totem-code-game__body {
+  scale: -1 1;
+}
+
 .totem-code-game__drum {
   position: absolute;
   z-index: 2;
-  width: 44.921875%;
-  height: 20.5078125%;
+  left: 22%;
+  width: 56%;
+  height: 16.5%;
   padding: 0;
   overflow: visible;
   border: 0;
@@ -160,59 +100,63 @@
   touch-action: manipulation;
 }
 
-.totem-code-game__drum--upper {
-  top: 37.109375%;
-  left: 27.5390625%;
+.totem-code-game__drum--moon {
+  top: 33%;
 }
 
-.totem-code-game__drum--lower {
-  top: 62.1744792%;
-  left: 27.5390625%;
+.totem-code-game__drum--concept {
+  top: 52.5%;
+}
+
+.totem-code-game__drum--letter {
+  top: 71.5%;
 }
 
 .totem-code-game__carving {
   position: absolute;
   top: 50%;
   left: 50%;
-  display: block;
-  width: 52%;
-  height: 100%;
+  display: grid;
+  place-items: center;
+  width: 62%;
+  height: 74%;
+  overflow: hidden;
+  border-radius: 8%;
   translate: -50% -50%;
-  background-size: 400% 200%;
-  background-repeat: no-repeat;
-  filter: drop-shadow(0 1px 1px rgba(29, 9, 4, 0.42));
+  color: #4a2512;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.5rem, 3.2vw, 2.8rem);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow:
+    -1px -1px 0 rgba(255, 210, 127, 0.75),
+    1px 2px 1px rgba(38, 14, 5, 0.72);
 }
 
-.totem-code-game__carving--natural {
-  background-image: url('@/shared/assets/common/decorative-glyphs/carved-glyph-sprite-sheet-natural-v2.png');
+.totem-code-game__carving--moon {
+  width: 58%;
+  height: 72%;
+  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', sans-serif;
+  font-size: clamp(1.7rem, 3.6vw, 3.05rem);
 }
 
-.totem-code-game__carving--ornamented {
-  background-image: url('@/shared/assets/common/decorative-glyphs/carved-glyph-sprite-sheet-ornamented-v1.png');
-}
-
-.totem-code-game__carving--shape {
-  --sprite-y: 0%;
+.totem-code-game__carving--concept {
+  width: 82%;
+  height: 74%;
 }
 
 .totem-code-game__carving--letter {
-  --sprite-y: 100%;
+  width: 68%;
+  height: 74%;
 }
 
-.totem-code-game__carving--cell-0 {
-  background-position: 0% var(--sprite-y);
-}
-
-.totem-code-game__carving--cell-1 {
-  background-position: 33.333% var(--sprite-y);
-}
-
-.totem-code-game__carving--cell-2 {
-  background-position: 66.667% var(--sprite-y);
-}
-
-.totem-code-game__carving--cell-3 {
-  background-position: 100% var(--sprite-y);
+.totem-code-game__carving img {
+  display: block;
+  width: 54px;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
 .totem-code-game__switch {
@@ -265,17 +209,6 @@
   outline-offset: 2px;
 }
 
-.totem-code-game__hint {
-  bottom: 4%;
-  width: min(720px, calc(100% - 32px));
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: rgba(75, 45, 21, 0.72);
-  font-size: clamp(0.75rem, 1.7vw, 0.92rem);
-  font-weight: 800;
-  line-height: 1.35;
-}
-
 .totem-code-game__solved {
   bottom: 12%;
   padding: 8px 14px;
@@ -284,124 +217,7 @@
   font-weight: 900;
 }
 
-.totem-code-game__hints {
-  position: absolute;
-  z-index: 4;
-  top: 15%;
-  right: 1.5%;
-  display: grid;
-  gap: 9px;
-}
-
-.totem-code-game__hints button {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  margin: 0;
-  padding: 9px 11px;
-  border: 1px solid rgba(255, 228, 160, 0.75);
-  border-radius: 12px;
-  background: rgba(91, 48, 23, 0.86);
-  color: #fff2c5;
-  box-shadow: 0 3px 0 rgba(59, 27, 11, 0.75);
-  font-size: 0.76rem;
-  font-weight: 900;
-  cursor: pointer;
-}
-
-.totem-code-game__hints button:hover {
-  background: #9a5528;
-}
-
-.totem-code-game__overlay {
-  position: absolute;
-  z-index: 10;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 18px;
-  background: rgba(11, 25, 35, 0.5);
-}
-
-.totem-code-game__book {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: min(540px, 100%);
-  min-height: 230px;
-  border: 9px solid #754a2d;
-  border-radius: 10px;
-  background: #f7e3ad;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);
-  color: #563827;
-}
-
-.totem-code-game__page {
-  padding: 30px 25px;
-  background: linear-gradient(90deg, #f8eabd, #ead294);
-  box-shadow: inset -8px 0 10px rgba(106, 65, 29, 0.13);
-}
-
-.totem-code-game__page--right {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(90deg, #e6cb8c, #f8eabd);
-  box-shadow: inset 8px 0 10px rgba(106, 65, 29, 0.13);
-  text-align: center;
-}
-
-.totem-code-game__page--right span {
-  font-size: 2.7rem;
-}
-
-.totem-code-game__page small {
-  font-weight: 800;
-  opacity: 0.7;
-}
-
-.totem-code-game__page h3 {
-  margin: 10px 0;
-  font-family: Georgia, serif;
-}
-
-.totem-code-game__page p {
-  margin: 0;
-  line-height: 1.45;
-}
-
-.totem-code-game__close {
-  position: absolute;
-  z-index: 2;
-  top: 9px;
-  right: 9px;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: #754a2d;
-  color: #fff5d2;
-  cursor: pointer;
-}
-
 @media (max-width: 760px) {
-  .totem-code-game__hints {
-    top: 15%;
-    right: 50%;
-    grid-template-columns: repeat(3, max-content);
-    translate: 50% 0;
-  }
-
-  .totem-code-game__hints button {
-    padding: 7px;
-    font-size: 0;
-  }
-
   .totem-code-game__totem--1 {
     left: -3%;
   }
@@ -420,12 +236,8 @@
 }
 
 @media (max-width: 520px) {
-  .totem-code-game__heading {
-    top: 4px;
-  }
-
   .totem-code-game__totem {
-    width: min(32.4vw, 158px);
+    width: min(35vw, 175px);
   }
 
   .totem-code-game__totem--1 {
@@ -455,15 +267,4 @@
     pointer-events: auto;
   }
 
-  .totem-code-game__hint {
-    bottom: 2%;
-  }
-
-  .totem-code-game__book {
-    grid-template-columns: 1fr;
-  }
-
-  .totem-code-game__page--right {
-    display: none;
-  }
 }

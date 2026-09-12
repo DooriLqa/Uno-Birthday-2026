@@ -530,14 +530,14 @@ h1 {
 .game-overlay__bottom-exit {
   position: fixed;
   z-index: 50;
-  right: 0;
   bottom: 0;
   left: 0;
-  height: 11%;
+  width: clamp(30vw, 40vw, 800px);
+  height: clamp(10vh, 20vh, 300px);
   padding: 0;
   border: 0;
   background: transparent;
-  --cursor-image: url('@/shared/assets/common/cursors/arrow-down.png') 32 52, s-resize;
+  --cursor-image: url('@/shared/assets/common/cursors/projected-back.png') 13 32, w-resize;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .game-overlay__bottom-exit:hover,
@@ -546,7 +546,8 @@ h1 {
 }
 @media (max-width: 700px) {
   .game-overlay__bottom-exit {
-    height: 13%;
+    width: 24vw;
+    height: 16vh;
   }
 }
 .game-overlay.arkanoid-page {

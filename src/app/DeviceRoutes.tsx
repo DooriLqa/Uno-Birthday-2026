@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { GameFlow } from './GameFlow'
+import { MobilePage } from './MobilePage'
 
 const isMobileDevice = () => window.matchMedia('(max-width: 700px)').matches
 
@@ -8,5 +9,5 @@ export function DesktopRoute() {
 }
 
 export function MobileRoute() {
-  return isMobileDevice() ? <GameFlow /> : <Navigate to="/" replace />
+  return isMobileDevice() ? <MobilePage /> : <Navigate to="/" replace />
 }
