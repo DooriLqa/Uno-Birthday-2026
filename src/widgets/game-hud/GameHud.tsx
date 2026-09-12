@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import {
   ChevronLeft,
   ChevronRight,
+  Clapperboard,
   Map as MapIcon,
   Radio as RadioIcon,
   Volume2,
@@ -24,6 +25,41 @@ const INVENTORY_COLUMNS = 2
 const RADIO_ITEM_ID = 'beach-radio'
 const CORRECT_STATION_ID = 'station-06'
 
+const CREDIT_SECTIONS: { title: string; names: string[] }[] = [
+  {
+    title: 'Код',
+    names: ['DooriLqa', 'croppusha', 'RAMisExpensive', 'Derp', 'JustZoB'],
+  },
+  {
+    title: 'Оформление',
+    names: ['nobrainshiba', 'DooriLqa'],
+  },
+  {
+    title: 'Монтаж',
+    names: ['JustZoB'],
+  },
+  {
+    title: 'Озвучка',
+    names: [
+      'Praden',
+      'liz0n',
+      'yugybunyg',
+      'Faridysha',
+      'Michelangeloux',
+      'Hyomushka',
+      'PogUbamBamBam',
+      'tomasx',
+      'croppusha',
+      'chozaher',
+      'alfrend',
+    ],
+  },
+  {
+    title: 'Special thanks',
+    names: ['ChatGPT'],
+  },
+]
+
 type Props = {
   onOpenRadio?: () => void
   onOpenMap?: () => void
@@ -34,6 +70,7 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
   const pawCoins = usePawCoinStore((state) => state.pawCoins)
   const inventory = useInventoryStore((state) => state.items)
   const [previewItem, setPreviewItem] = useState<InventoryItem | null>(null)
+  const [creditsOpen, setCreditsOpen] = useState(false)
   const isPowered = useRadioStore((state) => state.isPowered)
   const discoveredStationIds = useRadioStore((state) => state.discoveredStationIds)
   const volume = useRadioStore((state) => state.volume)
@@ -45,6 +82,20 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
     inventory.length + (inventory.length % INVENTORY_COLUMNS),
   )
   const emptySlotCount = renderedSlotCount - inventory.length
+
+  useEffect(() => {
+    if (!creditsOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setCreditsOpen(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [creditsOpen])
 
   return (
     <div className="game-hud" aria-label="Игровой интерфейс">
@@ -125,6 +176,43 @@ export function GameHud({ onOpenRadio, onOpenMap, mapOpen = false }: Props) {
         )}
       </div>
       {previewItem && <InventoryPreview item={previewItem} onClose={() => setPreviewItem(null)} />}
+
+      {createPortal(
+        <button
+          type="button"
+          className={`game-hud__credits-button ${creditsOpen ? 'is-active' : ''}`}
+          onClick={() => setCreditsOpen((value) => !value)}
+          aria-pressed={creditsOpen}
+          aria-label={creditsOpen ? 'Остановить титры' : 'Показать титры'}
+          title={creditsOpen ? 'Остановить титры' : 'Показать титры'}
+        >
+          <Clapperboard size={20} />
+        </button>,
+        document.body,
+      )}
+
+      {creditsOpen &&
+        createPortal(
+          <div className="credits" role="dialog" aria-modal="true" aria-label="Титры">
+            <div className="credits__viewport">
+              <div className="credits__list">
+                <h2 className="credits__title">Титры</h2>
+                {CREDIT_SECTIONS.map((section) => (
+                  <section className="credits__section" key={section.title}>
+                    <h3 className="credits__section-title">{section.title}</h3>
+                    <ul className="credits__names">
+                      {section.names.map((name) => (
+                        <li key={`${section.title}-${name}`}>{name}</li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+                <p className="credits__thanks">Спасибо за игру!</p>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }
@@ -198,7 +286,7 @@ function InventorySlot({
       </button>
     )
   }
-  
+
   if (!presentation.inspectable) {
     return (
       <span className={className} title={presentation.name} aria-label={presentation.name}>
