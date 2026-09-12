@@ -405,7 +405,7 @@ function saveProgress(currentLevel: number, unlockedLevel: number, completed: bo
 export function Arkanoid({ onComplete }: Props) {
   const layout = ARKANOID_LAYOUT
   const stageRef = useRef<HTMLDivElement>(null)
-  const [stageScale, setStageScale] = useState(1)
+  const [stageScale, setStageScale] = useState({ x: 1, y: 1 })
   const [sessionPaid, setSessionPaid] = useState(false)
   const { insertCoin, inserting, pawCoins } = useArcadeCoin('arkanoid:coin-insert')
   const horizontalExtent = Math.max(
@@ -421,14 +421,10 @@ export function Arkanoid({ onComplete }: Props) {
     const stage = stageRef.current
     if (!stage) return
     const observer = new ResizeObserver(([entry]) => {
-      // Preserve object/text proportions and leave room above the lower cabinet trim.
-      // The sea background fills the stage independently of this playable world.
-      setStageScale(
-        Math.min(
-          entry.contentRect.width / CANVAS_WIDTH,
-          (entry.contentRect.height * 0.86) / CANVAS_HEIGHT,
-        ),
-      )
+      setStageScale({
+        x: entry.contentRect.width / CANVAS_WIDTH,
+        y: entry.contentRect.height / CANVAS_HEIGHT,
+      })
     })
     observer.observe(stage)
     return () => observer.disconnect()
@@ -1676,7 +1672,9 @@ export function Arkanoid({ onComplete }: Props) {
 
             <div
               className="arkanoid__world"
-              style={{ transform: `translate(-50%, -50%) scale(${stageScale})` }}
+              style={{
+                transform: `translate(-50%, -50%) scale(${stageScale.x}, ${stageScale.y})`,
+              }}
             >
               <canvas
                 ref={canvasRef}

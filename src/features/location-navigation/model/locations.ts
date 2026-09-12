@@ -165,7 +165,7 @@ export const locations: Record<LocationId, LocationDefinition> = {
     hotspots: [
       {
         id: 'librarian',
-        label: 'Поговорить с библиотекаршей',
+        label: 'Поговорить с библиотекарем',
         area: area(80, 26, 19, 70),
         cursor: 'dialogue',
         action: { type: 'librarian' },

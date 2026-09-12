@@ -105,10 +105,7 @@ export function LocationNavigator({
   }, [active, dialogueOpen])
 
   const aspect = size ? size.width / size.height : 16 / 9
-  const width =
-    location.id === 'library'
-      ? Math.min(viewport.width, viewport.height * aspect)
-      : Math.max(viewport.width, viewport.height * aspect)
+  const width = Math.max(viewport.width, viewport.height * aspect)
   const height = width / aspect
   const overflow = width - viewport.width
   const layout = {

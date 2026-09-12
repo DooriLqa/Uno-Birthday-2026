@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { BOOKS, GENRES, DIRECTIONS, ROWS, isBookCorrect, completedCabinets } from '../model/config'
 import { useLibraryStore } from '../model/store'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
+import correctBookSound from '@/shared/assets/games/beach-library/correctBook.mp3'
+import wrongBookSound from '@/shared/assets/games/beach-library/wrongBook.mp3'
 import { FLOOR_BOOK_ASSETS } from '../model/bookAssets'
 import { PAGE_ASSETS } from '../model/pageAssets'
 import { finishLibrarianCleanup, talkToLibrarian } from '../model/librarianDialogue'
@@ -55,7 +57,7 @@ export function BeachLibrary() {
       return
     }
     const correct = isBookCorrect(held, slot)
-    playOneShotSound(correct ? '/audio/sfx/coin.mp3' : '/audio/sfx/brick.mp3', 'library', 0.45)
+    playOneShotSound(correct ? correctBookSound : wrongBookSound, 'beach-library', 0.45)
     setStatus(
       rewards.length
         ? `Найдены страницы! Добавлено в инвентарь: ${rewards.length}.`
