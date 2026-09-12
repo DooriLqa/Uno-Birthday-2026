@@ -249,7 +249,8 @@
   background: #fffdf3;
   color: #70421d;
   font-weight: 900;
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
 }
 .radio-action--primary {
   border-color: #d75e42;
@@ -310,7 +311,8 @@
   color: #503e2d;
   font-weight: 800;
   text-align: left;
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
   transition:
     transform 0.16s ease,
     border-color 0.16s ease;
@@ -389,6 +391,8 @@
   border-radius: 4px;
   overflow: hidden;
   background: transparent;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
 
   /* чтобы свечение не влияло на соседние элементы */
   isolation: isolate;
@@ -461,6 +465,14 @@
   margin: 0;
   padding: 0;
   z-index: 10;
+
+  --cursor-image: url('@/shared/assets/common/cursors/hand-open.png') 20 10, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
+}
+
+.radio-frequency:active {
+  --cursor-image: url('@/shared/assets/common/cursors/hand-grab.png') 20 10, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 /* Chrome / Edge / Safari */
@@ -509,7 +521,7 @@
   border: 1px solid #6f6040;
   border-radius: 1px;
 
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 0 0, pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
   cursor: var(--cursor-pointer);
 }
 
@@ -548,7 +560,7 @@
 
   z-index: 10;
 
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 32 50, pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
   cursor: var(--cursor-pointer);
 }
 
@@ -631,7 +643,8 @@
 
   color: #d8b878;
 
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
   user-select: none;
 
   box-shadow:
@@ -1014,7 +1027,8 @@
   width: 100%;
   margin: 0;
   accent-color: #ffe09a;
-  cursor: grab;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-grab.png') 32 32, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .radio-device__frequency-markers {
   margin-top: 2px;
@@ -1040,7 +1054,8 @@
   border-radius: 50%;
   background: #e7b85f;
   color: #684128;
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
   box-shadow: 0 4px 0 #8e572f;
 }
 .radio-device__power.is-on {
@@ -1200,7 +1215,8 @@
   border-radius: 50%;
   background: #ff7e57;
   color: white;
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
   box-shadow: 0 3px 0 #d8573b;
 }
 
@@ -1219,7 +1235,8 @@
   width: 100%;
   margin: 0;
   accent-color: #7d4d2d;
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
 }
 
 .quiz-audio-player__time {

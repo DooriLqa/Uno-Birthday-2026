@@ -136,6 +136,20 @@ export const questions: QuizQuestion[] = [
     ],
     correctIndex: 2,
   },
+  {
+    id: 'q18',
+    text: 'Какой игрой Югибани НЕ выигрывала Тянукус?',
+    audioSrc: sekiroStream,
+    answers: ['Greetings', 'Portal', 'Jump King', 'Crash Bandicoot 3:Warped'],
+    correctIndex: 2,
+  },
+  {
+    id: 'q19',
+    text: 'Сколько очков заработала Lizon на Тянукус 3?',
+    audioSrc: sekiroStream,
+    answers: ['855', '618', '552', '477'],
+    correctIndex: 3,
+  },
 ]
 
 export function pickQuestion(excludedIds: string[] = []): QuizQuestion {
