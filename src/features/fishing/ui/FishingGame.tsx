@@ -22,6 +22,7 @@ import {
 import { audioController } from '@/shared/lib/audio/audioController'
 import rod from '@/shared/assets/games/fishing/rod.png'
 import bobber from '@/shared/assets/games/fishing/bobber.png'
+import fishingSound1 from '@/shared/assets/games/fishing/zabros.mp3'
 import './FishingGame.css'
 
 type Phase = 'idle' | 'charging' | 'casting' | 'returning' | 'waiting' | 'bite' | 'fight' | 'result'
@@ -98,6 +99,17 @@ export function FishingGame({ onClose }: Props) {
   const catchRef = useRef(20)
   const lastFightTimeRef = useRef(0)
   const resultLockedRef = useRef(false)
+  const castAudioRef = useRef<HTMLAudioElement | null>(null)
+
+  // Создаём аудио для заброса один раз
+  useEffect(() => {
+    const audio = new Audio(fishingSound1)
+    audio.preload = 'auto'
+    castAudioRef.current = audio
+    return () => {
+      castAudioRef.current = null
+    }
+  }, [])
 
   const setPhase = useCallback((next: Phase) => {
     phaseRef.current = next
@@ -116,6 +128,17 @@ export function FishingGame({ onClose }: Props) {
   }, [])
 
   useEffect(() => () => clearRoundTimers(), [clearRoundTimers])
+
+  const playCastSound = useCallback(() => {
+    const audio = castAudioRef.current
+    if (!audio) return
+    try {
+      audio.currentTime = 0
+      void audio.play()
+    } catch {
+      // игнорируем ошибки воспроизведения
+    }
+  }, [])
 
   const playBiteSound = useCallback(() => {
     audioController.playTone({ frequency: 900, endFrequency: 470 })
@@ -319,12 +342,14 @@ export function FishingGame({ onClose }: Props) {
     setBobberX(58)
     setBobberTop(distance === 'near' ? 65 : distance === 'mid' ? 50 : 42)
     setPhase('casting')
+    // Звук заброса удочки
+    playCastSound()
     window.setTimeout(() => {
       if (phaseRef.current !== 'casting') return
       setPhase('waiting')
       startWaiting()
     }, 800)
-  }, [setPhase, startWaiting])
+  }, [playCastSound, setPhase, startWaiting])
 
   const startCharging = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {

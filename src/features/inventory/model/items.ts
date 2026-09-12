@@ -11,6 +11,12 @@ import sailorLogbookPickup from '@/shared/assets/features/inventory/books/pickup
 import treasureAtlasPickup from '@/shared/assets/features/inventory/books/pickups/treasure-atlas.png'
 import coffeeArtwork from '@/shared/assets/features/inventory/drinks/coffee.png'
 import bubbleTeaArtwork from '@/shared/assets/features/inventory/drinks/bubble-tea.png'
+import islandMapIcon from '@/shared/assets/features/inventory/paper-icons/island-map.png'
+import libraryPageIcon from '@/shared/assets/features/inventory/paper-icons/library-page.png'
+import libraryHintIcon from '@/shared/assets/features/inventory/paper-icons/library-hint.png'
+import libraryNoteIcon from '@/shared/assets/features/inventory/paper-icons/library-note.png'
+import pataponArtwork from '@/shared/assets/features/inventory/patapon/patapon.png'
+import pataponIcon from '@/shared/assets/features/inventory/patapon/patapon-icon.png'
 
 export type CafeDrinkId =
   | 'espresso'
@@ -116,6 +122,16 @@ export const ARCADE_REWARDS_BY_GAME_ID: Readonly<Record<string, InventoryItem>> 
   },
 }
 
+export const GAME_REWARDS_BY_GAME_ID: Readonly<Record<string, InventoryItem>> = {
+  ...ARCADE_REWARDS_BY_GAME_ID,
+  japonsk: {
+    id: 'patapon',
+    name: 'Патапон',
+    icon: '👁️',
+    inspectable: true,
+  },
+}
+
 const BOOK_PICKUP_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
   'tropical-field-journal': tropicalFieldJournalPickup,
   'sailor-logbook': sailorLogbookPickup,
@@ -123,6 +139,14 @@ const BOOK_PICKUP_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
 }
 
 const ITEM_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
+  patapon: pataponIcon,
+  'shiba-treasure-map': islandMapIcon,
+  'beach-library-page-0': libraryPageIcon,
+  'beach-library-page-1': libraryPageIcon,
+  'beach-library-page-2': libraryPageIcon,
+  'beach-library-page-3': libraryPageIcon,
+  'beach-library-letters': libraryHintIcon,
+  'beach-library-note': libraryNoteIcon,
   'arcade-pin-dachshund-red': collieRedKeychain,
   'arcade-pin-shiba-green': shepherdGreenKeychain,
   'arcade-pin-aussie-blue': beagleBlueKeychain,
@@ -142,12 +166,16 @@ const ARCADE_REWARDS_BY_ITEM_ID = Object.fromEntries(
 export const isArcadeKeychain = (itemId: string) => itemId in ARCADE_REWARDS_BY_ITEM_ID
 
 const ITEM_DEFINITIONS_BY_ID: Readonly<Record<string, InventoryItem>> = {
+  ...Object.fromEntries(Object.values(GAME_REWARDS_BY_GAME_ID).map((item) => [item.id, item])),
   ...ARCADE_REWARDS_BY_ITEM_ID,
   ...Object.fromEntries(BOOK_ITEMS.map((item) => [item.id, item])),
   ...CAFE_DRINKS_BY_ID,
 }
 
 export const getInventoryItemArtwork = (itemId: string) => ITEM_ARTWORK_BY_ID[itemId]
+
+export const getInventoryItemPreviewArtwork = (itemId: string) =>
+  itemId === 'patapon' ? pataponArtwork : getInventoryItemArtwork(itemId)
 
 export const getBookPickupArtwork = (itemId: string) => BOOK_PICKUP_ARTWORK_BY_ID[itemId]
 
