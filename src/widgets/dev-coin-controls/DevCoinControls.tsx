@@ -17,7 +17,7 @@ const LIBRARY_PAGE_ITEMS: InventoryItem[] = [
     icon: '📄',
   })),
   { id: LETTER_PAGE, name: 'Лист с текстом (буквы)', icon: '🔤' },
-  { id: NOTE_PAGE, name: 'Записка библиотекаря (подсказка)', icon: '📜' },
+  { id: NOTE_PAGE, name: 'Письмо из библиотеки (подсказка)', icon: '📜' },
 ]
 
 const DEV_ITEMS: InventoryItem[] = [
