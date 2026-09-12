@@ -11,7 +11,7 @@ import fisherHut from '@/shared/assets/locations/wild/fisher-hut.png'
 import pirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
 import jungleOverview from '@/shared/assets/locations/jungle/overview.png'
 import jungleCave from '@/shared/assets/locations/jungle/cave.png'
-import jungleWaterfall from '@/shared/assets/locations/jungle/waterfall.png'
+import jungleWaterfall from '@/shared/assets/locations/jungle/waterfall-v2.png'
 import nicheStream from '@/shared/assets/locations/jungle/niche-stream.png'
 import locationFootstepsSound from '@/shared/assets/common/audio/location-footsteps.ogg'
 

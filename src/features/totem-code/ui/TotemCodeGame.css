@@ -188,12 +188,12 @@
 }
 
 .totem-code-game__switch--left {
-  left: -14px;
+  left: 5px;
   --cursor-image: url('@/shared/assets/common/cursors/arrow-left.png') 13 32, w-resize;
 }
 
 .totem-code-game__switch--right {
-  right: -14px;
+  right: 5px;
   --cursor-image: url('@/shared/assets/common/cursors/arrow-right.png') 51 32, e-resize;
 }
 

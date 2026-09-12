@@ -62,9 +62,9 @@
 .location-navigator__ritual-site {
   position: absolute;
   z-index: 0;
-  top: 7%;
-  left: 50%;
-  width: 16%;
+  top: 19%;
+  left: 48.5%;
+  width: 4%;
   height: auto;
   pointer-events: none;
   user-select: none;
