@@ -527,6 +527,28 @@ h1 {
   pointer-events: none;
   user-select: none;
 }
+.game-overlay__bottom-exit {
+  position: fixed;
+  z-index: 50;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 11%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  --cursor-image: url('@/shared/assets/common/cursors/arrow-down.png') 32 52, s-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
+}
+.game-overlay__bottom-exit:hover,
+.game-overlay__bottom-exit:focus-visible {
+  outline: none;
+}
+@media (max-width: 700px) {
+  .game-overlay__bottom-exit {
+    height: 13%;
+  }
+}
 .game-overlay.arkanoid-page {
   padding: 0;
   overflow: hidden;
