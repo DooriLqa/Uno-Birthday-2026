@@ -144,7 +144,7 @@
   border: 1px solid #6f6040;
   border-radius: 1px;
 
-  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 0 0, pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, pointer;
   cursor: var(--cursor-pointer);
 }
 .power-button {
@@ -254,7 +254,9 @@
 
   color: #d8b878;
 
-  cursor: pointer;
+  cursor:
+    url('@/shared/assets/common/cursors/hand-point.png') 20 8,
+    pointer;
   user-select: none;
 
   box-shadow:
@@ -438,7 +440,9 @@
   border-radius: 50%;
   background: #e7b85f;
   color: #684128;
-  cursor: pointer;
+  cursor:
+    url('@/shared/assets/common/cursors/hand-point.png') 20 8,
+    pointer;
   box-shadow: 0 4px 0 #8e572f;
 }
 .radio-device__power.is-on {
@@ -527,7 +531,9 @@
   background: linear-gradient(180deg, #fff3bd, #f3cb78);
   box-shadow: 0 4px 0 #84501f;
   color: #593216;
-  cursor: pointer;
+  cursor:
+    url('@/shared/assets/common/cursors/hand-point.png') 20 8,
+    pointer;
   transition:
     translate 0.15s ease,
     box-shadow 0.15s ease;
@@ -589,7 +595,9 @@
   font-weight: 800;
   text-align: left;
   overflow-wrap: anywhere;
-  cursor: pointer;
+  cursor:
+    url('@/shared/assets/common/cursors/hand-point.png') 20 8,
+    pointer;
   transition:
     background 0.15s ease,
     translate 0.15s ease;
@@ -725,7 +733,9 @@
   border-radius: 50%;
   background: #1f7183;
   color: white;
-  cursor: pointer;
+  cursor:
+    url('@/shared/assets/common/cursors/hand-point.png') 20 8,
+    pointer;
 }
 .quiz-audio-player__timeline {
   min-width: 0;
@@ -735,7 +745,9 @@
   width: 100%;
   margin: 0;
   accent-color: #1f7183;
-  cursor: pointer;
+  cursor:
+    url('@/shared/assets/common/cursors/hand-point.png') 20 8,
+    pointer;
 }
 .quiz-audio-player__time {
   display: flex;

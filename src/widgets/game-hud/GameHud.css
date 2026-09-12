@@ -33,7 +33,8 @@
   place-items: center;
   padding: 0;
   border-radius: 15px;
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
 }
 .game-hud__map-button:hover {
   transform: translateY(-1px);
@@ -168,7 +169,8 @@
 .game-hud__slot--button,
 .game-hud__radio-power,
 .game-hud__radio-open {
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
 }
 .game-hud__slot--button:hover,
 .game-hud__radio-power:hover,
@@ -201,10 +203,18 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-open.png') 20 10, auto;
+  cursor: var(--cursor-pointer);
 }
 .game-hud__radio-volume input {
   width: 105px;
   accent-color: #6b4128;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-open.png') 20 10, auto;
+  cursor: var(--cursor-pointer);
+}
+.game-hud__radio-volume:active {
+  --cursor-image: url('@/shared/assets/common/cursors/hand-grab.png') 20 10, grab;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 .game-hud__radio-open {
   padding: 6px 8px;
@@ -269,7 +279,8 @@
   background: #fff8dc;
   color: #71401f;
   box-shadow: 0 4px 0 #c88a42;
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
 }
 .inventory-preview__image {
   display: block;
@@ -322,7 +333,8 @@
   background: transparent;
   color: white;
   opacity: 0;
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.72));
   transition:
     opacity 140ms ease,
@@ -365,7 +377,8 @@
   border: 2px solid #87522c;
   border-radius: 50%;
   background: transparent;
-  cursor: pointer;
+  --cursor-pointer: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-pointer);
 }
 .inventory-book__pagination button.is-active {
   background: #d69335;

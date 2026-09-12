@@ -97,6 +97,7 @@ export function FishingGame({ onClose }: Props) {
   const greenVelocityRef = useRef(0)
   const catchRef = useRef(20)
   const lastFightTimeRef = useRef(0)
+  const resultLockedRef = useRef(false)
 
   const setPhase = useCallback((next: Phase) => {
     phaseRef.current = next
@@ -137,6 +138,7 @@ export function FishingGame({ onClose }: Props) {
     setCatchProgress(20)
     setRodJerk(0)
     setResult(null)
+    resultLockedRef.current = false
     setPhase('idle')
   }, [clearRoundTimers, setPhase])
 
@@ -191,6 +193,11 @@ export function FishingGame({ onClose }: Props) {
 
     setResult({ fish, rarity, message })
     setPhase('result')
+
+    resultLockedRef.current = true
+    window.setTimeout(() => {
+      resultLockedRef.current = false
+    }, 500)
   }, [addCoins, addCatch, catches, resetToIdle, setPhase])
 
   const returnRod = useCallback(() => {
@@ -310,7 +317,7 @@ export function FishingGame({ onClose }: Props) {
     rarityRef.current = pickRarity(distance)
     setCastDistance(distance)
     setBobberX(58)
-    setBobberTop(distance === 'near' ? 65 : distance === 'mid' ? 47 : 39)
+    setBobberTop(distance === 'near' ? 65 : distance === 'mid' ? 50 : 42)
     setPhase('casting')
     window.setTimeout(() => {
       if (phaseRef.current !== 'casting') return
@@ -414,7 +421,7 @@ export function FishingGame({ onClose }: Props) {
   }, [resetToIdle])
 
   const closeResult = useCallback(() => {
-    if (phaseRef.current === 'result') resetToIdle()
+    if (phaseRef.current === 'result' && !resultLockedRef.current) resetToIdle()
   }, [resetToIdle])
 
   return (
