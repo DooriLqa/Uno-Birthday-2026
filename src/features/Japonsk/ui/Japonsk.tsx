@@ -1,11 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './Japonsk.css'
+import JaponskBackground from '@/shared/assets/games/japonsk/japonsk-bg.png'
+import KeyBall from '@/shared/assets/games/japonsk/answer.png'
+import fireSound from '@/shared/assets/games/japonsk/fire.mp3'
+import keyAppearSound from '@/shared/assets/games/japonsk/key-appear.wav'
+import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 
 type Props = {
   onComplete: () => void
 }
 
 type Cell = 'empty' | 'filled' | 'cross'
+
+const JAPANSK_BOARD_STORAGE_KEY = 'japonsk-board-v1'
 
 const solution = [
   [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
@@ -61,10 +68,65 @@ const columnHints = [
   [9],
 ]
 
+const JAPONSK_GAME_KEY = 'japonsk'
+const WIN_SOUND_KEY = `${JAPONSK_GAME_KEY}:WIN`
+const WIN_SOUND = keyAppearSound
+
 export function Japonsk({ onComplete }: Props) {
-  const [board, setBoard] = useState<Cell[][]>(solution.map((row) => row.map(() => 'empty')))
+  const [board, setBoard] = useState<Cell[][]>(() => {
+    try {
+      const saved = localStorage.getItem(JAPANSK_BOARD_STORAGE_KEY)
+
+      if (saved) {
+        const parsed = JSON.parse(saved) as Cell[][]
+
+        if (
+          parsed.length === solution.length &&
+          parsed.every(
+            (row, index) =>
+              row.length === solution[index].length &&
+              row.every((cell) => cell === 'empty' || cell === 'filled' || cell === 'cross'),
+          )
+        ) {
+          return parsed
+        }
+      }
+    } catch {
+      // Если сохранение повреждено — начинаем пустую игру
+    }
+
+    return solution.map((row) => row.map(() => 'empty'))
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(JAPANSK_BOARD_STORAGE_KEY, JSON.stringify(board))
+    } catch {
+      // Ничего не делаем, если localStorage недоступен
+    }
+  }, [board])
+
+  useEffect(() => {
+    const audio = new Audio(fireSound)
+
+    audio.loop = true
+    audio.volume = 0.25
+
+    const startSound = () => {
+      audio.play().catch(() => {})
+    }
+
+    window.addEventListener('click', startSound, { once: true })
+
+    return () => {
+      audio.pause()
+      audio.currentTime = 0
+      window.removeEventListener('click', startSound)
+    }
+  }, [])
 
   const [showSuccess, setShowSuccess] = useState(false)
+  const [showKeyBall, setShowKeyBall] = useState(false)
 
   const clickCell = (row: number, column: number) => {
     setBoard((current) => {
@@ -89,12 +151,15 @@ export function Japonsk({ onComplete }: Props) {
         const isFilled = board[row][column] === 'filled'
 
         if (shouldBeFilled !== isFilled) {
+          setShowSuccess(true)
           return
         }
       }
     }
 
-    setShowSuccess(true)
+    playOneShotSound(WIN_SOUND, WIN_SOUND_KEY, 0.1)
+
+    setShowKeyBall(true)
     onComplete()
   }
 
@@ -147,9 +212,24 @@ export function Japonsk({ onComplete }: Props) {
 
   return (
     <div className="Japonsk">
+      {/* =====================================================
+          ФОН
+          ===================================================== */}
+
+      <img className="Japonsk__background" src={JaponskBackground} alt="" />
+
+      {/* =====================================================
+          СЦЕНА
+          ===================================================== */}
+
       <div className="Japonsk__scene">
+        {/* ===================================================
+            КРОССВОРД
+            =================================================== */}
+
         <div className="Japonsk__crossword">
           {/* Подсказки сверху */}
+
           <div className="Japonsk__top-hints">
             <div className="Japonsk__hint-corner" />
 
@@ -178,6 +258,7 @@ export function Japonsk({ onComplete }: Props) {
           </div>
 
           {/* Подсказки слева + поле */}
+
           <div className="Japonsk__board-wrapper">
             <div className="Japonsk__left-hints">
               {rowHints.map((hint, rowIndex) => {
@@ -209,6 +290,7 @@ export function Japonsk({ onComplete }: Props) {
             </div>
 
             {/* Поле */}
+
             <div className="Japonsk__board">
               {board.map((row, rowIndex) =>
                 row.map((cell, columnIndex) => (
@@ -234,17 +316,23 @@ export function Japonsk({ onComplete }: Props) {
           </div>
         </div>
 
-        {/* Кнопка проверки */}
+        {showKeyBall && <img className="Japonsk__key-ball" src={KeyBall} alt="" />}
+
+        {/* ===================================================
+            КНОПКА ПРОВЕРКИ
+            =================================================== */}
+
         <button type="button" className="Japonsk__check" onClick={checkSolution}>
           ПРОВЕРИТЬ
         </button>
 
-        {/* Уведомление о победе */}
+        {/* ===================================================
+            ОКНО ПОБЕДЫ
+            =================================================== */}
+
         {showSuccess && (
           <div className="Japonsk__success">
-            <div className="Japonsk__success-title">ПОБЕДА</div>
-
-            <div className="Japonsk__success-text">Вскрой ему черепушку!</div>
+            <div className="Japonsk__success-title">Неправильно!</div>
 
             <button
               type="button"

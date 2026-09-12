@@ -24,8 +24,8 @@ export type ArkanoidLayout = {
 }
 
 export const ARKANOID_WORLD = {
-  width: 900,
-  height: 600,
+  width: 2200,
+  height: 700,
 } as const
 
 export const ARKANOID_LAYOUT: ArkanoidLayout = {

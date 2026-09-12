@@ -118,6 +118,36 @@
     box-shadow 120ms ease;
 }
 
+.arkanoid__cabinet--hit {
+  animation: arkanoid-machine-hit 320ms ease-out;
+}
+
+@keyframes arkanoid-machine-hit {
+  0% {
+    transform: translate(-50%, -50%);
+  }
+
+  20% {
+    transform: translate(calc(-50% - 4px), -50%) rotate(-0.35deg);
+  }
+
+  40% {
+    transform: translate(calc(-50% + 4px), -50%) rotate(0.35deg);
+  }
+
+  60% {
+    transform: translate(calc(-50% - 2px), -50%) rotate(-0.18deg);
+  }
+
+  80% {
+    transform: translate(calc(-50% + 2px), -50%) rotate(0.12deg);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+}
+
 .arkanoid__overlay button:hover:not(:disabled) {
   background: #a44b2e;
 }
