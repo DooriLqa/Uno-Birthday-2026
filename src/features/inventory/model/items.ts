@@ -2,6 +2,7 @@ import type { InventoryItem } from './store'
 import collieRedKeychain from '@/shared/assets/features/inventory/arcade-keychains/collie-red-keychain.png'
 import shepherdGreenKeychain from '@/shared/assets/features/inventory/arcade-keychains/shepherd-green-keychain.png'
 import beagleBlueKeychain from '@/shared/assets/features/inventory/arcade-keychains/beagle-blue-keychain.png'
+import stupidBadgeArtwork from '@/shared/assets/features/inventory/arcade-keychains/stupid.png'
 import tropicalFieldJournalSpreadOne from '@/shared/assets/features/inventory/books/tropical-field-journal-spread-v3-1.png'
 import tropicalFieldJournalSpreadTwo from '@/shared/assets/features/inventory/books/tropical-field-journal-spread-v3-2.png'
 import sailorLogbookSpread from '@/shared/assets/features/inventory/books/sailor-logbook-spread-v3.png'
@@ -95,6 +96,15 @@ export const BOOK_ITEMS: readonly InventoryItem[] = [
   },
 ]
 
+export const STUPID_BADGE: InventoryItem = {
+  id: 'stupid-badge',
+  name: `Значок «I'm sorry, I was born stupid»`,
+  icon: '🏷️',
+  rarity: 'rare',
+  inspectable: true,
+  description: `Значок с надписью «I'm sorry, I was born stupid».`,
+}
+
 export const ARCADE_REWARDS_BY_GAME_ID: Readonly<Record<string, InventoryItem>> = {
   'flappy-bird': {
     id: 'arcade-pin-dachshund-red',
@@ -139,6 +149,7 @@ const BOOK_PICKUP_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
 }
 
 const ITEM_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
+  [STUPID_BADGE.id]: stupidBadgeArtwork,
   patapon: pataponIcon,
   'shiba-treasure-map': islandMapIcon,
   'beach-library-page-0': libraryPageIcon,
@@ -166,6 +177,7 @@ const ARCADE_REWARDS_BY_ITEM_ID = Object.fromEntries(
 export const isArcadeKeychain = (itemId: string) => itemId in ARCADE_REWARDS_BY_ITEM_ID
 
 const ITEM_DEFINITIONS_BY_ID: Readonly<Record<string, InventoryItem>> = {
+  [STUPID_BADGE.id]: STUPID_BADGE,
   ...Object.fromEntries(Object.values(GAME_REWARDS_BY_GAME_ID).map((item) => [item.id, item])),
   ...ARCADE_REWARDS_BY_ITEM_ID,
   ...Object.fromEntries(BOOK_ITEMS.map((item) => [item.id, item])),

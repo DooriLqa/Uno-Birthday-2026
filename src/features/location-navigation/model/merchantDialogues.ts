@@ -6,12 +6,14 @@ import {
 } from '@/features/dialogues'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore } from '@/features/inventory/model/store'
+import { STUPID_BADGE } from '@/features/inventory/model/items'
 import merchantSprite from '@/shared/assets/features/dialogues/shiba-merchant.png'
 
 export const MAP_ITEM_ID = 'shiba-treasure-map'
 export const LANTERN_ITEM_ID = 'oil-lantern'
 export const CAVE_DARK_DIALOGUE_ID = 'jungle-cave-dark-v1'
 const LANTERN_COST = 15
+const BADGE_COST = 100
 const GREETING_ID = 'tourist-merchant-map-v1'
 const merchant: DialogueSpeaker = {
   id: 'shiba-merchant',
@@ -134,9 +136,40 @@ function buyOilLantern() {
   })
 }
 
+function buyStupidBadge() {
+  if (useInventoryStore.getState().items.some((item) => item.id === STUPID_BADGE.id)) return
+
+  if (!usePawCoinStore.getState().spendPawCoins(BADGE_COST)) {
+    openDialogue({
+      id: 'tourist-merchant-badge-poor',
+      messages: [
+        {
+          id: 'not-enough',
+          speaker: merchant,
+          emotion: 'neutral',
+          text: `${STUPID_BADGE.name} стоит ${BADGE_COST} монет. Пока не хватает — возвращайся, когда накопишь!`,
+        },
+      ],
+    })
+    return
+  }
+
+  useInventoryStore.getState().addItem(STUPID_BADGE)
+}
+
 function openMerchantOptions(onOpenQuiz: () => void) {
   const choices: DialogueChoice[] = [
-    ...(hasOilLantern()
+    ...(useInventoryStore.getState().items.some((item) => item.id === STUPID_BADGE.id)
+      ? []
+      : [
+          {
+            id: 'buy-stupid-badge',
+            label: `Купить: ${STUPID_BADGE.name} — ${BADGE_COST} монет`,
+            onSelect: buyStupidBadge,
+          },
+        ]),
+    ...(hasOilLantern() ||
+    !useDialogueStore.getState().readDialogueIds.includes(CAVE_DARK_DIALOGUE_ID)
       ? []
       : [
           {
@@ -164,9 +197,7 @@ function openMerchantOptions(onOpenQuiz: () => void) {
         id: 'options',
         speaker: merchant,
         emotion: 'happy',
-        text: hasOilLantern()
-          ? 'Фонарь пригодился? Чем ещё могу помочь?'
-          : 'Для пещеры нужен надёжный свет. Что выберешь?',
+        text: 'Загляни в мои товары или сыграй в квиз. Что выберешь?',
         choices,
       },
     ],
@@ -202,16 +233,12 @@ export function talkToMerchant(onOpenQuiz: () => void) {
           speaker: merchant,
           emotion: 'happy',
           text: 'А когда захочешь проверить свою эрудицию — загляни ещё раз. У меня есть квиз с радиоприёмником в награду!',
+          onComplete: () => openMerchantOptions(onOpenQuiz),
         },
       ],
     })
     return
   }
 
-  if (state.readDialogueIds.includes(CAVE_DARK_DIALOGUE_ID)) {
-    openMerchantOptions(onOpenQuiz)
-    return
-  }
-
-  openQuizInvitation(onOpenQuiz)
+  openMerchantOptions(onOpenQuiz)
 }
