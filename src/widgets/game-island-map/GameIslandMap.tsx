@@ -3,13 +3,21 @@ import { worldRegions, type LocationId } from '@/features/location-navigation/mo
 import './GameIslandMap.css'
 
 type Props = {
+  onClose: () => void
   onOpenRegion: (entry: LocationId) => void
 }
 
-export function GameIslandMap({ onOpenRegion }: Props) {
+export function GameIslandMap({ onClose, onOpenRegion }: Props) {
   return (
-    <section className="game-island-map" aria-label="Карта регионов острова">
-      <div className="game-island-map__active-area">
+    <section
+      className="game-island-map"
+      aria-label="Карта регионов острова"
+      onClick={onClose}
+    >
+      <div
+        className="game-island-map__active-area"
+        onClick={(event) => event.stopPropagation()}
+      >
         <img
           className="game-island-map__image"
           src={tropicalIslandMap}

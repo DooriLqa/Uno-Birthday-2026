@@ -3,6 +3,7 @@ import { getGame } from '@/app/gameRegistry'
 import { GamePage } from '@/pages/game'
 import { GameIslandMap } from '@/widgets/game-island-map'
 import { DevCoinControls } from '@/widgets/dev-coin-controls/DevCoinControls'
+import { CreditsOverlay } from '@/widgets/game-hud/CreditsOverlay'
 import { GameHud } from '@/widgets/game-hud/GameHud'
 import { RadioModal } from '@/features/beach-radio'
 import { LocationNavigator } from '@/features/location-navigation'
@@ -30,6 +31,7 @@ export function GameFlow() {
   const [activeGameId, setActiveGameId] = useState<string | null>(null)
   const [mapOpen, setMapOpen] = useState(false)
   const [radioOpen, setRadioOpen] = useState(false)
+  const [creditsOpen, setCreditsOpen] = useState(false)
   const { scene, setScene, setHistory } = useWorldStore()
   const activeGame = getGame(activeGameId)
   const ambienceVolume = locations[scene.locationId]?.ambienceVolume ?? 0
@@ -64,6 +66,7 @@ export function GameFlow() {
     <main className="island-map-page">
       {mapOpen && (
         <GameIslandMap
+          onClose={() => setMapOpen(false)}
           onOpenRegion={(entry) => {
             playOneShotSound(locations[entry].transitionSound)
             setScene({ locationId: entry, pan: 0.5 })
@@ -72,7 +75,14 @@ export function GameFlow() {
           }}
         />
       )}
-      <GameHud mapOpen={mapOpen} onOpenRadio={() => setRadioOpen(true)} onOpenMap={openMap} />
+      <GameHud
+        mapOpen={mapOpen}
+        onOpenRadio={() => setRadioOpen(true)}
+        onOpenMap={openMap}
+        showCreditsButton={!DEV_TOOLS_ENABLED}
+        creditsOpen={creditsOpen}
+        onToggleCredits={() => setCreditsOpen((value) => !value)}
+      />
       <LocationNavigator
         active={!mapOpen && !activeGame && !radioOpen}
         visible={(!activeGame || activeGame.id === 'beach-radio') && !radioOpen}
@@ -94,7 +104,8 @@ export function GameFlow() {
         />
       )}
       <RadioModal open={radioOpen} onClose={() => setRadioOpen(false)} />
-      {DEV_TOOLS_ENABLED && <DevCoinControls />}
+      <CreditsOverlay open={creditsOpen} onClose={() => setCreditsOpen(false)} />
+      {DEV_TOOLS_ENABLED && <DevCoinControls onOpenCredits={() => setCreditsOpen(true)} />}
     </main>
   )
 }

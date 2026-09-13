@@ -28,9 +28,9 @@
 .totem-code-game__campfire {
   position: absolute;
   z-index: 1;
-  bottom: 7%;
+  bottom: 15%;
   left: 50%;
-  width: clamp(190px, 23vw, 320px);
+  width: clamp(210px, 33vw, 420px);
   height: auto;
   translate: -50% 0;
   user-select: none;
@@ -40,30 +40,30 @@
 .totem-code-game__totem {
   position: absolute;
   z-index: 2;
-  width: clamp(185px, 20vw, 270px);
+  width: clamp(185px, 20vw, 310px);
   aspect-ratio: 2 / 3;
   isolation: isolate;
   filter: drop-shadow(0 10px 7px rgba(72, 35, 12, 0.34));
 }
 
 .totem-code-game__totem--1 {
-  bottom: 4%;
-  left: 7%;
+  top: 15%;
+  left: 5%;
 }
 
 .totem-code-game__totem--2 {
-  bottom: 27%;
-  left: 23%;
+  top: 3%;
+  left: 24%;
 }
 
 .totem-code-game__totem--3 {
-  right: 23%;
-  bottom: 27%;
+  right: 25%;
+  top: 3%;
 }
 
 .totem-code-game__totem--4 {
   right: 7%;
-  bottom: 4%;
+  top: 13%;
 }
 
 .totem-code-game__body {
@@ -88,6 +88,7 @@
 .totem-code-game__drum {
   position: absolute;
   z-index: 2;
+  display: block;
   left: 22%;
   width: 56%;
   height: 16.5%;
@@ -135,7 +136,7 @@
 }
 
 .totem-code-game__carving--moon {
-  width: 58%;
+  width: 82%;
   height: 72%;
   font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', sans-serif;
   font-size: clamp(1.7rem, 3.6vw, 3.05rem);
@@ -153,7 +154,7 @@
 
 .totem-code-game__carving img {
   display: block;
-  width: 54px;
+  width: 60px;
   height: 100%;
   object-fit: contain;
   pointer-events: none;
@@ -166,8 +167,8 @@
   top: 50%;
   display: grid;
   place-items: center;
-  width: 29px;
-  height: 29px;
+  width: 36px;
+  height: 36px;
   margin: 0;
   padding: 0;
   border: 1px solid rgba(255, 230, 169, 0.84);
@@ -188,17 +189,14 @@
 }
 
 .totem-code-game__switch--left {
-  left: -14px;
-  --cursor-image: url('@/shared/assets/common/cursors/arrow-left.png') 13 32, w-resize;
+  left: 18px;
 }
 
 .totem-code-game__switch--right {
-  right: -14px;
-  --cursor-image: url('@/shared/assets/common/cursors/arrow-right.png') 51 32, e-resize;
+  right: 18px;
 }
 
-.totem-code-game__drum:hover .totem-code-game__switch,
-.totem-code-game__drum:focus-within .totem-code-game__switch {
+.totem-code-game__drum:is(:hover, :focus-within) > .totem-code-game__switch, .totem-code-game__switch:hover {
   opacity: 1;
   pointer-events: auto;
   scale: 1;
@@ -271,4 +269,9 @@
     pointer-events: auto;
   }
 
+}
+
+.totem-code-game__drum > .totem-code-game__switch:disabled {
+  opacity: 0;
+  pointer-events: none;
 }

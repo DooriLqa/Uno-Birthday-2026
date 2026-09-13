@@ -1,4 +1,13 @@
-import { MessageCircle, Minus, PackagePlus, Plus, RotateCcw, Trash2, Wrench } from 'lucide-react'
+import {
+  Clapperboard,
+  MessageCircle,
+  Minus,
+  PackagePlus,
+  Plus,
+  RotateCcw,
+  Trash2,
+  Wrench,
+} from 'lucide-react'
 import { useState } from 'react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { dialogueTestSamples, openDialogue } from '@/features/dialogues'
@@ -28,7 +37,7 @@ const DEV_ITEMS: InventoryItem[] = [
   ...Object.values(GAME_REWARDS_BY_GAME_ID),
 ]
 
-export function DevCoinControls() {
+export function DevCoinControls({ onOpenCredits }: { onOpenCredits: () => void }) {
   const pawCoins = usePawCoinStore((state) => state.pawCoins)
   const addPawCoins = usePawCoinStore((state) => state.addPawCoins)
   const spendPawCoins = usePawCoinStore((state) => state.spendPawCoins)
@@ -124,6 +133,10 @@ export function DevCoinControls() {
             title="Сбросить веса всех вопросов квиза"
           >
             <RotateCcw size={15} /> Стереть память квиза
+          </button>
+
+          <button type="button" onClick={onOpenCredits} title="Показать титры">
+            <Clapperboard size={15} /> Показать титры
           </button>
 
           <button

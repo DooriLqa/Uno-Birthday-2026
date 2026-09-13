@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import { ARKANOID_LAYOUT } from '../model/layout'
 import { ArcadeDisplay } from '@/shared/ui/ArcadeDisplay'
 import { useArcadeCoin } from '@/shared/lib/arcade/useArcadeCoin'
+import { audioController } from '@/shared/lib/audio/audioController'
 import arkanoidSound1 from '@/shared/assets/games/arkanoid/Arkanoid_1.wav'
 import arkanoidSound2 from '@/shared/assets/games/arkanoid/Arkanoid_2.wav'
 import arkanoidSound3 from '@/shared/assets/games/arkanoid/Arkanoid_3.wav'
@@ -30,6 +31,17 @@ import powerUpFallFireImage from '@/shared/assets/games/arkanoid/fallpowerup-fir
 import fireBallImage from '@/shared/assets/games/arkanoid/fire-ball.png'
 
 import './Arkanoid.css'
+
+const ARKANOID_SOUNDS = {
+  launch: arkanoidSound1,
+  hit: arkanoidSound2,
+  destroy: arkanoidSound3,
+  powerUp: arkanoidSound4,
+  levelComplete: arkanoidSound5,
+  gameOver: arkanoidSound6,
+  lifeLost: arkanoidSound7,
+  platformBounce: arkanoidSound8,
+} as const
 
 type Props = {
   onComplete: () => void
@@ -100,8 +112,8 @@ type GameState = {
   gameOver: boolean
 }
 
-const CANVAS_WIDTH = 900
-const CANVAS_HEIGHT = 600
+const CANVAS_WIDTH = 1200
+const CANVAS_HEIGHT = 568
 
 const STORAGE_KEY = 'arkanoid-progress-v1'
 
@@ -134,6 +146,41 @@ const FIRE_SHOT_COUNT = 10
 
 // Время, пока после разрушения показывается последний кадр спрайта.
 const BRICK_DESTRUCTION_DURATION = 500
+const MACHINE_HIT_COOLDOWN = 10_000
+const MACHINE_HIT_ANGLE = 0.12
+const MACHINE_HIT_POWER = 0.18
+
+const MACHINE_HIT_SHAKE_DURATION = 320
+
+// Небольшой случайный разброс после каждого отскока.
+// Нужен, чтобы мяч не зацикливался между двумя параллельными поверхностями.
+const BOUNCE_RANDOM_MAX = 0.18
+const BOUNCE_PUSH = 1.5
+
+function addBounceRandom(ball: Ball) {
+  const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy)
+
+  if (speed <= 0) {
+    ball.vx = 0.18
+    ball.vy = -2.8
+    return
+  }
+
+  // Маленькое случайное изменение только угла, скорость сохраняем.
+  const angle = Math.atan2(ball.vy, ball.vx)
+  const randomAngle = (Math.random() * 2 - 1) * BOUNCE_RANDOM_MAX
+  const nextAngle = angle + randomAngle
+
+  ball.vx = Math.cos(nextAngle) * speed
+  ball.vy = Math.sin(nextAngle) * speed
+
+  // Не даём мячу стать идеально вертикальным.
+  if (Math.abs(ball.vx) < 0.12) {
+    ball.vx = ball.vx < 0 ? -0.12 : 0.12
+    const verticalSpeed = Math.sqrt(Math.max(0, speed * speed - ball.vx * ball.vx))
+    ball.vy = ball.vy < 0 ? -verticalSpeed : verticalSpeed
+  }
+}
 
 /*
  * =========================================================
@@ -151,22 +198,14 @@ const BRICK_DESTRUCTION_DURATION = 500
 const LEVEL_LAYOUTS: number[][][] = [
   // Уровень 1
   [
-    [0, 0, 1, 1, 1, 1, 1, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 2, 8, 3, 1, 1, 1, 1],
+    [3, 2, 1, 2, 3, 1, 2, 3, 2],
+    [2, 8, 2, 3, 1, 2, 3, 2, 3],
+    [1, 2, 3, 8, 2, 3, 2, 3, 2],
+    [2, 3, 1, 2, 3, 2, 3, 2, 8],
+    [3, 1, 2, 3, 2, 3, 2, 8, 1],
   ],
 
   // Уровень 2
-  [
-    [9, 0, 1, 2, 1, 2, 1, 0, 9],
-    [1, 1, 2, 1, 1, 1, 2, 1, 1],
-    [0, 2, 1, 1, 3, 1, 1, 2, 0],
-    [1, 1, 1, 2, 1, 2, 1, 1, 1],
-    [9, 1, 1, 1, 1, 1, 1, 1, 9],
-  ],
-
-  // Уровень 3
   [
     [9, 2, 1, 3, 1, 3, 1, 2, 9],
     [2, 1, 3, 1, 9, 1, 3, 1, 2],
@@ -175,22 +214,40 @@ const LEVEL_LAYOUTS: number[][][] = [
     [9, 2, 1, 3, 1, 3, 1, 2, 9],
   ],
 
+  // Уровень 3
+  [
+    [9, 9, 8, 3, 1, 3, 1, 3, 8, 9, 9],
+    [9, 1, 3, 1, 1, 9, 1, 1, 3, 1, 9],
+    [2, 3, 8, 2, 1, 9, 9, 2, 8, 3, 2],
+    [3, 1, 3, 1, 9, 9, 1, 1, 2, 1, 3],
+    [9, 2, 8, 3, 1, 9, 1, 2, 8, 2, 9],
+    [9, 9, 2, 2, 3, 3, 3, 2, 2, 9, 9],
+  ],
+
   // Уровень 4
   [
-    [9, 9, 2, 3, 1, 3, 2, 9, 9],
-    [9, 2, 3, 1, 9, 1, 3, 2, 9],
-    [2, 3, 1, 9, 9, 9, 1, 3, 2],
-    [9, 2, 3, 8, 9, 8, 3, 2, 9],
-    [9, 9, 2, 3, 1, 3, 2, 9, 9],
+    [9, 9, 9, 9, 1, 9, 9, 9, 9, 9, 1, 9, 9, 9, 9, 9, 9, 1, 9],
+    [9, 9, 9, 9, 1, 9, 9, 9, 9, 9, 1, 8, 9, 9, 9, 9, 8, 1, 9],
+    [9, 9, 9, 3, 1, 3, 9, 9, 9, 8, 1, 3, 9, 9, 9, 8, 2, 1, 9],
+    [9, 9, 2, 8, 1, 8, 2, 9, 2, 3, 1, 3, 2, 9, 2, 3, 2, 1, 9],
+    [9, 9, 2, 3, 1, 3, 2, 1, 8, 8, 1, 8, 2, 1, 2, 8, 2, 9, 9],
+    [9, 1, 2, 8, 9, 8, 8, 1, 2, 3, 9, 3, 2, 1, 2, 3, 9, 9, 9],
+    [9, 1, 2, 9, 9, 9, 2, 1, 2, 9, 9, 9, 2, 1, 2, 9, 9, 9, 9],
+    [9, 1, 9, 9, 9, 9, 9, 1, 9, 9, 9, 9, 9, 1, 9, 9, 9, 9, 9],
+    [9, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
   ],
 
   // Уровень 5
   [
-    [9, 3, 2, 1, 9, 9, 1, 2, 3, 9],
-    [3, 2, 1, 9, 2, 2, 9, 1, 2, 3],
-    [2, 1, 9, 3, 1, 1, 3, 9, 1, 2],
-    [3, 2, 1, 9, 2, 2, 9, 1, 2, 3],
-    [9, 3, 2, 1, 9, 9, 1, 2, 3, 9],
+    [9, 1, 9, 3, 9, 1, 9, 9, 9, 9, 1, 9, 9, 9, 9, 3, 1, 1, 9, 2, 3],
+    [2, 9, 9, 9, 2, 1, 9, 0, 0, 9, 1, 9, 8, 3, 9, 1, 3, 9, 0, 9, 3],
+    [3, 1, 9, 1, 3, 1, 9, 0, 0, 9, 1, 9, 2, 8, 9, 1, 9, 0, 0, 0, 9],
+    [2, 9, 9, 9, 2, 8, 9, 0, 0, 9, 1, 9, 8, 1, 9, 1, 9, 9, 9, 9, 9],
+    [9, 3, 9, 3, 9, 3, 9, 9, 9, 9, 1, 9, 3, 3, 9, 3, 9, 3, 3, 3, 9],
+    [1, 2, 3, 2, 1, 1, 2, 3, 2, 1, 1, 2, 3, 2, 1, 1, 2, 3, 2, 1, 1],
+    [0, 0, 8, 0, 0, 8, 0, 0, 8, 0, 0, 8, 0, 0, 8, 0, 0, 8, 0, 0, 8],
+    [1, 2, 3, 2, 1, 1, 2, 3, 2, 1, 1, 2, 3, 2, 1, 1, 2, 3, 2, 1, 1],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
   ],
 ]
 
@@ -238,7 +295,7 @@ function getBrickStats(value: number): {
 }
 
 function randomPowerUp(): PowerUpType | undefined {
-  if (Math.random() > 0.08) {
+  if (Math.random() > 0.25) {
     return undefined
   }
 
@@ -248,7 +305,7 @@ function randomPowerUp(): PowerUpType | undefined {
     return 'wide'
   }
 
-  if (roll < 0.8) {
+  if (roll < 0.7) {
     return 'triple'
   }
   return 'fire'
@@ -406,6 +463,9 @@ export function Arkanoid({ onComplete }: Props) {
   const layout = ARKANOID_LAYOUT
   const stageRef = useRef<HTMLDivElement>(null)
   const [stageScale, setStageScale] = useState({ x: 1, y: 1 })
+  const machineHitCooldownRef = useRef(0)
+  const gameRef = useRef<GameState | null>(createInitialGame(loadProgress().currentLevel))
+  const [machineHit, setMachineHit] = useState(false)
   const [sessionPaid, setSessionPaid] = useState(false)
   const { insertCoin, inserting, pawCoins } = useArcadeCoin('arkanoid:coin-insert')
   const horizontalExtent = Math.max(
@@ -421,31 +481,72 @@ export function Arkanoid({ onComplete }: Props) {
     const stage = stageRef.current
     if (!stage) return
     const observer = new ResizeObserver(([entry]) => {
+      const scaleX = entry.contentRect.width / CANVAS_WIDTH
+      const scaleY = entry.contentRect.height / CANVAS_HEIGHT
+      const scale = Math.min(scaleX, scaleY)
+
       setStageScale({
-        x: entry.contentRect.width / CANVAS_WIDTH,
-        y: entry.contentRect.height / CANVAS_HEIGHT,
+        x: scale,
+        y: scale,
       })
     })
     observer.observe(stage)
     return () => observer.disconnect()
   }, [])
 
+  const hitMachine = useCallback(() => {
+    const now = performance.now()
+
+    // КД 10 секунд
+    if (now - machineHitCooldownRef.current < MACHINE_HIT_COOLDOWN) {
+      return
+    }
+
+    const game = gameRef.current
+
+    if (!game || !game.running || game.gameOver || game.won || game.balls.length === 0) {
+      return
+    }
+
+    // Запускаем КД
+    machineHitCooldownRef.current = now
+
+    // Визуальная встряска автомата
+    setMachineHit(true)
+
+    window.setTimeout(() => {
+      setMachineHit(false)
+    }, MACHINE_HIT_SHAKE_DURATION)
+
+    // Немного меняем траекторию каждого шарика
+    for (const ball of game.balls) {
+      const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy)
+
+      if (speed <= 0) {
+        continue
+      }
+
+      const currentAngle = Math.atan2(ball.vy, ball.vx)
+
+      const randomAngle = (Math.random() * 2 - 1) * MACHINE_HIT_ANGLE
+
+      const newAngle = currentAngle + randomAngle
+
+      ball.vx = Math.cos(newAngle) * speed
+
+      ball.vy = Math.sin(newAngle) * speed
+
+      // Небольшой боковой толчок
+      const pushDirection = Math.random() < 0.5 ? -1 : 1
+
+      ball.vx += pushDirection * MACHINE_HIT_POWER
+    }
+  }, [])
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
   const animationRef = useRef<number | null>(null)
 
-  const audioRef = useRef({
-    launch: null as HTMLAudioElement | null,
-    hit: null as HTMLAudioElement | null,
-    destroy: null as HTMLAudioElement | null,
-    powerUp: null as HTMLAudioElement | null,
-    levelComplete: null as HTMLAudioElement | null,
-    gameOver: null as HTMLAudioElement | null,
-    lifeLost: null as HTMLAudioElement | null,
-    platformBounce: null as HTMLAudioElement | null,
-  })
-
-  const gameRef = useRef<GameState | null>(createInitialGame(loadProgress().currentLevel))
   const imageCacheRef = useRef<Record<string, HTMLImageElement>>({})
 
   const keysRef = useRef({
@@ -473,26 +574,9 @@ export function Arkanoid({ onComplete }: Props) {
   const [, setActivePowerUps] = useState<PowerUpType[]>([])
 
   useEffect(() => {
-    audioRef.current.launch = new Audio(arkanoidSound1)
-    audioRef.current.hit = new Audio(arkanoidSound2)
-    audioRef.current.destroy = new Audio(arkanoidSound3)
-    audioRef.current.powerUp = new Audio(arkanoidSound4)
-    audioRef.current.levelComplete = new Audio(arkanoidSound5)
-    audioRef.current.gameOver = new Audio(arkanoidSound6)
-    audioRef.current.lifeLost = new Audio(arkanoidSound7)
-    audioRef.current.platformBounce = new Audio(arkanoidSound8)
-
-    for (const audio of Object.values(audioRef.current)) {
-      if (audio) {
-        audio.preload = 'auto'
-      }
-    }
-
-    const audioElements = Object.values(audioRef.current)
-
     return () => {
-      for (const audio of audioElements) {
-        audio?.pause()
+      for (const key of Object.keys(ARKANOID_SOUNDS)) {
+        audioController.stop(`arkanoid-${key}`)
       }
     }
   }, [])
@@ -521,15 +605,8 @@ export function Arkanoid({ onComplete }: Props) {
     }
   }, [])
 
-  const playSound = useCallback((key: keyof typeof audioRef.current) => {
-    const audio = audioRef.current[key]
-
-    if (!audio) {
-      return
-    }
-
-    audio.currentTime = 0
-    void audio.play().catch(() => undefined)
+  const playSound = useCallback((key: keyof typeof ARKANOID_SOUNDS) => {
+    audioController.playOneShot(ARKANOID_SOUNDS[key], { key: `arkanoid-${key}` })
   }, [])
 
   const getPowerUpImage = useCallback((type: PowerUpType): string => {
@@ -1259,20 +1336,26 @@ export function Arkanoid({ onComplete }: Props) {
         ball.y += ball.vy
 
         if (ball.x - ball.radius <= 0) {
-          ball.x = ball.radius
+          ball.x = ball.radius + BOUNCE_PUSH
 
+          ball.vx = Math.abs(ball.vx)
+          addBounceRandom(ball)
           ball.vx = Math.abs(ball.vx)
         }
 
         if (ball.x + ball.radius >= CANVAS_WIDTH) {
-          ball.x = CANVAS_WIDTH - ball.radius
+          ball.x = CANVAS_WIDTH - ball.radius - BOUNCE_PUSH
 
+          ball.vx = -Math.abs(ball.vx)
+          addBounceRandom(ball)
           ball.vx = -Math.abs(ball.vx)
         }
 
         if (ball.y - ball.radius <= 0) {
-          ball.y = ball.radius
+          ball.y = ball.radius + BOUNCE_PUSH
 
+          ball.vy = Math.abs(ball.vy)
+          addBounceRandom(ball)
           ball.vy = Math.abs(ball.vy)
         }
 
@@ -1292,7 +1375,9 @@ export function Arkanoid({ onComplete }: Props) {
 
           ball.vy = -Math.max(getBallSpeed(game.level), Math.abs(ball.vy))
 
-          ball.y = game.paddle.y - ball.radius - 1
+          ball.y = game.paddle.y - ball.radius - BOUNCE_PUSH
+          addBounceRandom(ball)
+          ball.vy = -Math.abs(ball.vy)
         }
 
         for (let brickIndex = 0; brickIndex < game.bricks.length; brickIndex++) {
@@ -1326,8 +1411,10 @@ export function Arkanoid({ onComplete }: Props) {
             const previousY = ball.y - ball.vy
 
             if (previousX + ball.radius <= brick.x && ball.x + ball.radius >= brick.x) {
-              ball.x = brick.x - ball.radius
+              ball.x = brick.x - ball.radius - BOUNCE_PUSH
 
+              ball.vx = -Math.abs(ball.vx)
+              addBounceRandom(ball)
               ball.vx = -Math.abs(ball.vx)
 
               break
@@ -1337,16 +1424,20 @@ export function Arkanoid({ onComplete }: Props) {
               previousX - ball.radius >= brick.x + brick.width &&
               ball.x - ball.radius <= brick.x + brick.width
             ) {
-              ball.x = brick.x + brick.width + ball.radius
+              ball.x = brick.x + brick.width + ball.radius + BOUNCE_PUSH
 
+              ball.vx = Math.abs(ball.vx)
+              addBounceRandom(ball)
               ball.vx = Math.abs(ball.vx)
 
               break
             }
 
             if (previousY + ball.radius <= brick.y && ball.y + ball.radius >= brick.y) {
-              ball.y = brick.y - ball.radius
+              ball.y = brick.y - ball.radius - BOUNCE_PUSH
 
+              ball.vy = -Math.abs(ball.vy)
+              addBounceRandom(ball)
               ball.vy = -Math.abs(ball.vy)
 
               break
@@ -1356,8 +1447,10 @@ export function Arkanoid({ onComplete }: Props) {
               previousY - ball.radius >= brick.y + brick.height &&
               ball.y - ball.radius <= brick.y + brick.height
             ) {
-              ball.y = brick.y + brick.height + ball.radius
+              ball.y = brick.y + brick.height + ball.radius + BOUNCE_PUSH
 
+              ball.vy = Math.abs(ball.vy)
+              addBounceRandom(ball)
               ball.vy = Math.abs(ball.vy)
 
               break
@@ -1397,6 +1490,7 @@ export function Arkanoid({ onComplete }: Props) {
               }
             }
 
+            addBounceRandom(ball)
             break
           }
 
@@ -1411,6 +1505,11 @@ export function Arkanoid({ onComplete }: Props) {
           }
 
           ball.vy = -ball.vy
+
+          // Выталкиваем мяч из кирпича и чуть случайно меняем угол.
+          ball.x += Math.sign(ball.vx || 1) * BOUNCE_PUSH * 0.35
+          ball.y += Math.sign(ball.vy || -1) * BOUNCE_PUSH
+          addBounceRandom(ball)
 
           break
         }
@@ -1653,7 +1752,10 @@ export function Arkanoid({ onComplete }: Props) {
         } as CSSProperties
       }
     >
-      <div className="arkanoid__cabinet">
+      <div
+        className={`arkanoid__cabinet${machineHit ? ' arkanoid__cabinet--hit' : ''}`}
+        onClick={hitMachine}
+      >
         <img
           className="arkanoid__cabinet-image"
           src={layout.image}
@@ -1724,7 +1826,13 @@ export function Arkanoid({ onComplete }: Props) {
                     Пройдено уровней: {completedLevels} из {TOTAL_LEVELS}
                   </p>
 
-                  <button type="button" onClick={() => startGame(1)}>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      startGame(1)
+                    }}
+                  >
                     Попробовать снова
                   </button>
                 </div>
@@ -1742,11 +1850,23 @@ export function Arkanoid({ onComplete }: Props) {
                   </p>
 
                   {level < TOTAL_LEVELS ? (
-                    <button type="button" onClick={nextLevel}>
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        nextLevel()
+                      }}
+                    >
                       Следующий уровень
                     </button>
                   ) : (
-                    <button type="button" onClick={onComplete}>
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        onComplete()
+                      }}
+                    >
                       Завершить
                     </button>
                   )}

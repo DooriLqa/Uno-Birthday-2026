@@ -42,8 +42,6 @@
   box-shadow: 0 10px 25px rgba(23, 91, 117, 0.2);
   font-size: 0.78rem;
   pointer-events: auto;
-  scrollbar-color: #c99849 rgba(112, 66, 29, 0.08);
-  scrollbar-width: thin;
 }
 .dev-coin-controls__coin-actions {
   display: grid;
@@ -73,6 +71,31 @@
   gap: 5px;
   max-height: 230px;
   overflow: auto;
+}
+
+.dev-coin-controls__panel::-webkit-scrollbar,
+.dev-coin-controls__inventory::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dev-coin-controls__panel::-webkit-scrollbar-track,
+.dev-coin-controls__inventory::-webkit-scrollbar-track {
+  background: rgba(112, 66, 29, 0.08);
+}
+
+.dev-coin-controls__panel::-webkit-scrollbar-thumb,
+.dev-coin-controls__inventory::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #c99849;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .dev-coin-controls__panel,
+  .dev-coin-controls__inventory {
+    scrollbar-color: #c99849 rgba(112, 66, 29, 0.08);
+    scrollbar-width: thin;
+  }
 }
 .dev-coin-controls__inventory-row {
   display: grid;

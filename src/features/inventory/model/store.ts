@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import inventoryPickupSound from '@/shared/assets/common/audio/camping-tent-straightening.mp3'
+import { audioController } from '@/shared/lib/audio/audioController'
 import { BOOK_ITEMS } from './items'
 
 export type InventoryRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
@@ -27,17 +29,15 @@ type InventoryState = {
 }
 
 const LEGACY_TRAVEL_BOOK_ID = 'dog-island-travel-book'
+const BOOK_IDS = new Set(BOOK_ITEMS.map((book) => book.id))
 
-const withDefaultBooks = (items: InventoryItem[]) => {
-  const currentItems = items.filter((item) => item.id !== LEGACY_TRAVEL_BOOK_ID)
-  const currentIds = new Set(currentItems.map((item) => item.id))
-  return [...currentItems, ...BOOK_ITEMS.filter((book) => !currentIds.has(book.id))]
-}
+const withoutPreloadedBooks = (items: InventoryItem[]) =>
+  items.filter((item) => item.id !== LEGACY_TRAVEL_BOOK_ID && !BOOK_IDS.has(item.id))
 
 export const useInventoryStore = create<InventoryState>()(
   persist(
     (set, get) => ({
-      items: withDefaultBooks([]),
+      items: [],
       previewItemId: null,
       addItem: (item) => {
         const current = get().items.find((entry) => entry.id === item.id)
@@ -51,6 +51,7 @@ export const useInventoryStore = create<InventoryState>()(
             : [...state.items, { ...item, quantity: item.quantity ?? 1 }],
           previewItemId: shouldInspect ? item.id : state.previewItemId,
         }))
+        audioController.playOneShot(inventoryPickupSound)
         return nextQuantity
       },
       removeItem: (itemId, amount = 1) =>
@@ -68,11 +69,11 @@ export const useInventoryStore = create<InventoryState>()(
     }),
     {
       name: 'beach-party-inventory',
-      version: 1,
+      version: 2,
       partialize: (state) => ({ items: state.items }),
       migrate: (persistedState) => {
         const state = persistedState as Partial<InventoryState>
-        return { ...state, items: withDefaultBooks(state.items ?? []) }
+        return { ...state, items: withoutPreloadedBooks(state.items ?? []) }
       },
     },
   ),

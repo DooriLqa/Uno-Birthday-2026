@@ -8,6 +8,15 @@
 * {
   box-sizing: border-box;
 }
+
+*::-webkit-scrollbar,
+*::-webkit-scrollbar-button,
+*::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-track {
+  cursor: none !important;
+}
+
 body {
   min-width: 320px;
   min-height: 100vh;

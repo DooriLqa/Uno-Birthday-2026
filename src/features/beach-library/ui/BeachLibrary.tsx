@@ -47,6 +47,7 @@ export function BeachLibrary() {
       y: ((bounds.top - scene.top) / scene.height) * 100,
     })
     setHeld(id)
+    setStatus('Выбери место на полке, чтобы поставить книгу.')
   }
   const drop = (slot: number) => {
     if (held === null) return
