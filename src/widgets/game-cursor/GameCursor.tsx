@@ -92,6 +92,15 @@ export function GameCursor() {
       if (!frame && inside && !disposed) frame = requestAnimationFrame(render)
     }
 
+    const bringToFront = () => {
+      // Top-layer elements follow opening order, regardless of their z-index.
+      if (supportsPopover) {
+        if (layer.matches(':popover-open')) layer.hidePopover()
+        layer.showPopover()
+      }
+      schedule()
+    }
+
     const track = (event: PointerEvent) => {
       if (event.pointerType !== 'mouse') {
         leave()
@@ -141,6 +150,7 @@ export function GameCursor() {
     window.addEventListener('blur', leave)
     window.addEventListener('resize', schedule)
     window.addEventListener('game-cursor-refresh', schedule)
+    window.addEventListener('game-cursor-bring-to-front', bringToFront)
     return () => {
       disposed = true
       cancelAnimationFrame(frame)
@@ -157,6 +167,7 @@ export function GameCursor() {
       window.removeEventListener('blur', leave)
       window.removeEventListener('resize', schedule)
       window.removeEventListener('game-cursor-refresh', schedule)
+      window.removeEventListener('game-cursor-bring-to-front', bringToFront)
       if (supportsPopover && layer.matches(':popover-open')) layer.hidePopover()
     }
   }, [])
