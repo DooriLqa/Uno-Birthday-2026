@@ -536,25 +536,72 @@ h1 {
   pointer-events: none;
   user-select: none;
 }
-.game-overlay__bottom-exit {
+.game-overlay__exit-zone {
   position: fixed;
   z-index: 50;
   bottom: 0;
-  left: 0;
   width: clamp(30vw, 40vw, 800px);
-  height: clamp(10vh, 20vh, 300px);
+  height: clamp(8vh, 16vh, 300px);
   padding: 0;
   border: 0;
   background: transparent;
+}
+
+.game-overlay__exit-zone::before,
+.location-navigator__back-zone::before,
+.fishing-navigator__back-zone::before {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    var(--back-gradient-direction, to top),
+    rgba(26, 17, 8, 0.74),
+    rgba(35, 23, 13, 0.12) 25%,
+    rgba(35, 23, 13, 0.02) 40%,
+    transparent
+  );
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.game-overlay__exit-zone--left {
+  left: 0;
+  --back-gradient-direction: 25deg;
   --cursor-image: url('@/shared/assets/common/cursors/projected-back.png') 13 32, w-resize;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
-.game-overlay__bottom-exit:hover,
-.game-overlay__bottom-exit:focus-visible {
+
+.game-overlay__exit-zone--right {
+  right: 0;
+  --back-gradient-direction: 330deg;
+  --cursor-image: url('@/shared/assets/common/cursors/projected-back.png') 53 30, e-resize;
+  cursor: var(--cursor-rendering, var(--cursor-image));
+}
+
+.game-overlay__exit-zone:hover::before,
+.game-overlay__exit-zone:focus-visible::before,
+.location-navigator__back-zone:hover::before,
+.location-navigator__back-zone:focus-visible::before,
+.fishing-navigator__back-zone:hover::before,
+.fishing-navigator__back-zone:focus-visible::before {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-overlay__exit-zone::before,
+  .location-navigator__back-zone::before,
+  .fishing-navigator__back-zone::before {
+    transition: none;
+  }
+}
+
+.game-overlay__exit-zone:hover,
+.game-overlay__exit-zone:focus-visible {
   outline: none;
 }
 @media (max-width: 700px) {
-  .game-overlay__bottom-exit {
+  .game-overlay__exit-zone {
     width: 24vw;
     height: 16vh;
   }
