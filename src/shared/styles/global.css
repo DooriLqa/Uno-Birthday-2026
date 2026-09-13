@@ -642,6 +642,10 @@ h1 {
   height: calc(100dvh - 140px);
   margin: 0 auto;
 }
+
+.find-a-pair-page{
+  padding-top: 64px;
+}
 .game-overlay.book-shelf-page {
   padding: 84px 16px 24px;
   background-position: center;
