@@ -61,7 +61,7 @@ body {
 
   display: block;
 
-  object-fit: contain;
+  object-fit: fill;
   object-position: center center;
 
   z-index: 0;
@@ -104,7 +104,7 @@ body {
   position: absolute;
 
   left: 12%;
-  top: 21%;
+  top: 17%;
 
   width: 37%;
 
@@ -351,8 +351,8 @@ body {
     кнопка не перескакивает.
   */
 
-  left: 75%;
-  top: 82%;
+  left: 78%;
+  top: 78%;
 
   width: 20%;
 

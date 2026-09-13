@@ -268,3 +268,251 @@
   background: #514235;
   text-shadow: none;
 }
+
+/* =========================================================
+   ЭКРАН ПОДГОТОВКИ К ИГРЕ
+   ========================================================= */
+
+.arkanoid__overlay--setup {
+  background: rgba(18, 10, 6, 0.72);
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.arkanoid__setup {
+  width: min(760px, calc(100% - 36px));
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 22px 26px 20px;
+  border: 3px solid #c79b52;
+  border-radius: 6px;
+  background: linear-gradient(rgba(45, 27, 17, 0.96), rgba(31, 18, 11, 0.97));
+  box-shadow:
+    8px 8px 0 rgba(12, 6, 3, 0.65),
+    inset 0 0 0 2px #715032,
+    inset 0 0 28px rgba(237, 197, 117, 0.08);
+  color: #fff0cb;
+}
+
+.arkanoid__setup h2 {
+  margin: 0 0 16px;
+  color: #ffe099;
+  font-size: 28px;
+  line-height: 1.1;
+  text-shadow: 2px 2px 0 #713524;
+}
+
+.arkanoid__setup-section {
+  margin-top: 14px;
+}
+
+.arkanoid__setup-section h3 {
+  margin: 0 0 9px;
+  color: #edc575;
+  font-size: 18px;
+  text-shadow: 1px 1px 0 #432115;
+}
+
+.arkanoid__difficulty {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.arkanoid__difficulty-button {
+  min-width: 0;
+  min-height: 58px !important;
+  margin: 0;
+  padding: 8px 10px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 2px solid #8d6538 !important;
+  border-radius: 4px !important;
+  background: #3b2416 !important;
+  box-shadow:
+    3px 3px 0 rgba(24, 12, 7, 0.55),
+    inset 0 0 0 1px #5d3c25 !important;
+  color: #fff0cb !important;
+  text-shadow: 1px 1px 0 #432115 !important;
+}
+
+.arkanoid__difficulty-button strong {
+  font-size: 16px;
+}
+
+.arkanoid__difficulty-button span {
+  color: #d7b778;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.arkanoid__difficulty-button:hover:not(:disabled) {
+  background: #59321e !important;
+}
+
+.arkanoid__difficulty-button--active,
+.arkanoid__difficulty-button--active:hover:not(:disabled) {
+  border-color: #edc575 !important;
+  background: #843b27 !important;
+  box-shadow:
+    3px 3px 0 rgba(24, 12, 7, 0.55),
+    inset 0 0 0 2px #b7693a !important;
+}
+
+.arkanoid__difficulty-button--active span {
+  color: #ffe099;
+}
+
+.arkanoid__difficulty-description {
+  margin: 7px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #d7b778 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.arkanoid__buffs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.arkanoid__buff {
+  min-width: 0;
+  min-height: 88px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px;
+  border: 2px solid #715032;
+  border-radius: 4px;
+  background: rgba(24, 13, 8, 0.68);
+}
+
+.arkanoid__buff img {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.arkanoid__buff div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+
+.arkanoid__buff strong {
+  color: #edc575;
+  font-size: 13px;
+  line-height: 1.15;
+}
+
+.arkanoid__buff span {
+  color: #fff0cb;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.arkanoid__setup-status {
+  margin: 14px 0 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #d7b778 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.arkanoid__setup > button {
+  min-width: 220px;
+}
+
+/* Не даём клику по экрану подготовки доходить до корпуса автомата. */
+.arkanoid__overlay--setup,
+.arkanoid__overlay--setup * {
+  pointer-events: auto;
+}
+
+@media (max-width: 740px) {
+  .arkanoid__overlay--setup {
+    padding: 8px;
+  }
+
+  .arkanoid__setup {
+    width: min(100%, 680px);
+    padding: 14px;
+  }
+
+  .arkanoid__setup h2 {
+    margin-bottom: 10px;
+    font-size: 22px;
+  }
+
+  .arkanoid__setup-section {
+    margin-top: 9px;
+  }
+
+  .arkanoid__setup-section h3 {
+    margin-bottom: 6px;
+    font-size: 15px;
+  }
+
+  .arkanoid__difficulty {
+    gap: 5px;
+  }
+
+  .arkanoid__difficulty-button {
+    min-height: 48px !important;
+    padding: 6px !important;
+  }
+
+  .arkanoid__difficulty-button strong {
+    font-size: 13px;
+  }
+
+  .arkanoid__difficulty-button span {
+    font-size: 11px;
+  }
+
+  .arkanoid__buffs {
+    gap: 5px;
+  }
+
+  .arkanoid__buff {
+    min-height: 70px;
+    padding: 6px;
+    gap: 5px;
+  }
+
+  .arkanoid__buff img {
+    width: 27px;
+    height: 27px;
+    flex-basis: 27px;
+  }
+
+  .arkanoid__buff strong {
+    font-size: 10px;
+  }
+
+  .arkanoid__buff span {
+    font-size: 9px;
+  }
+
+  .arkanoid__setup-status {
+    margin: 9px 0 6px !important;
+    font-size: 11px !important;
+  }
+}
