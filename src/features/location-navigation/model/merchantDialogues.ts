@@ -60,6 +60,11 @@ export function tryEnterJungleCave(onOpenCrossword: () => void) {
 }
 
 function openQuizInvitation(onOpenQuiz: () => void) {
+  if (useInventoryStore.getState().items.some((item) => item.id === 'beach-radio')) {
+    onOpenQuiz()
+    return
+  }
+
   openDialogue({
     id: 'tourist-merchant-quiz',
     messages: [

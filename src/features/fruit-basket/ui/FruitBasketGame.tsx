@@ -1,7 +1,6 @@
 import { ArcadeDisplay } from '@/shared/ui/ArcadeDisplay'
 import { useArcadeCoin } from '@/shared/lib/arcade/useArcadeCoin'
 import { useEffect, useRef, useState } from 'react'
-import { usePawCoinStore } from '@/features/currency/model/store'
 import brickImage from '@/shared/assets/games/fruit-basket/brick.png'
 import buildingImage from '@/shared/assets/games/fruit-basket/building.png'
 import groundImage from '@/shared/assets/games/fruit-basket/ground.png'
@@ -163,11 +162,8 @@ export function FruitBasketGame({ onComplete }: Props) {
     return () => observer.disconnect()
   }, [])
 
-  const addPawCoins = usePawCoinStore((state) => state.addPawCoins)
-
   const gameRef = useRef(game)
   const completeRef = useRef(onComplete)
-  const addPawCoinsRef = useRef(addPawCoins)
 
   const nextId = useRef(0)
 
@@ -196,10 +192,6 @@ export function FruitBasketGame({ onComplete }: Props) {
   useEffect(() => {
     completeRef.current = onComplete
   }, [onComplete])
-
-  useEffect(() => {
-    addPawCoinsRef.current = addPawCoins
-  }, [addPawCoins])
 
   // Управление корзиной
   useEffect(() => {
@@ -545,7 +537,6 @@ export function FruitBasketGame({ onComplete }: Props) {
         const gameOver = lives <= 0
 
         if (won) {
-          addPawCoinsRef.current(1)
           completeRef.current()
         }
 
