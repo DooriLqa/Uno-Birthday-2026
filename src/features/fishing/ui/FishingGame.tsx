@@ -8,6 +8,7 @@ import {
 } from 'react'
 import { Fish as FishIcon } from 'lucide-react'
 import { usePawCoinStore } from '@/features/currency/model/store'
+import { useInventoryStore } from '@/features/inventory/model/store'
 import fishSheet from '@/shared/assets/games/fishing/fish-sheet.png'
 import {
   DISTANCE_LABELS,
@@ -21,6 +22,7 @@ import {
 } from '../model/fish'
 import { audioController } from '@/shared/lib/audio/audioController'
 import rod from '@/shared/assets/games/fishing/rod.png'
+import rodGold from '@/shared/assets/games/fishing/rod-gold.png'
 import bobber from '@/shared/assets/games/fishing/bobber.png'
 import fishingSound1 from '@/shared/assets/games/fishing/zabros.mp3'
 import './FishingGame.css'
@@ -32,7 +34,8 @@ type CatchResult = { fish: Fish; rarity: FishRarity; message: string }
 const BITE_MIN = 5000
 const BITE_MAX = 10000
 const BITE_WINDOW = 1000
-const GREEN_HEIGHT = 18
+const GREEN_HEIGHT_BASE = 18
+const GREEN_HEIGHT_GOLD = 23
 const STORAGE_KEY = 'fishing_catches'
 
 // Максимальный dt для защиты от "залипания" вкладки
@@ -66,6 +69,11 @@ const loadCatches = (): { common: number; uncommon: number } => {
 
 export function FishingGame({ onClose }: Props) {
   const addCoins = usePawCoinStore((state) => state.addPawCoins)
+  const hasGoldRod = useInventoryStore((state) =>
+    state.items.some((item) => item.id === 'fishing-rod-gold'),
+  )
+  const greenHeight = hasGoldRod ? GREEN_HEIGHT_GOLD : GREEN_HEIGHT_BASE
+  const activeRod = hasGoldRod ? rodGold : rod
 
   // Локальное состояние для рыбок
   const [catches, setCatches] = useState(() => loadCatches())
@@ -308,7 +316,7 @@ export function FishingGame({ onClose }: Props) {
       fishYRef.current = nextFish
 
       // Проверка попадания в зону
-      const inside = nextFish >= greenYRef.current && nextFish <= greenYRef.current + GREEN_HEIGHT
+      const inside = nextFish >= greenYRef.current && nextFish <= greenYRef.current + greenHeight
       catchRef.current = clamp(catchRef.current + (inside ? 14 : -12) * dt, 0, 100)
 
       // Обновление состояния
@@ -331,7 +339,7 @@ export function FishingGame({ onClose }: Props) {
     }
 
     fightFrameRef.current = requestAnimationFrame(tick)
-  }, [awardCatch, clearRoundTimers, returnRod, setPhase])
+  }, [awardCatch, clearRoundTimers, greenHeight, returnRod, setPhase])
 
   const triggerBite = useCallback(() => {
     if (phaseRef.current !== 'waiting') return
@@ -521,7 +529,7 @@ export function FishingGame({ onClose }: Props) {
         className={`fishing-rod fishing-rod--${phase}`}
         style={{ '--rod-jerk': `${rodJerk}px` } as CSSProperties}
       >
-        <img className="fishing-rod-image" src={rod} alt="" />
+        <img className="fishing-rod-image" src={activeRod} alt="" />
         {/* Якорь на кончике удилища — двигается вместе с .fishing-rod */}
         <span className="fishing-rod-tip" aria-hidden="true" />
       </div>
@@ -593,7 +601,7 @@ export function FishingGame({ onClose }: Props) {
                 <div className="fishing-fight__water-lines" />
                 <div
                   className="fishing-fight__green"
-                  style={{ top: `${greenY}%`, height: `${GREEN_HEIGHT}%` }}
+                  style={{ top: `${greenY}%`, height: `${greenHeight}%` }}
                 />
                 <div className="fishing-fight__fish" style={{ top: `${fishY}%` }}>
                   <FishIcon size={34} />

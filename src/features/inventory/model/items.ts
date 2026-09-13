@@ -19,6 +19,7 @@ import libraryNoteIcon from '@/shared/assets/features/inventory/paper-icons/libr
 import oilLanternArtwork from '@/shared/assets/features/inventory/lantern/oil-lantern.png'
 import pataponArtwork from '@/shared/assets/features/inventory/patapon/patapon.png'
 import pataponIcon from '@/shared/assets/features/inventory/patapon/patapon-icon.png'
+import fishingRodGoldArtwork from '@/shared/assets/games/fishing/rod-gold.png'
 
 export type CafeDrinkId =
   | 'espresso'
@@ -106,6 +107,15 @@ export const STUPID_BADGE: InventoryItem = {
   description: `Значок с надписью «I'm sorry, I was born stupid».`,
 }
 
+export const FISHING_ROD: InventoryItem = {
+  id: 'fishing-rod-gold',
+  name: 'Золотая удочка',
+  icon: '🎣',
+  rarity: 'legendary',
+  inspectable: true,
+  description: 'Позолоченная удочка, которая увеличивает зелёную зону при борьбе с рыбой.',
+}
+
 export const ARCADE_REWARDS_BY_GAME_ID: Readonly<Record<string, InventoryItem>> = {
   'flappy-bird': {
     id: 'arcade-pin-dachshund-red',
@@ -152,6 +162,7 @@ const BOOK_PICKUP_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
 const ITEM_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
   'oil-lantern': oilLanternArtwork,
   [STUPID_BADGE.id]: stupidBadgeArtwork,
+  [FISHING_ROD.id]: fishingRodGoldArtwork,
   patapon: pataponIcon,
   'shiba-treasure-map': islandMapIcon,
   'beach-library-page-0': libraryPageIcon,
@@ -180,6 +191,7 @@ export const isArcadeKeychain = (itemId: string) => itemId in ARCADE_REWARDS_BY_
 
 const ITEM_DEFINITIONS_BY_ID: Readonly<Record<string, InventoryItem>> = {
   [STUPID_BADGE.id]: STUPID_BADGE,
+  [FISHING_ROD.id]: FISHING_ROD,
   ...Object.fromEntries(Object.values(GAME_REWARDS_BY_GAME_ID).map((item) => [item.id, item])),
   ...ARCADE_REWARDS_BY_ITEM_ID,
   ...Object.fromEntries(BOOK_ITEMS.map((item) => [item.id, item])),
