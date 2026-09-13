@@ -37,16 +37,16 @@ export function GamePage({ game, onBack, onOpenRadio }: Props) {
       </div>
       <button
         type="button"
-        className="game-overlay__exit-zone game-overlay__exit-zone--left"
+        className="game-overlay__exit-zone game-overlay__exit-zone--back"
         onClick={onBack}
         aria-label="Вернуться в предыдущую локацию слева"
       />
-      <button
+      {/* <button
         type="button"
         className="game-overlay__exit-zone game-overlay__exit-zone--right"
         onClick={onBack}
         aria-label="Вернуться в предыдущую локацию справа"
-      />
+      /> */}
     </main>
   )
 }

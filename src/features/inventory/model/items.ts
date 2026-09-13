@@ -15,6 +15,7 @@ import islandMapIcon from '@/shared/assets/features/inventory/paper-icons/island
 import libraryPageIcon from '@/shared/assets/features/inventory/paper-icons/library-page.png'
 import libraryHintIcon from '@/shared/assets/features/inventory/paper-icons/library-hint.png'
 import libraryNoteIcon from '@/shared/assets/features/inventory/paper-icons/library-note.png'
+import oilLanternArtwork from '@/shared/assets/features/inventory/lantern/oil-lantern.png'
 import pataponArtwork from '@/shared/assets/features/inventory/patapon/patapon.png'
 import pataponIcon from '@/shared/assets/features/inventory/patapon/patapon-icon.png'
 
@@ -139,6 +140,7 @@ const BOOK_PICKUP_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
 }
 
 const ITEM_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
+  'oil-lantern': oilLanternArtwork,
   patapon: pataponIcon,
   'shiba-treasure-map': islandMapIcon,
   'beach-library-page-0': libraryPageIcon,

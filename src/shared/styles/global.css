@@ -540,8 +540,8 @@ h1 {
   position: fixed;
   z-index: 50;
   bottom: 0;
-  width: clamp(30vw, 40vw, 800px);
-  height: clamp(8vh, 16vh, 300px);
+  width: 100vw;
+  height: clamp(8vh, 14vh, 300px);
   padding: 0;
   border: 0;
   background: transparent;
@@ -554,8 +554,8 @@ h1 {
   inset: 0;
   background: linear-gradient(
     var(--back-gradient-direction, to top),
-    rgba(26, 17, 8, 0.74),
-    rgba(35, 23, 13, 0.12) 25%,
+    rgba(26, 17, 8, 0.94),
+    rgba(35, 23, 13, 0.12) 29%,
     rgba(35, 23, 13, 0.02) 40%,
     transparent
   );
@@ -565,9 +565,9 @@ h1 {
   transition: opacity 160ms ease;
 }
 
-.game-overlay__exit-zone--left {
+.game-overlay__exit-zone--back {
   left: 0;
-  --back-gradient-direction: 25deg;
+  --back-gradient-direction: to top;
   --cursor-image: url('@/shared/assets/common/cursors/projected-back.png') 13 32, w-resize;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
