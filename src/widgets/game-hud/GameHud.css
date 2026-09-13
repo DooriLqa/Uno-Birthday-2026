@@ -496,6 +496,8 @@
   min-height: 0;
   object-fit: contain;
   filter: drop-shadow(0 14px 12px rgba(92, 48, 20, 0.24));
+  user-select: none; /* Запрещает выделение картинки */
+  pointer-events: none;
 }
 
 .inventory-preview__fallback {
