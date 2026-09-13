@@ -20,7 +20,7 @@ import { MAP_ITEM_ID } from '@/features/location-navigation/model/merchantDialog
 import './GameHud.css'
 import coin from '@/shared/assets/common/branding/coin.png'
 
-const INVENTORY_COLUMNS = 2
+const INVENTORY_VISIBLE_SLOTS = 5
 const RADIO_ITEM_ID = 'beach-radio'
 const CORRECT_STATION_ID = 'station-06'
 
@@ -53,10 +53,7 @@ export function GameHud({
   const setPowered = useRadioStore((state) => state.setPowered)
   const setVolume = useRadioStore((state) => state.setVolume)
   const radioFound = discoveredStationIds.includes(CORRECT_STATION_ID)
-  const renderedSlotCount = Math.max(
-    INVENTORY_COLUMNS,
-    inventory.length + (inventory.length % INVENTORY_COLUMNS),
-  )
+  const renderedSlotCount = Math.max(INVENTORY_VISIBLE_SLOTS, inventory.length)
   const emptySlotCount = renderedSlotCount - inventory.length
   const previewItem = inventory.find((item) => item.id === previewItemId) ?? null
 

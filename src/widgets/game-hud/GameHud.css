@@ -85,7 +85,7 @@
   flex-direction: column;
   align-items: stretch;
   gap: 7px;
-  width: 186px;
+  width: 120px;
   padding: 10px 11px 12px;
   border-radius: 18px;
   font-weight: 900;
@@ -102,16 +102,32 @@
 
 .game-hud__slots {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   grid-auto-rows: 68px;
   gap: 8px;
-  max-height: 296px;
+  /* Five slots, four gaps, and vertical padding. */
+  max-height: calc(5 * 68px + 4 * 8px + 7px);
   padding: 2px 2px 5px;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-gutter: stable;
-  scrollbar-color: #c99849 rgba(112, 66, 29, 0.08);
-  scrollbar-width: thin;
+  scrollbar-color: #a96d24 #ead8b4;
+  scrollbar-width: auto;
+}
+
+.game-hud__slots::-webkit-scrollbar {
+  width: 12px;
+}
+
+.game-hud__slots::-webkit-scrollbar-track {
+  background: #ead8b4;
+  border-radius: 8px;
+}
+
+.game-hud__slots::-webkit-scrollbar-thumb {
+  background: #a96d24;
+  border: 2px solid #ead8b4;
+  border-radius: 8px;
 }
 
 .game-hud__slot {
@@ -614,14 +630,14 @@
   }
 
   .game-hud__inventory {
-    width: 154px;
+    width: 94px;
   }
 
   .game-hud__slots {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     grid-auto-rows: 54px;
     gap: 7px;
-    max-height: 237px;
+    max-height: calc(5 * 54px + 4 * 7px + 7px);
   }
 
   .game-hud__map-button {
