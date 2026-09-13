@@ -16,5 +16,21 @@ export const useWorldStore = create<WorldState>()(
     history: [],
     setScene: (scene) => set({ scene }),
     setHistory: (history) => set({ history }),
-  }), { name: 'tourist-world-v1' }),
+  }), {
+    name: 'tourist-world-v1',
+    version: 1,
+    migrate: (persistedState) => {
+      const state = persistedState as {
+        scene: { locationId: string; pan: number }
+        history: { locationId: string; pan: number }[]
+      }
+      return {
+        ...state,
+        scene: state.scene.locationId === 'arcades'
+          ? { locationId: 'shop', pan: 0.5 }
+          : state.scene,
+        history: state.history.filter((scene) => scene.locationId !== 'arcades'),
+      } as Pick<WorldState, 'scene' | 'history'>
+    },
+  }),
 )

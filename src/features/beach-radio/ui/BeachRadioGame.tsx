@@ -100,7 +100,7 @@ export function BeachRadioGame({ onComplete, onOpenRadio, onClose }: Props) {
         className={`beach-radio-dialog ${dialogStep === 'quiz' ? 'beach-radio-dialog--quiz' : ''}`}
         aria-live="polite"
       >
-        {dialogStep === 'seller' && (
+        {(dialogStep === 'seller' || dialogStep === 'win') && (
           <button
             type="button"
             className="beach-radio-quiz-close"
