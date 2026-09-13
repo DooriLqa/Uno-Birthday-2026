@@ -12,6 +12,8 @@ type Props = {
 
 type Cell = 'empty' | 'filled' | 'cross'
 
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+
 const JAPANSK_BOARD_STORAGE_KEY = 'japonsk-board-v1'
 
 const solution = [
@@ -144,7 +146,7 @@ export function Japonsk({ onComplete }: Props) {
     })
   }
 
-  const checkSolution = () => {
+  const checkSolution = async () => {
     for (let row = 0; row < solution.length; row++) {
       for (let column = 0; column < solution[row].length; column++) {
         const shouldBeFilled = solution[row][column] === 1
@@ -160,6 +162,9 @@ export function Japonsk({ onComplete }: Props) {
     playOneShotSound(WIN_SOUND, WIN_SOUND_KEY, 0.1)
 
     setShowKeyBall(true)
+
+    await wait(1500)
+
     onComplete()
   }
 
