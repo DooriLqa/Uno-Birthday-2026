@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Clapperboard,
-  Map as MapIcon,
   Radio as RadioIcon,
   Volume2,
 } from 'lucide-react'
@@ -43,6 +42,7 @@ export function GameHud({
 }: Props) {
   const pawCoins = usePawCoinStore((state) => state.pawCoins)
   const inventory = useInventoryStore((state) => state.items)
+  const hasMap = inventory.some((item) => item.id === MAP_ITEM_ID)
   const previewItemId = useInventoryStore((state) => state.previewItemId)
   const openItemPreview = useInventoryStore((state) => state.openItemPreview)
   const closeItemPreview = useInventoryStore((state) => state.closeItemPreview)
@@ -60,7 +60,11 @@ export function GameHud({
   return (
     <div className="game-hud" aria-label="Игровой интерфейс">
       <div className="game-hud__left">
-        {onOpenMap && (
+        <div className="game-hud__coins" title="Монетки с лапкой">
+          <img className="game-hud__coin" src={coin} alt="" />
+          <strong>{pawCoins}</strong>
+        </div>
+        {onOpenMap && hasMap && (
           <button
             type="button"
             className={`game-hud__map-button ${mapOpen ? 'is-open' : ''}`}
@@ -68,13 +72,14 @@ export function GameHud({
             aria-label={mapOpen ? 'Закрыть карту' : 'Открыть карту'}
             title={mapOpen ? 'Закрыть карту' : 'Открыть карту'}
           >
-            <MapIcon size={20} />
+            <img
+              className="game-hud__map-button-image"
+              src={getInventoryItemArtwork(MAP_ITEM_ID)}
+              alt=""
+              aria-hidden="true"
+            />
           </button>
         )}
-        <div className="game-hud__coins" title="Монетки с лапкой">
-          <img className="game-hud__coin" src={coin} alt="" />
-          <strong>{pawCoins}</strong>
-        </div>
       </div>
       <div className="game-hud__right">
         <div className="game-hud__inventory" aria-label="Инвентарь">

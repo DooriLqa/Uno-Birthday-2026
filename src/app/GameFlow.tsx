@@ -66,6 +66,7 @@ export function GameFlow() {
     <main className="island-map-page">
       {mapOpen && (
         <GameIslandMap
+          onClose={() => setMapOpen(false)}
           onOpenRegion={(entry) => {
             playOneShotSound(locations[entry].transitionSound)
             setScene({ locationId: entry, pan: 0.5 })
