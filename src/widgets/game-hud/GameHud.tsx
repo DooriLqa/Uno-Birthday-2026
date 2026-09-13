@@ -267,6 +267,7 @@ function InventoryPreview({ item, onClose }: { item: InventoryItem; onClose: () 
   const artwork = getInventoryItemPreviewArtwork(item.id)
   const bookPages = presentation.kind === 'book' ? (presentation.pages ?? []) : []
   const isBook = bookPages.length > 0
+  const isKeychain = isArcadeKeychain(item.id)
 
   const showPreviousPage = () => setPageIndex((current) => Math.max(0, current - 1))
   const showNextPage = () => setPageIndex((current) => Math.min(bookPages.length - 1, current + 1))
@@ -347,6 +348,16 @@ function InventoryPreview({ item, onClose }: { item: InventoryItem; onClose: () 
               </span>
             </nav>
           </div>
+        ) : artwork && isKeychain ? (
+          <button
+            type="button"
+            className="inventory-preview__keychain"
+            onClick={onClose}
+            aria-label={`Закрыть просмотр: ${presentation.name}`}
+            title="Закрыть"
+          >
+            <img className="inventory-preview__image" src={artwork} alt={presentation.name} />
+          </button>
         ) : artwork ? (
           <img className="inventory-preview__image" src={artwork} alt={presentation.name} />
         ) : (

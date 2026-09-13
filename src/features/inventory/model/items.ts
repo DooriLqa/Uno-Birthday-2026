@@ -184,7 +184,7 @@ const ITEM_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
 }
 
 const ARCADE_REWARDS_BY_ITEM_ID = Object.fromEntries(
-  Object.values(ARCADE_REWARDS_BY_GAME_ID).map((item) => [item.id, item]),
+  Object.values(GAME_REWARDS_BY_GAME_ID).map((item) => [item.id, item]),
 ) as Readonly<Record<string, InventoryItem>>
 
 export const isArcadeKeychain = (itemId: string) => itemId in ARCADE_REWARDS_BY_ITEM_ID

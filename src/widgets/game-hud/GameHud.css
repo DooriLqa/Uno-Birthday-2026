@@ -500,6 +500,18 @@
   pointer-events: none;
 }
 
+.inventory-preview__keychain {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
+  cursor: var(--cursor-rendering, var(--cursor-image));
+}
+
 .inventory-preview__fallback {
   display: grid;
   place-items: center;
