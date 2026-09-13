@@ -96,6 +96,11 @@
   font-size: 16px;
 }
 
+/* .button-cursor {
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 53 30, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
+} */
+
 .arkanoid__overlay button {
   min-height: 48px;
   max-width: calc(100% - 40px);
@@ -111,7 +116,8 @@
   font-size: 16px;
   font-weight: 800;
   text-shadow: 2px 2px 0 #432115;
-  cursor: pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 5, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
   transition:
     background 120ms ease,
     transform 120ms ease,
