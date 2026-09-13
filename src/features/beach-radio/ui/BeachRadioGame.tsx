@@ -145,7 +145,7 @@ export function BeachRadioGame({ onComplete, onOpenRadio, onClose }: Props) {
             {quizError && <div className="beach-radio-dialog__error">{quizError}</div>}
             {showDevHint && (
               <div className="beach-radio-dialog__hint">
-                Монетки с лапкой — общая валюта для будущих мини-игр.
+                Монетки с лапкой — общая валюта для мини-игр.
               </div>
             )}
           </>
