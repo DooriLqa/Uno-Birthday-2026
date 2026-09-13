@@ -44,6 +44,13 @@
   transform: translateY(-1px);
 }
 
+.game-hud__map-button-image {
+  display: block;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
 .game-hud__coins {
   display: flex;
   align-items: center;
