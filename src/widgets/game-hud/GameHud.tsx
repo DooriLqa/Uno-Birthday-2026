@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import {
-  Clapperboard,
-  Radio as RadioIcon,
-  Volume2,
-} from 'lucide-react'
+import { Clapperboard, Radio as RadioIcon, Volume2 } from 'lucide-react'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore, type InventoryItem } from '@/features/inventory/model/store'
 import {
@@ -18,6 +14,7 @@ import { useLibraryPages } from '@/features/beach-library/model/pagesStore'
 import { MAP_ITEM_ID } from '@/features/location-navigation/model/merchantDialogues'
 import './GameHud.css'
 import coin from '@/shared/assets/common/branding/coin.png'
+import radioIcon from '@/shared/assets/features/inventory/paper-icons/radio-icon.png'
 
 const INVENTORY_VISIBLE_SLOTS = 5
 const RADIO_ITEM_ID = 'beach-radio'
@@ -143,7 +140,8 @@ export function GameHud({
         )}
       </div>
       {previewItem && <InventoryPreview item={previewItem} onClose={closeItemPreview} />}
-      {showCreditsButton && onToggleCredits &&
+      {showCreditsButton &&
+        onToggleCredits &&
         createPortal(
           <button
             type="button"
@@ -209,7 +207,7 @@ function InventorySlot({
         title="Открыть радиоприёмник"
         aria-label="Открыть радиоприёмник"
       >
-        <RadioIcon size={28} />
+        <img className="radio-icon" src={radioIcon} />
       </button>
     )
   }
