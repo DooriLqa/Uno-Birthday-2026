@@ -61,7 +61,7 @@ export const librarianCompletionDialogue: Dialogue = {
       id: 'letter',
       speaker,
       emotion: 'happy',
-      text: 'Спасибо за помощь с уборкой! Теперь здесь полный "порядок".Вот письмо, о котором я говорила.',
+      text: 'Спасибо за помощь с уборкой! Теперь здесь полный "порядок". Вот письмо, о котором я говорила.',
     },
     {
       id: 'letter-response',

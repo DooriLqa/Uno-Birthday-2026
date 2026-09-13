@@ -73,7 +73,7 @@ function openQuizInvitation(onOpenQuiz: () => void) {
         id: 'start',
         speaker: merchant,
         emotion: 'happy',
-        text: 'Приступим! Правила и кнопка начала — на следующем экране.',
+        text: 'Приступим!',
         onComplete: onOpenQuiz,
       },
     ],
