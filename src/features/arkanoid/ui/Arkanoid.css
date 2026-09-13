@@ -77,7 +77,7 @@
   align-items: center;
   justify-content: center;
 
-  gap: 12px;
+  gap: 10px;
 
   background: rgba(24, 15, 10, 0.84);
   color: #fff0cb;
@@ -280,11 +280,12 @@
 }
 
 .arkanoid__setup {
-  width: min(760px, calc(100% - 36px));
-  max-height: calc(100% - 24px);
-  overflow-y: auto;
+  width: min(900px, calc(100% - 20px));
+  max-height: calc(100% - 8px);
+  overflow: hidden;
   box-sizing: border-box;
-  padding: 22px 26px 20px;
+  transform: translateY(1.5vh);
+  padding: 16px 20px 14px;
   border: 3px solid #c79b52;
   border-radius: 6px;
   background: linear-gradient(rgba(45, 27, 17, 0.96), rgba(31, 18, 11, 0.97));
@@ -296,15 +297,31 @@
 }
 
 .arkanoid__setup h2 {
-  margin: 0 0 16px;
+  margin: 0;
   color: #ffe099;
   font-size: 28px;
   line-height: 1.1;
   text-shadow: 2px 2px 0 #713524;
 }
 
+.arkanoid__difficulty-progress-top {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0 0 6px;
+  color: #ffe099;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 1px 1px 0 #432115;
+}
+
 .arkanoid__setup-section {
-  margin-top: 14px;
+  margin-top: 8px;
+}
+
+.arkanoid__setup-section--difficulty {
+  margin-top: 0;
 }
 
 .arkanoid__setup-section h3 {
@@ -386,21 +403,21 @@
 
 .arkanoid__buff {
   min-width: 0;
-  min-height: 88px;
+  min-height: 92px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 9px;
+  gap: 10px;
+  padding: 8px;
   border: 2px solid #715032;
   border-radius: 4px;
   background: rgba(24, 13, 8, 0.68);
 }
 
 .arkanoid__buff img {
-  width: 34px;
-  height: 34px;
-  flex: 0 0 34px;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
   object-fit: contain;
   image-rendering: auto;
 }
@@ -415,13 +432,13 @@
 
 .arkanoid__buff strong {
   color: #edc575;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.15;
 }
 
 .arkanoid__buff span {
   color: #fff0cb;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.25;
 }
 
@@ -453,12 +470,12 @@
 
   .arkanoid__setup {
     width: min(100%, 680px);
-    padding: 14px;
+    padding: 10px;
   }
 
-  .arkanoid__setup h2 {
-    margin-bottom: 10px;
-    font-size: 22px;
+  .arkanoid__difficulty-progress-top {
+    margin-bottom: 4px;
+    font-size: 10px;
   }
 
   .arkanoid__setup-section {
@@ -492,27 +509,109 @@
   }
 
   .arkanoid__buff {
-    min-height: 70px;
+    min-height: 82px;
     padding: 6px;
     gap: 5px;
   }
 
   .arkanoid__buff img {
-    width: 27px;
-    height: 27px;
-    flex-basis: 27px;
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
   }
 
   .arkanoid__buff strong {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .arkanoid__buff span {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .arkanoid__setup-status {
     margin: 9px 0 6px !important;
     font-size: 11px !important;
   }
+}
+
+.arkanoid__difficulty-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.65);
+}
+
+.arkanoid__difficulty-button:disabled:hover {
+  transform: none;
+}
+
+.arkanoid__difficulty-progress {
+  margin: 8px 0 0;
+  font-size: 12px;
+  opacity: 0.7;
+  text-align: center;
+}
+
+.arkanoid__hp-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 90px;
+  padding: 14px 18px;
+  box-sizing: border-box;
+
+  border: 2px solid #715032;
+  border-radius: 4px;
+
+  background: rgba(24, 13, 8, 0.68);
+}
+
+.arkanoid__hp-preview {
+  min-width: 150px;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+
+  border: 2px solid #5a071c;
+  border-radius: 6px;
+
+  background: rgba(10, 5, 4, 0.8);
+}
+
+.arkanoid__hp-dot {
+  width: 14px;
+  height: 14px;
+
+  border-radius: 50%;
+
+  background: #ff2f5f;
+  border: 3px solid #5a071c;
+
+  box-shadow:
+    0 0 8px #ff2f5f,
+    0 0 16px rgba(255, 105, 180, 0.65);
+}
+
+.arkanoid__hp-text {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  text-align: left;
+}
+
+.arkanoid__hp-text strong {
+  color: #edc575;
+  font-size: 15px;
+  line-height: 1.15;
+}
+
+.arkanoid__hp-text span {
+  color: #fff0cb;
+  font-size: 12px;
+  line-height: 1.3;
 }

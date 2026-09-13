@@ -28,6 +28,10 @@ import powerUpFireImage from '@/shared/assets/games/arkanoid/powerup-fire.png'
 import powerUpFallWideImage from '@/shared/assets/games/arkanoid/fallpowerup-wide.png'
 import powerUpFallTripleImage from '@/shared/assets/games/arkanoid/fallpowerup-triple.png'
 import powerUpFallFireImage from '@/shared/assets/games/arkanoid/fallpowerup-fire.png'
+import powerUpWideImage_guide from '@/shared/assets/games/arkanoid/powerup-wide_guide.png'
+import powerUpTripleImage_guide from '@/shared/assets/games/arkanoid/powerup-triple_guide.png'
+import powerUpFireImage_guide from '@/shared/assets/games/arkanoid/powerup-fire_guide.png'
+
 import fireBallImage from '@/shared/assets/games/arkanoid/fire-ball.png'
 
 import './Arkanoid.css'
@@ -53,21 +57,33 @@ type PowerUpType = 'wide' | 'triple' | 'fire'
 
 type Difficulty = 'easy' | 'normal' | 'hard'
 
-const DIFFICULTIES: Record<Difficulty, { label: string; lives: number; description: string }> = {
+const DIFFICULTY_PROGRESS_KEY = 'arkanoid-difficulty-progress-v1'
+
+type DifficultyProgress = {
+  losses: number
+}
+
+const DIFFICULTIES: Record<
+  Difficulty,
+  { label: string; lives: number; description: string; unlockLosses: number }
+> = {
   easy: {
     label: 'Легко',
-    lives: 5,
-    description: '5 HP — больше права на ошибку',
+    lives: 7,
+    description: '7 HP — давай ты сможешь, верь в себя зайка, верь!',
+    unlockLosses: 3,
   },
   normal: {
     label: 'Нормально',
-    lives: 3,
-    description: '3 HP — стандартная сложность',
+    lives: 5,
+    description: '5 HP — вам засчитают прохождения на Тянукусе',
+    unlockLosses: 1,
   },
   hard: {
     label: 'Сложно',
-    lives: 1,
-    description: '1 HP — одна ошибка и игра окончена',
+    lives: 3,
+    description: '3 HP — подойдет, если вы играли в патапон',
+    unlockLosses: 0,
   },
 }
 
@@ -468,6 +484,31 @@ function loadProgress() {
   }
 }
 
+function loadDifficultyProgress(): DifficultyProgress {
+  try {
+    const saved = localStorage.getItem(DIFFICULTY_PROGRESS_KEY)
+
+    if (!saved) {
+      return { losses: 0 }
+    }
+
+    const progress = JSON.parse(saved) as Partial<DifficultyProgress>
+    return {
+      losses: typeof progress.losses === 'number' && progress.losses >= 0 ? progress.losses : 0,
+    }
+  } catch {
+    return { losses: 0 }
+  }
+}
+
+function saveDifficultyProgress(losses: number) {
+  localStorage.setItem(DIFFICULTY_PROGRESS_KEY, JSON.stringify({ losses }))
+}
+
+function isDifficultyUnlocked(difficulty: Difficulty, losses: number) {
+  return losses >= DIFFICULTIES[difficulty].unlockLosses
+}
+
 function saveProgress(currentLevel: number, unlockedLevel: number, completed: boolean) {
   localStorage.setItem(
     STORAGE_KEY,
@@ -590,7 +631,9 @@ export function Arkanoid({ onComplete }: Props) {
 
   const [started, setStarted] = useState(false)
   const [completedLevels, setCompletedLevels] = useState(0)
-  const [difficulty, setDifficulty] = useState<Difficulty>('normal')
+  const [difficulty, setDifficulty] = useState<Difficulty>('hard')
+  const [difficultyLosses, setDifficultyLosses] = useState(() => loadDifficultyProgress().losses)
+  const [showSetup, setShowSetup] = useState(true)
 
   const [, setActivePowerUps] = useState<PowerUpType[]>([])
 
@@ -616,6 +659,9 @@ export function Arkanoid({ onComplete }: Props) {
       powerUpWideImage,
       powerUpTripleImage,
       powerUpFireImage,
+      powerUpWideImage_guide,
+      powerUpTripleImage_guide,
+      powerUpFireImage_guide,
     ]
 
     for (const src of images) {
@@ -1054,14 +1100,28 @@ export function Arkanoid({ onComplete }: Props) {
 
       if (game.lives <= 0) {
         const passedLevels = Math.max(0, game.level - 1)
+        const nextLosses = difficultyLosses + 1
 
         game.running = false
         game.gameOver = true
 
         setCompletedLevels(passedLevels)
         playSound('gameOver')
-        setGameOver(true)
+        setGameOver(false)
+        setShowSetup(true)
 
+        setDifficultyLosses(nextLosses)
+        saveDifficultyProgress(nextLosses)
+
+        const newGame = createInitialGame(1, DIFFICULTIES[difficulty].lives)
+        newGame.running = false
+        newGame.started = false
+        gameRef.current = newGame
+
+        setLevel(1)
+        setSelectedLevel(1)
+        setLives(DIFFICULTIES[difficulty].lives)
+        setStarted(false)
         setSessionPaid(false)
 
         // После потери всех жизней прогресс полностью сбрасывается.
@@ -1101,7 +1161,7 @@ export function Arkanoid({ onComplete }: Props) {
 
       game.powerUps = []
     },
-    [playSound],
+    [difficulty, difficultyLosses, playSound],
   )
 
   const hitBrick = useCallback(
@@ -1614,16 +1674,23 @@ export function Arkanoid({ onComplete }: Props) {
     [difficulty, unlockedLevel],
   )
 
-  const selectDifficulty = useCallback((value: Difficulty) => {
-    setDifficulty(value)
+  const selectDifficulty = useCallback(
+    (value: Difficulty) => {
+      if (!isDifficultyUnlocked(value, difficultyLosses)) {
+        return
+      }
 
-    const game = gameRef.current
+      setDifficulty(value)
 
-    if (game && !game.running && !game.started) {
-      game.lives = DIFFICULTIES[value].lives
-      setLives(game.lives)
-    }
-  }, [])
+      const game = gameRef.current
+
+      if (game && !game.running && !game.started) {
+        game.lives = DIFFICULTIES[value].lives
+        setLives(game.lives)
+      }
+    },
+    [difficultyLosses],
+  )
 
   const launchPaidBall = useCallback(() => {
     const game = gameRef.current
@@ -1640,9 +1707,6 @@ export function Arkanoid({ onComplete }: Props) {
 
     const speed = getBallSpeed(game.level)
 
-    game.lives = DIFFICULTIES[difficulty].lives
-    setLives(game.lives)
-
     playSound('launch')
 
     ball.x = game.paddle.x + game.paddle.width / 2
@@ -1654,6 +1718,7 @@ export function Arkanoid({ onComplete }: Props) {
     game.running = true
     game.started = true
     setStarted(true)
+    setShowSetup(false)
   }, [difficulty, playSound])
 
   const launchBall = useCallback(() => {
@@ -1830,89 +1895,130 @@ export function Arkanoid({ onComplete }: Props) {
 
               {!started && !won && !gameOver && (
                 <div
-                  className="arkanoid__overlay arkanoid__overlay--ready arkanoid__overlay--setup"
+                  className={`arkanoid__overlay arkanoid__overlay--ready${showSetup ? ' arkanoid__overlay--setup' : ''}`}
                   onClick={(event) => event.stopPropagation()}
                 >
-                  <div className="arkanoid__setup">
-                    <h2>Подготовка к игре</h2>
-
-                    <section className="arkanoid__setup-section">
-                      <h3>Сложность</h3>
-
-                      <div className="arkanoid__difficulty">
-                        {(
-                          Object.entries(DIFFICULTIES) as [
-                            Difficulty,
-                            (typeof DIFFICULTIES)[Difficulty],
-                          ][]
-                        ).map(([key, option]) => (
-                          <button
-                            key={key}
-                            type="button"
-                            className={`arkanoid__difficulty-button${
-                              difficulty === key ? ' arkanoid__difficulty-button--active' : ''
-                            }`}
-                            onClick={() => selectDifficulty(key)}
-                          >
-                            <strong>{option.label}</strong>
-                            <span>{option.lives} HP</span>
-                          </button>
-                        ))}
+                  {showSetup ? (
+                    <div className="arkanoid__setup">
+                      <div className="arkanoid__difficulty-progress-top">
+                        Поражений: {difficultyLosses} / 3
                       </div>
 
-                      <p className="arkanoid__difficulty-description">
-                        {DIFFICULTIES[difficulty].description}
+                      <section className="arkanoid__setup-section arkanoid__setup-section--difficulty">
+                        <h3>Сложность</h3>
+
+                        <div className="arkanoid__difficulty">
+                          {(
+                            Object.entries(DIFFICULTIES) as [
+                              Difficulty,
+                              (typeof DIFFICULTIES)[Difficulty],
+                            ][]
+                          ).map(([key, option]) => (
+                            <button
+                              key={key}
+                              type="button"
+                              className={`arkanoid__difficulty-button${
+                                difficulty === key ? ' arkanoid__difficulty-button--active' : ''
+                              }`}
+                              onClick={() => selectDifficulty(key)}
+                              disabled={!isDifficultyUnlocked(key, difficultyLosses)}
+                            >
+                              <strong>
+                                {isDifficultyUnlocked(key, difficultyLosses)
+                                  ? option.label
+                                  : `🔒 ${option.label}`}
+                              </strong>
+                              <span>
+                                {isDifficultyUnlocked(key, difficultyLosses)
+                                  ? `${option.lives} HP`
+                                  : `Откроется после ${option.unlockLosses} ${option.unlockLosses === 1 ? 'поражения' : 'поражений'}`}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+
+                        <p className="arkanoid__difficulty-description">
+                          {DIFFICULTIES[difficulty].description}
+                        </p>
+                      </section>
+
+                      <section className="arkanoid__setup-section">
+                        <h3>Бафы</h3>
+
+                        <div className="arkanoid__buffs">
+                          <div className="arkanoid__buff">
+                            <img src={powerUpWideImage_guide} alt="" draggable={false} />
+                            <div>
+                              <strong>Широкая платформа</strong>
+                              <span>Платформа увеличивается на 50% на 10 секунд.</span>
+                            </div>
+                          </div>
+
+                          <div className="arkanoid__buff">
+                            <img src={powerUpTripleImage_guide} alt="" draggable={false} />
+                            <div>
+                              <strong>Тройной шар</strong>
+                              <span>Один шар превращается в три.</span>
+                            </div>
+                          </div>
+
+                          <div className="arkanoid__buff">
+                            <img src={powerUpFireImage_guide} alt="" draggable={false} />
+                            <div>
+                              <strong>Огненный шар</strong>
+                              <span>Запускает серию из 10 огненных выстрелов.</span>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+
+                      <section className="arkanoid__setup-section">
+                        <h3>Отображение HP</h3>
+
+                        <div className="arkanoid__hp-info">
+                          <div className="arkanoid__hp-preview">
+                            <span className="arkanoid__hp-dot" />
+                            <span className="arkanoid__hp-dot" />
+                            <span className="arkanoid__hp-dot" />
+                          </div>
+
+                          <div className="arkanoid__hp-text">
+                            <strong>Ваши жизни</strong>
+                            <span>
+                              Красные кружки над платформой показывают оставшееся количество HP.
+                              После потери шара вы теряете одну жизнь.
+                            </span>
+                          </div>
+                        </div>
+                      </section>
+
+                      <p className="arkanoid__setup-status">
+                        {inserting
+                          ? 'Монетка вставляется…'
+                          : sessionPaid
+                            ? 'Нажмите Space, чтобы запустить шар'
+                            : pawCoins < 1
+                              ? 'Не хватает монеток'
+                              : 'Одна партия — 1 монетка'}
                       </p>
-                    </section>
 
-                    <section className="arkanoid__setup-section">
-                      <h3>Бафы</h3>
-
-                      <div className="arkanoid__buffs">
-                        <div className="arkanoid__buff">
-                          <img src={powerUpWideImage} alt="" draggable={false} />
-                          <div>
-                            <strong>Широкая платформа</strong>
-                            <span>Платформа увеличивается на 50% на 10 секунд.</span>
-                          </div>
-                        </div>
-
-                        <div className="arkanoid__buff">
-                          <img src={powerUpTripleImage} alt="" draggable={false} />
-                          <div>
-                            <strong>Тройной шар</strong>
-                            <span>Один шар превращается в три.</span>
-                          </div>
-                        </div>
-
-                        <div className="arkanoid__buff">
-                          <img src={powerUpFireImage} alt="" draggable={false} />
-                          <div>
-                            <strong>Огненный шар</strong>
-                            <span>Запускает серию из 10 огненных выстрелов.</span>
-                          </div>
-                        </div>
-                      </div>
-                    </section>
-
-                    <p className="arkanoid__setup-status">
-                      {inserting
-                        ? 'Монетка вставляется…'
-                        : sessionPaid
-                          ? 'Нажмите Space, чтобы запустить шар'
-                          : pawCoins < 1
-                            ? 'Не хватает монеток'
-                            : 'Одна партия — 1 монетка'}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={launchBall}
-                      disabled={inserting || (!sessionPaid && pawCoins < 1)}
-                    >
-                      {sessionPaid ? 'Запустить шар' : 'Вставить монетку и играть'}
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={launchBall}
+                        disabled={inserting || (!sessionPaid && pawCoins < 1)}
+                      >
+                        {sessionPaid ? 'Запустить шар' : 'Вставить монетку и играть'}
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <h2>Запуск игры</h2>
+                      <p>Нажмите Space, чтобы запустить шар</p>
+                      <button type="button" onClick={launchBall} disabled={inserting}>
+                        Запустить шар
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
 
