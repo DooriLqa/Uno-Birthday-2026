@@ -292,8 +292,8 @@ export const locations: Record<LocationId, LocationDefinition> = {
       {
         id: 'bottles',
         label: 'Разобрать записки из бутылок',
-        area: area(30, 28, 45, 55),
-        cursor: 'projected-forward',
+        area: area(32, 61, 64, 28),
+        cursor: 'hand-point',
         action: { type: 'game', gameId: 'robot-maze' },
       },
       {
