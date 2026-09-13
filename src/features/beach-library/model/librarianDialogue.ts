@@ -2,7 +2,7 @@ import { openDialogue, type Dialogue } from '@/features/dialogues'
 import librarianSprite from '@/shared/assets/features/dialogues/poodle-librarian.png'
 
 const speaker = { id: 'library-poodle', name: 'Библиотекарь', sprite: librarianSprite }
-const yuni = { id: 'yuni', name: 'Юни', isMain: true }
+const yuni = { id: 'yuni', name: '', isMain: true }
 
 export const librarianDialogue: Dialogue = {
   id: 'library-cleanup',
@@ -36,7 +36,7 @@ export const librarianDialogue: Dialogue = {
       id: 'hint',
       speaker,
       emotion: 'neutral',
-      text: 'Также я должна была передать тебе письмо, но оно затерялось в этом бардкаке, возможно оно под какой-то из книг.',
+      text: 'Также я должна была передать тебе письмо, но оно затерялось в этом бардаке, возможно оно под какой-то из книг.',
     },
     {
       id: 'letter-response',
