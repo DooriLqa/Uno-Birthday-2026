@@ -140,6 +140,7 @@ export function GameCursor() {
     document.addEventListener('scroll', schedule, true)
     window.addEventListener('blur', leave)
     window.addEventListener('resize', schedule)
+    window.addEventListener('game-cursor-refresh', schedule)
     return () => {
       disposed = true
       cancelAnimationFrame(frame)
@@ -155,6 +156,7 @@ export function GameCursor() {
       document.removeEventListener('scroll', schedule, true)
       window.removeEventListener('blur', leave)
       window.removeEventListener('resize', schedule)
+      window.removeEventListener('game-cursor-refresh', schedule)
       if (supportsPopover && layer.matches(':popover-open')) layer.hidePopover()
     }
   }, [])

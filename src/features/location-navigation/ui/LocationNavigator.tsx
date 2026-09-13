@@ -103,6 +103,11 @@ export function LocationNavigator({
   const width = Math.max(viewport.width, viewport.height * aspect)
   const height = width / aspect
   const overflow = width - viewport.width
+  const canPanLeft = scene.pan > 0
+  const canPanRight = scene.pan < 1
+  useEffect(() => {
+    window.dispatchEvent(new Event('game-cursor-refresh'))
+  }, [canPanLeft, canPanRight])
   const layout = {
     width,
     height,
@@ -234,7 +239,8 @@ export function LocationNavigator({
               type="button"
               className={
                 'location-navigator__pan-zone location-navigator__pan-zone--' +
-                (side < 0 ? 'left' : 'right')
+                (side < 0 ? 'left' : 'right') +
+                ((side < 0 ? canPanLeft : canPanRight) ? '' : ' is-at-limit')
               }
               onMouseEnter={() => pan(side)}
               onMouseLeave={stop}

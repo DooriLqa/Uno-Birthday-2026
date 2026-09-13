@@ -221,6 +221,9 @@
   --cursor-image: var(--cursor-forward);
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
+.location-navigator__pan-zone.is-at-limit {
+  --cursor-image: var(--cursor-default);
+}
 .location-navigator__pan-zone:hover,
 .location-navigator__pan-zone:focus-visible {
   outline: none;

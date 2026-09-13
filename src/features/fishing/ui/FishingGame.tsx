@@ -113,7 +113,6 @@ export function FishingGame({ onClose }: Props) {
   const catchRef = useRef(20)
   const lastFightTimeRef = useRef(0)
   const resultLockedRef = useRef(false)
-  const castAudioRef = useRef<HTMLAudioElement | null>(null)
 
   // Refs для лески
   const sceneRef = useRef<HTMLDivElement>(null)
@@ -121,16 +120,6 @@ export function FishingGame({ onClose }: Props) {
   const bobberRef = useRef<HTMLDivElement>(null)
   const lineRef = useRef<SVGLineElement>(null)
   const lineRafRef = useRef<number | null>(null)
-
-  // Создаём аудио для заброса один раз
-  useEffect(() => {
-    const audio = new Audio(fishingSound1)
-    audio.preload = 'auto'
-    castAudioRef.current = audio
-    return () => {
-      castAudioRef.current = null
-    }
-  }, [])
 
   const setPhase = useCallback((next: Phase) => {
     phaseRef.current = next
@@ -151,14 +140,7 @@ export function FishingGame({ onClose }: Props) {
   useEffect(() => () => clearRoundTimers(), [clearRoundTimers])
 
   const playCastSound = useCallback(() => {
-    const audio = castAudioRef.current
-    if (!audio) return
-    try {
-      audio.currentTime = 0
-      void audio.play()
-    } catch {
-      // игнорируем ошибки воспроизведения
-    }
+    audioController.playOneShot(fishingSound1, { key: 'fishing-cast' })
   }, [])
 
   const playBiteSound = useCallback(() => {
