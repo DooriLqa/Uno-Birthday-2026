@@ -51,6 +51,26 @@ type BrickType = 'normal' | 'hard' | 'strong' | 'barrel' | 'indestructible'
 
 type PowerUpType = 'wide' | 'triple' | 'fire'
 
+type Difficulty = 'easy' | 'normal' | 'hard'
+
+const DIFFICULTIES: Record<Difficulty, { label: string; lives: number; description: string }> = {
+  easy: {
+    label: 'Легко',
+    lives: 5,
+    description: '5 HP — больше права на ошибку',
+  },
+  normal: {
+    label: 'Нормально',
+    lives: 3,
+    description: '3 HP — стандартная сложность',
+  },
+  hard: {
+    label: 'Сложно',
+    lives: 1,
+    description: '1 HP — одна ошибка и игра окончена',
+  },
+}
+
 type Brick = {
   x: number
   y: number
@@ -367,7 +387,7 @@ function createBricks(level: number): Brick[] {
   return bricks
 }
 
-function createInitialGame(level: number): GameState {
+function createInitialGame(level: number, lives = 3): GameState {
   const paddleWidth = PADDLE_BASE_WIDTH
 
   const paddle = {
@@ -402,7 +422,7 @@ function createInitialGame(level: number): GameState {
     level,
 
     score: 0,
-    lives: 3,
+    lives,
 
     paddle,
 
@@ -570,6 +590,7 @@ export function Arkanoid({ onComplete }: Props) {
 
   const [started, setStarted] = useState(false)
   const [completedLevels, setCompletedLevels] = useState(0)
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal')
 
   const [, setActivePowerUps] = useState<PowerUpType[]>([])
 
@@ -606,7 +627,7 @@ export function Arkanoid({ onComplete }: Props) {
   }, [])
 
   const playSound = useCallback((key: keyof typeof ARKANOID_SOUNDS) => {
-    audioController.playOneShot(ARKANOID_SOUNDS[key], { key: `arkanoid-${key}` })
+    audioController.playOneShot(ARKANOID_SOUNDS[key], { key: `arkanoid-${key}`, volume: 0.25 })
   }, [])
 
   const getPowerUpImage = useCallback((type: PowerUpType): string => {
@@ -1570,7 +1591,7 @@ export function Arkanoid({ onComplete }: Props) {
         return
       }
 
-      const game = createInitialGame(selected)
+      const game = createInitialGame(selected, DIFFICULTIES[difficulty].lives)
 
       game.running = false
       game.started = false
@@ -1581,7 +1602,7 @@ export function Arkanoid({ onComplete }: Props) {
       setSelectedLevel(selected)
 
       setScore(0)
-      setLives(3)
+      setLives(DIFFICULTIES[difficulty].lives)
       setCompletedLevels(Math.max(0, selected - 1))
 
       setWon(false)
@@ -1590,8 +1611,19 @@ export function Arkanoid({ onComplete }: Props) {
 
       setActivePowerUps([])
     },
-    [unlockedLevel],
+    [difficulty, unlockedLevel],
   )
+
+  const selectDifficulty = useCallback((value: Difficulty) => {
+    setDifficulty(value)
+
+    const game = gameRef.current
+
+    if (game && !game.running && !game.started) {
+      game.lives = DIFFICULTIES[value].lives
+      setLives(game.lives)
+    }
+  }, [])
 
   const launchPaidBall = useCallback(() => {
     const game = gameRef.current
@@ -1608,6 +1640,9 @@ export function Arkanoid({ onComplete }: Props) {
 
     const speed = getBallSpeed(game.level)
 
+    game.lives = DIFFICULTIES[difficulty].lives
+    setLives(game.lives)
+
     playSound('launch')
 
     ball.x = game.paddle.x + game.paddle.width / 2
@@ -1619,7 +1654,7 @@ export function Arkanoid({ onComplete }: Props) {
     game.running = true
     game.started = true
     setStarted(true)
-  }, [playSound])
+  }, [difficulty, playSound])
 
   const launchBall = useCallback(() => {
     const game = gameRef.current
@@ -1795,25 +1830,89 @@ export function Arkanoid({ onComplete }: Props) {
 
               {!started && !won && !gameOver && (
                 <div
-                  className="arkanoid__overlay arkanoid__overlay--ready"
-                  style={{ background: 'transparent' }}
+                  className="arkanoid__overlay arkanoid__overlay--ready arkanoid__overlay--setup"
+                  onClick={(event) => event.stopPropagation()}
                 >
-                  <p>
-                    {inserting
-                      ? 'Монетка вставляется…'
-                      : sessionPaid
-                        ? 'Нажмите Space, чтобы запустить шар'
-                        : pawCoins < 1
-                          ? 'Не хватает монеток'
-                          : 'Одна партия — 1 монетка. Нажмите Space'}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={launchBall}
-                    disabled={inserting || (!sessionPaid && pawCoins < 1)}
-                  >
-                    {sessionPaid ? 'Запустить шар' : 'Вставить монетку и играть'}
-                  </button>
+                  <div className="arkanoid__setup">
+                    <h2>Подготовка к игре</h2>
+
+                    <section className="arkanoid__setup-section">
+                      <h3>Сложность</h3>
+
+                      <div className="arkanoid__difficulty">
+                        {(
+                          Object.entries(DIFFICULTIES) as [
+                            Difficulty,
+                            (typeof DIFFICULTIES)[Difficulty],
+                          ][]
+                        ).map(([key, option]) => (
+                          <button
+                            key={key}
+                            type="button"
+                            className={`arkanoid__difficulty-button${
+                              difficulty === key ? ' arkanoid__difficulty-button--active' : ''
+                            }`}
+                            onClick={() => selectDifficulty(key)}
+                          >
+                            <strong>{option.label}</strong>
+                            <span>{option.lives} HP</span>
+                          </button>
+                        ))}
+                      </div>
+
+                      <p className="arkanoid__difficulty-description">
+                        {DIFFICULTIES[difficulty].description}
+                      </p>
+                    </section>
+
+                    <section className="arkanoid__setup-section">
+                      <h3>Бафы</h3>
+
+                      <div className="arkanoid__buffs">
+                        <div className="arkanoid__buff">
+                          <img src={powerUpWideImage} alt="" draggable={false} />
+                          <div>
+                            <strong>Широкая платформа</strong>
+                            <span>Платформа увеличивается на 50% на 10 секунд.</span>
+                          </div>
+                        </div>
+
+                        <div className="arkanoid__buff">
+                          <img src={powerUpTripleImage} alt="" draggable={false} />
+                          <div>
+                            <strong>Тройной шар</strong>
+                            <span>Один шар превращается в три.</span>
+                          </div>
+                        </div>
+
+                        <div className="arkanoid__buff">
+                          <img src={powerUpFireImage} alt="" draggable={false} />
+                          <div>
+                            <strong>Огненный шар</strong>
+                            <span>Запускает серию из 10 огненных выстрелов.</span>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+
+                    <p className="arkanoid__setup-status">
+                      {inserting
+                        ? 'Монетка вставляется…'
+                        : sessionPaid
+                          ? 'Нажмите Space, чтобы запустить шар'
+                          : pawCoins < 1
+                            ? 'Не хватает монеток'
+                            : 'Одна партия — 1 монетка'}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={launchBall}
+                      disabled={inserting || (!sessionPaid && pawCoins < 1)}
+                    >
+                      {sessionPaid ? 'Запустить шар' : 'Вставить монетку и играть'}
+                    </button>
+                  </div>
                 </div>
               )}
 
