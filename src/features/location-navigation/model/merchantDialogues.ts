@@ -6,7 +6,7 @@ import {
 } from '@/features/dialogues'
 import { usePawCoinStore } from '@/features/currency/model/store'
 import { useInventoryStore } from '@/features/inventory/model/store'
-import { STUPID_BADGE } from '@/features/inventory/model/items'
+import { FISHING_ROD, STUPID_BADGE } from '@/features/inventory/model/items'
 import merchantSprite from '@/shared/assets/features/dialogues/shiba-merchant.png'
 
 export const MAP_ITEM_ID = 'shiba-treasure-map'
@@ -14,6 +14,7 @@ export const LANTERN_ITEM_ID = 'oil-lantern'
 export const CAVE_DARK_DIALOGUE_ID = 'jungle-cave-dark-v1'
 const LANTERN_COST = 15
 const BADGE_COST = 100
+const FISHING_ROD_COST = 20
 const GREETING_ID = 'tourist-merchant-map-v1'
 const merchant: DialogueSpeaker = {
   id: 'shiba-merchant',
@@ -157,6 +158,40 @@ function buyStupidBadge() {
   useInventoryStore.getState().addItem(STUPID_BADGE)
 }
 
+function buyFishingRod() {
+  if (useInventoryStore.getState().items.some((item) => item.id === FISHING_ROD.id)) {
+    openDialogue({
+      id: 'tourist-merchant-fishing-rod-owned',
+      messages: [
+        {
+          id: 'owned',
+          speaker: merchant,
+          emotion: 'happy',
+          text: 'Золотая удочка уже у тебя. Самое время проверить её на большой рыбке!',
+        },
+      ],
+    })
+    return
+  }
+
+  if (!usePawCoinStore.getState().spendPawCoins(FISHING_ROD_COST)) {
+    openDialogue({
+      id: 'tourist-merchant-fishing-rod-poor',
+      messages: [
+        {
+          id: 'not-enough',
+          speaker: merchant,
+          emotion: 'neutral',
+          text: `Золотая удочка стоит ${FISHING_ROD_COST} монет. Пока не хватает — возвращайся, когда накопишь!`,
+        },
+      ],
+    })
+    return
+  }
+
+  useInventoryStore.getState().addItem(FISHING_ROD)
+}
+
 function openMerchantOptions(onOpenQuiz: () => void) {
   const choices: DialogueChoice[] = [
     ...(useInventoryStore.getState().items.some((item) => item.id === STUPID_BADGE.id)
@@ -166,6 +201,15 @@ function openMerchantOptions(onOpenQuiz: () => void) {
             id: 'buy-stupid-badge',
             label: `Купить: ${STUPID_BADGE.name} — ${BADGE_COST} монет`,
             onSelect: buyStupidBadge,
+          },
+        ]),
+    ...(useInventoryStore.getState().items.some((item) => item.id === FISHING_ROD.id)
+      ? []
+      : [
+          {
+            id: 'buy-fishing-rod',
+            label: `Купить: ${FISHING_ROD.name} — ${FISHING_ROD_COST} монет`,
+            onSelect: buyFishingRod,
           },
         ]),
     ...(hasOilLantern() ||
