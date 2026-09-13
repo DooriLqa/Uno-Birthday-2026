@@ -716,3 +716,8 @@
     width: 90vw;
   }
 }
+
+.radio-icon {
+  width: 55px;
+  height: 55px;
+}
