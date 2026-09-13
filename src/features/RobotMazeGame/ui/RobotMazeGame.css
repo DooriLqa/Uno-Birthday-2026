@@ -277,6 +277,18 @@ body {
   display: contents;
 }
 
+.RobotMaze__coins {
+  display: flex;
+  align-items: center;
+}
+
+.RobotMaze__coins p {
+  margin: 0;
+  font-size: clamp(11px, 1vw, 14px);
+  line-height: 1.35;
+  font-weight: 800;
+}
+
 /* =========================================================
    ЛАБИРИНТ
    ========================================================= */
@@ -510,9 +522,7 @@ body {
 
   gap: 8px;
 
-  margin-bottom: 12px;
-
-  padding: 7px 10px;
+  padding: 12px 8px;
 
   border-radius: 9px;
 
@@ -800,6 +810,11 @@ body {
   text-shadow:
     3px 3px 0 rgba(61, 34, 16, 0.8),
     5px 5px 0 rgba(0, 0, 0, 0.2);
+}
+
+.robot-coin {
+  width: 20px;
+  height: 20px;
 }
 
 .RobotMaze__summary-text {
