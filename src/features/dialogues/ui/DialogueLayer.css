@@ -40,6 +40,41 @@
   width: 100%;
 }
 
+.dialogue-layer--shop-menu .dialogue-layer__history {
+  padding: 30px 30px 8px 4px;
+}
+
+.dialogue-layer--shop-menu .dialogue-layer__bubble {
+  position: relative;
+}
+
+.dialogue-layer__close--shop {
+  top: -28px;
+  right: -28px;
+  width: 44px;
+  height: 44px;
+  border: 2px solid #8b542a;
+  border-radius: 13px;
+  background: linear-gradient(180deg, #fff3bd, #f3cb78);
+  box-shadow: 0 4px 0 #84501f;
+  color: #593216;
+  cursor: url('@/shared/assets/common/cursors/hand-point.png') 20 8, pointer;
+  transition: translate 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dialogue-layer__close--shop:hover {
+  translate: 0 -2px;
+}
+
+.dialogue-layer__close--shop:active {
+  translate: 0 2px;
+  box-shadow: none;
+}
+
+.dialogue-layer__close--shop svg {
+  stroke-width: 2.8;
+}
+
 .dialogue-layer__entry.is-active {
   animation: dialogue-message-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -212,6 +247,17 @@
 }
 
 @media (max-width: 600px) {
+  .dialogue-layer--shop-menu .dialogue-layer__history {
+    padding: 24px 10px 8px 4px;
+  }
+
+  .dialogue-layer__close--shop {
+    top: -22px;
+    right: -8px;
+    width: 40px;
+    height: 40px;
+  }
+
   .dialogue-layer {
     padding: 16px;
   }

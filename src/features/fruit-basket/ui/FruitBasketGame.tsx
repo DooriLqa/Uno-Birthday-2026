@@ -1,7 +1,6 @@
 import { ArcadeDisplay } from '@/shared/ui/ArcadeDisplay'
 import { useArcadeCoin } from '@/shared/lib/arcade/useArcadeCoin'
 import { useEffect, useRef, useState } from 'react'
-import { usePawCoinStore } from '@/features/currency/model/store'
 import brickImage from '@/shared/assets/games/fruit-basket/brick.png'
 import buildingImage from '@/shared/assets/games/fruit-basket/building.png'
 import groundImage from '@/shared/assets/games/fruit-basket/ground.png'
@@ -29,7 +28,13 @@ import winSound from '@/shared/assets/common/audio/win-sound.mp3'
 import coinSound from '@/shared/assets/common/audio/coin.mp3'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
 import { FRUIT_BASKET_LAYOUT } from '../model/layout'
-import { BASKET_CATCH_OFFSET, isCaught, isMissed } from '../model/collision'
+import {
+  BASKET_CATCH_OFFSET,
+  isBadItemHit,
+  isBonusCaught,
+  isCaught,
+  isMissed,
+} from '../model/collision'
 import './FruitBasketGame.css'
 
 type Props = { onComplete: () => void }
@@ -163,11 +168,8 @@ export function FruitBasketGame({ onComplete }: Props) {
     return () => observer.disconnect()
   }, [])
 
-  const addPawCoins = usePawCoinStore((state) => state.addPawCoins)
-
   const gameRef = useRef(game)
   const completeRef = useRef(onComplete)
-  const addPawCoinsRef = useRef(addPawCoins)
 
   const nextId = useRef(0)
 
@@ -196,10 +198,6 @@ export function FruitBasketGame({ onComplete }: Props) {
   useEffect(() => {
     completeRef.current = onComplete
   }, [onComplete])
-
-  useEffect(() => {
-    addPawCoinsRef.current = addPawCoins
-  }, [addPawCoins])
 
   // Управление корзиной
   useEffect(() => {
@@ -415,10 +413,15 @@ export function FruitBasketGame({ onComplete }: Props) {
             nextY = item.y + item.speed
           }
 
-          if (
-            !item.overflowed &&
-            isCaught(item, { x: nextX, y: nextY }, current.basketX, basketX)
-          ) {
+          const nextPosition = { x: nextX, y: nextY }
+          const caught =
+            item.kind === 'good'
+              ? isCaught(item, nextPosition, current.basketX, basketX)
+              : item.kind === 'bad'
+                ? isBadItemHit(item, nextPosition, current.basketX, basketX)
+                : isBonusCaught(item, nextPosition, current.basketX, basketX)
+
+          if (!item.overflowed && caught) {
             // Хороший предмет
             if (item.kind === 'good') {
               if (basketLoad < MAX_BASKET_LOAD) {
@@ -545,7 +548,6 @@ export function FruitBasketGame({ onComplete }: Props) {
         const gameOver = lives <= 0
 
         if (won) {
-          addPawCoinsRef.current(1)
           completeRef.current()
         }
 
@@ -641,13 +643,17 @@ export function FruitBasketGame({ onComplete }: Props) {
             <div className="fruit-basket-game__start-screen">
               <strong>Корзинка удачи</strong>
               <p>
-                Управление персонажем на A и D или стрелками. Лови ценности, складывай их в корзину и
-                сдавай груз по краям поля. Наручники и кирпичи пропускай. Бонус x2 удваивает все очки
-                в корзине при сдаче, действует один раз.
+                Управление персонажем на A и D или стрелками. Лови ценности, складывай их в корзину
+                и сдавай груз по краям поля. Наручники и кирпичи пропускай. Бонус x2 удваивает все
+                очки в корзине при сдаче, действует один раз.
               </p>
               <p>Одна партия — 1 монетка. Все 5 жизней включены.</p>
               <button type="button" onClick={startGame} disabled={inserting || pawCoins < 1}>
-                {inserting ? 'Монетка вставляется…' : pawCoins < 1 ? 'Не хватает монеток' : 'Вставить монетку и играть'}
+                {inserting
+                  ? 'Монетка вставляется…'
+                  : pawCoins < 1
+                    ? 'Не хватает монеток'
+                    : 'Вставить монетку и играть'}
               </button>
             </div>
           )}
@@ -706,9 +712,14 @@ export function FruitBasketGame({ onComplete }: Props) {
           ))}
 
           <div
-            className={`fruit-basket-game__basket ${
-              game.basketLoad >= MAX_BASKET_LOAD ? 'is-full' : ''
-            }`}
+            className={[
+              'fruit-basket-game__basket',
+              game.x2Active ? 'is-x2-active' : '',
+              game.magnetUntil !== null ? 'is-magnet-active' : '',
+              game.basketLoad >= MAX_BASKET_LOAD ? 'is-full' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
             style={{
               left: `${game.basketX}%`,
             }}
