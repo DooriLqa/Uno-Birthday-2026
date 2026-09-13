@@ -13,6 +13,16 @@ body {
   overflow: hidden;
 }
 
+@font-face {
+  font-family: 'MgGreekArchaic UC Pol';
+
+  src: url('https://db.onlinewebfonts.com/t/a67c6c7065013061541aa5de6d50d7c3.woff2') format('woff2');
+
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* =========================================================
    ОСНОВНАЯ СТРАНИЦА
    ========================================================= */
@@ -103,8 +113,8 @@ body {
 .Japonsk__crossword {
   position: absolute;
 
-  left: 12%;
-  top: 17%;
+  left: 22%;
+  top: 10%;
 
   width: 37%;
 
@@ -150,9 +160,12 @@ body {
 
   box-sizing: border-box;
 
-  color: #d19a4b;
+  color: #ffffff;
 
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'MgGreekArchaic UC Pol', 'Times New Roman', serif;
+
+  -webkit-text-stroke: 0.8px #000000;
+  paint-order: stroke fill;
 
   font-size: clamp(8px, 1.1vw, 17px);
 
@@ -211,9 +224,12 @@ body {
 
   box-sizing: border-box;
 
-  color: #d19a4b;
+  color: #ffffff;
 
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'MgGreekArchaic UC Pol', 'Times New Roman', serif;
+
+  -webkit-text-stroke: 0.8px #000000;
+  paint-order: stroke fill;
 
   font-size: clamp(8px, 1.1vw, 17px);
 
@@ -368,7 +384,10 @@ body {
 
   color: #d7a354;
 
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family:
+    MgGreekArchaic UC Pol,
+    'Times New Roman',
+    serif;
 
   font-size: clamp(9px, 1.05vw, 16px);
 
@@ -406,18 +425,44 @@ body {
    ========================================================= */
 
 .Japonsk__hint-number {
+  color: #6f4b20;
+
+  -webkit-text-stroke: 5px #000000;
+  paint-order: stroke fill;
+
+  text-shadow:
+    0 0 2px rgba(116, 78, 28, 0.8),
+    0 0 5px rgba(82, 50, 13, 0.65),
+    0 0 9px rgba(65, 38, 8, 0.45);
+
   transition:
     color 0.2s ease,
     opacity 0.2s ease,
-    text-decoration 0.2s ease;
+    text-decoration 0.2s ease,
+    text-shadow 0.2s ease;
+}
+
+/* Лёгкое свечение при наведении */
+.Japonsk__hint-number:hover {
+  color: #a87832;
+
+  text-shadow:
+    0 0 3px rgba(218, 166, 70, 0.85),
+    0 0 7px rgba(171, 111, 28, 0.75),
+    0 0 12px rgba(125, 72, 10, 0.55);
 }
 
 .Japonsk__hint-number--completed {
-  color: rgba(45, 25, 10, 0.65);
+  color: #f2c35e;
 
-  text-decoration: line-through;
+  -webkit-text-stroke: 5px #000000;
+  paint-order: stroke fill;
 
-  text-decoration-thickness: 2px;
+  text-shadow:
+    0 0 2px rgba(255, 220, 120, 0.95),
+    0 0 5px rgba(235, 178, 55, 0.9),
+    0 0 9px rgba(220, 145, 25, 0.75),
+    0 0 14px rgba(190, 110, 15, 0.5);
 }
 
 /* =========================================================
@@ -453,7 +498,10 @@ body {
 
   color: #d19a4b;
 
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family:
+    MgGreekArchaic UC Pol,
+    'Times New Roman',
+    serif;
 }
 
 /* =========================================================
@@ -484,7 +532,10 @@ body {
 
   color: #d7a354;
 
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family:
+    MgGreekArchaic UC Pol,
+    'Times New Roman',
+    serif;
 
   font-size: 28px;
 
@@ -506,7 +557,10 @@ body {
 
   color: #c59a5b;
 
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family:
+    MgGreekArchaic UC Pol,
+    'Times New Roman',
+    serif;
 
   font-size: 16px;
 
@@ -532,7 +586,10 @@ body {
 
   color: #d7a354;
 
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family:
+    MgGreekArchaic UC Pol,
+    'Times New Roman',
+    serif;
 
   font-size: 14px;
 
