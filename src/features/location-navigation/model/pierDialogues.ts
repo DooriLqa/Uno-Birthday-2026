@@ -22,14 +22,14 @@ export function talkToPierSailor(onOpenFindAPair: () => void) {
         text: 'Ну что, сыграем?',
         choices: [
           {
-            id: 'later',
-            label: 'позже',
-            onSelect: () => {},
-          },
-          {
             id: 'play',
             label: 'Давай сыграем',
             onSelect: onOpenFindAPair,
+          },
+          {
+            id: 'later',
+            label: 'Позже',
+            onSelect: () => {},
           },
         ],
       },

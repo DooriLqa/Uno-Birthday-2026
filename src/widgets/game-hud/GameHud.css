@@ -227,7 +227,6 @@
   --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, auto;
   cursor: var(--cursor-rendering, var(--cursor-image));
   align-content: center;
-
 }
 
 .game-hud__slot--button:hover,
@@ -276,7 +275,7 @@
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
-.game-hud__radio-volume:active {
+.game-hud__radio-volume input:active {
   --cursor-image: url('@/shared/assets/common/cursors/hand-grab.png') 20 10, grab;
   cursor: var(--cursor-rendering, var(--cursor-image));
 }
@@ -682,13 +681,10 @@
     padding: 4px;
   }
   .inventory-preview--book {
-    padding:
-      calc(env(safe-area-inset-top, 0px) + 18px)
-      calc(env(safe-area-inset-right, 0px) + 24px)
-      calc(env(safe-area-inset-bottom, 0px) + 18px)
-      calc(env(safe-area-inset-left, 0px) + 24px);
+    padding: calc(env(safe-area-inset-top, 0px) + 18px) calc(env(safe-area-inset-right, 0px) + 24px)
+      calc(env(safe-area-inset-bottom, 0px) + 18px) calc(env(safe-area-inset-left, 0px) + 24px);
   }
-  
+
   .inventory-preview__close {
     top: 12px;
     right: 12px;
