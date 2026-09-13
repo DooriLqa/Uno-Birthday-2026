@@ -118,8 +118,6 @@
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-gutter: stable;
-  scrollbar-color: #a96d24 #ead8b4;
-  scrollbar-width: auto;
 }
 
 .game-hud__slots::-webkit-scrollbar {
@@ -135,6 +133,13 @@
   background: #a96d24;
   border: 2px solid #ead8b4;
   border-radius: 8px;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .game-hud__slots {
+    scrollbar-color: #a96d24 #ead8b4;
+    scrollbar-width: auto;
+  }
 }
 
 .game-hud__slot {
