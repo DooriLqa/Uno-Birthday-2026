@@ -261,6 +261,24 @@
   text-shadow: 1px 1px 0 #12324e;
 }
 
+.flappy-bird-game__message button {
+  pointer-events: auto;
+  margin-top: 8px;
+  padding: 10px 14px;
+  border: 2px solid #8be7ff;
+  border-radius: 4px;
+  background: #ffe47a;
+  color: #12324e;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.flappy-bird-game__message button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 @keyframes flappy-coin-bob {
   from {
     margin-top: -2px;

@@ -10,12 +10,11 @@ import screamSound from '@/shared/assets/games/flappy-bird/audio/scream.mp3'
 import startSound from '@/shared/assets/games/flappy-bird/audio/bird.mp3'
 import winSound from '@/shared/assets/common/audio/win-sound.mp3'
 import coinSound from '@/shared/assets/common/audio/coin.mp3'
-import insertCoinSound from '@/shared/assets/common/audio/insert-coin.mp3'
+import { useArcadeCoin } from '@/shared/lib/arcade/useArcadeCoin'
 
 import { FLAPPY_BIRD_LAYOUT, FLAPPY_WORLD, type FlappyBirdLayout } from '../model/layout'
 import { alphaMasksOverlap, loadAlphaMask, type AlphaMask } from '../model/pixelCollision'
 import { playOneShotSound } from '@/shared/lib/audio/playOneShotSound'
-import { usePawCoinStore } from '@/features/currency/model/store'
 import './FlappyBirdGame.css'
 
 type Props = { onComplete: () => void; layout?: FlappyBirdLayout }
@@ -88,7 +87,6 @@ const SCREAM_SOUND = screamSound
 const START_SOUND = startSound
 const WIN_SOUND = winSound
 const COIN_SOUND = coinSound
-const COIN_INSERT_SOUND = insertCoinSound
 
 const createInitialState = (): GameState => ({
   birdY: GAME_HEIGHT / 2 - BIRD_HEIGHT / 2,
@@ -134,7 +132,7 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
   const [stageScale, setStageScale] = useState(1)
   const [isHolding, setIsHolding] = useState(false)
   const gameRef = useRef(game)
-  const stageRef = useRef<HTMLButtonElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
   const onCompleteRef = useRef(onComplete)
   const frameRef = useRef<number | null>(null)
   const lastTimeRef = useRef<number | null>(null)
@@ -142,7 +140,7 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
   const coinTimerRef = useRef(0)
   const holdingRef = useRef(false)
   const deathLockUntilRef = useRef(0)
-  const startDelayRef = useRef(false)
+  const { insertCoin, inserting, pawCoins } = useArcadeCoin(FLAPPY_COIN_INSERT_SOUND_KEY)
   const collisionMasksRef = useRef<CollisionMasks | null>(null)
 
   useEffect(() => {
@@ -202,14 +200,31 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
     setGame(nextGame)
   }, [])
 
-  const flap = useCallback(async () => {
-    const current = gameRef.current
+  const startGame = () => {
+    insertCoin(() => {
+      lastTimeRef.current = null
+      pipeTimerRef.current = 0
+      coinTimerRef.current = 0
+      updateGame({
+        ...createInitialState(),
+        running: true,
+        birdVelocity: FLAP_VELOCITY,
+        pipes: [createPipe(1, FIRST_PIPE_X)],
+        nextPipeId: 2,
+      })
+      playOneShotSound(START_SOUND, FLAPPY_START_SOUND_KEY)
+    })
+  }
 
-    // After inserting the coin, keep the game locked for 1 second so
-    // accidental clicks/Space presses cannot start it during the delay.
-    if (startDelayRef.current) {
-      return
-    }
+  const restart = () => {
+    holdingRef.current = false
+    setIsHolding(false)
+    updateGame(createInitialState())
+  }
+
+  const flap = useCallback(() => {
+    const current = gameRef.current
+    if (current.completed || (!current.running && !current.gameOver)) return
 
     // A life was lost. The existing "Бух в воду!" screen is shown while
     // gameOver is true. The next Space/click starts the next life immediately.
@@ -240,47 +255,7 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
       return
     }
 
-    // Completed game: starting a completely new game costs one Paw Coin.
-    if (current.completed) {
-      updateGame(createInitialState())
-      lastTimeRef.current = null
-      pipeTimerRef.current = 0
-      coinTimerRef.current = 0
-      return
-    }
-
     const isFirstFlap = current.pipes.length === 0
-    const isGameStart = !current.running
-
-    // Only the first start of the 3-life session costs one Paw Coin.
-    if (isGameStart) {
-      const { spendPawCoins } = usePawCoinStore.getState()
-      if (!spendPawCoins(1)) {
-        return
-      }
-
-      startDelayRef.current = true
-      playOneShotSound(COIN_INSERT_SOUND, FLAPPY_COIN_INSERT_SOUND_KEY, 0.52)
-
-      await new Promise((resolve) => window.setTimeout(resolve, 1000))
-
-      startDelayRef.current = false
-
-      // The game starts only after the full 1-second delay.
-      const latest = gameRef.current
-      const latestIsFirstFlap = latest.pipes.length === 0
-
-      updateGame({
-        ...latest,
-        running: true,
-        birdVelocity: FLAP_VELOCITY,
-        pipes: latestIsFirstFlap ? [createPipe(1, FIRST_PIPE_X)] : latest.pipes,
-        nextPipeId: latestIsFirstFlap ? 2 : latest.nextPipeId,
-      })
-
-      playOneShotSound(START_SOUND, FLAPPY_START_SOUND_KEY)
-      return
-    }
 
     updateGame({
       ...current,
@@ -295,6 +270,7 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
     // Ignore the first second after death to protect against an accidental
     // click/Space event that caused the death.
     if (Date.now() < deathLockUntilRef.current) return
+    if (gameRef.current.completed || (!gameRef.current.running && !gameRef.current.gameOver) || gameRef.current.lives <= 0) return
     if (holdingRef.current) return
     holdingRef.current = true
     setIsHolding(true)
@@ -308,7 +284,7 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code !== 'Space') return
+      if (event.code !== 'Space' || event.target instanceof HTMLButtonElement) return
       event.preventDefault()
       if (!event.repeat) startHolding()
     }
@@ -443,11 +419,9 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
 
           const remainingLives = Math.max(0, current.lives - 1)
 
-          // After the third death return to the normal start screen.
-          // This also restores the three-life session and prevents the
-          // game-over state from becoming a dead end.
+          // Keep the final result visible until the player chooses a new paid session.
           if (remainingLives === 0) {
-            updateGame(createInitialState())
+            updateGame({ ...current, running: false, gameOver: true, lives: 0 })
           } else {
             updateGame({
               ...current,
@@ -594,10 +568,10 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
           aria-hidden="true"
           draggable={false}
         />
-        <button
-          type="button"
+        <div
           className={`flappy-bird-game__stage ${game.gameOver ? 'is-game-over' : ''}`}
           onPointerDown={(event) => {
+            if (event.target instanceof Element && event.target.closest('button')) return
             event.preventDefault()
             startHolding()
           }}
@@ -675,28 +649,40 @@ export function FlappyBirdGame({ onComplete, layout = FLAPPY_BIRD_LAYOUT }: Prop
               <span className="flappy-bird-game__ground" aria-hidden />
               {!game.running && !game.gameOver && !game.completed && game.lives === 3 && (
                 <span className="flappy-bird-game__message">
-                  <strong>Прыг!</strong>
+                  <strong>Полёт над лагуной</strong>
                   <small>
                     Пробел или левая кнопка мыши. Чтобы парить, продолжай удерживать кнопку после
                     прыжка
                   </small>
+                  <small>Одна партия — 1 монетка. Все 3 жизни включены.</small>
+                  <button type="button" onClick={startGame} disabled={inserting || pawCoins < 1}>
+                    {inserting ? 'Монетка вставляется…' : pawCoins < 1 ? 'Не хватает монеток' : 'Вставить монетку и играть'}
+                  </button>
                 </span>
               )}
               {game.gameOver && !game.completed && (
                 <span className="flappy-bird-game__message">
                   <strong>Бух в воду!</strong>
-                  <small>Нажми, чтобы попробовать ещё раз</small>
+                  {game.lives > 0 ? (
+                    <small>Нажми, чтобы попробовать ещё раз</small>
+                  ) : (
+                    <>
+                      <small>Все жизни закончились</small>
+                      <button type="button" onClick={restart}>Играть снова</button>
+                    </>
+                  )}
                 </span>
               )}
               {game.completed && (
                 <span className="flappy-bird-game__message flappy-bird-game__message--won">
                   <strong>Полёт завершён!</strong>
                   <small>Ты собрал все {COINS_TO_COMPLETE} монет</small>
+                  <button type="button" onClick={restart}>Играть снова</button>
                 </span>
               )}
             </span>
           </span>
-        </button>
+        </div>
       </div>
     </div>
   )
