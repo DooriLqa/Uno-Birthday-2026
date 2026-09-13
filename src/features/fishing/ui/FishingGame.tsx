@@ -40,6 +40,11 @@ const MAX_DT = 0.05
 // Минимальный dt для защиты от слишком быстрых обновлений
 const MIN_DT = 0.001
 
+// Диапазон масштаба поплавка в зависимости от силы заброса:
+// при power = 0   → 1.0 (100%)
+// при power = 100 → 0.4 (40%)
+const BOBBER_MIN_SCALE = 0.4
+
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
 // Загрузка сохранённых данных
@@ -74,6 +79,7 @@ export function FishingGame({ onClose }: Props) {
   const [power, setPower] = useState(0)
   const [bobberX, setBobberX] = useState(54)
   const [bobberTop, setBobberTop] = useState(62)
+  const [bobberScale, setBobberScale] = useState(1)
   const [fishY, setFishY] = useState(52)
   const [greenY, setGreenY] = useState(41)
   const [catchProgress, setCatchProgress] = useState(20)
@@ -100,6 +106,13 @@ export function FishingGame({ onClose }: Props) {
   const lastFightTimeRef = useRef(0)
   const resultLockedRef = useRef(false)
   const castAudioRef = useRef<HTMLAudioElement | null>(null)
+
+  // Refs для лески
+  const sceneRef = useRef<HTMLDivElement>(null)
+  const rodRef = useRef<HTMLDivElement>(null)
+  const bobberRef = useRef<HTMLDivElement>(null)
+  const lineRef = useRef<SVGLineElement>(null)
+  const lineRafRef = useRef<number | null>(null)
 
   // Создаём аудио для заброса один раз
   useEffect(() => {
@@ -156,6 +169,7 @@ export function FishingGame({ onClose }: Props) {
     setPower(0)
     setBobberX(58)
     setBobberTop(62)
+    setBobberScale(1)
     setFishY(52)
     setGreenY(41)
     setCatchProgress(20)
@@ -341,6 +355,9 @@ export function FishingGame({ onClose }: Props) {
     setCastDistance(distance)
     setBobberX(58)
     setBobberTop(distance === 'near' ? 65 : distance === 'mid' ? 50 : 42)
+    // Чем сильнее заброс — тем меньше поплавок: 100% → 40%
+    const scale = 1 - (clamp(value, 0, 100) / 100) * (1 - BOBBER_MIN_SCALE)
+    setBobberScale(scale)
     setPhase('casting')
     // Звук заброса удочки
     playCastSound()
@@ -449,16 +466,68 @@ export function FishingGame({ onClose }: Props) {
     if (phaseRef.current === 'result' && !resultLockedRef.current) resetToIdle()
   }, [resetToIdle])
 
+  // Леска видна, пока отрисован поплавок
+  const showFishingLine = phase === 'waiting' || phase === 'bite' || phase === 'fight'
+
+  useEffect(() => {
+    if (!showFishingLine) return
+
+    let active = true
+
+    const update = () => {
+      if (!active) return
+      const scene = sceneRef.current
+      const rodEl = rodRef.current
+      const bobberEl = bobberRef.current
+      const line = lineRef.current
+
+      if (scene && rodEl && bobberEl && line) {
+        const tip = rodEl.querySelector('.fishing-rod-tip') as HTMLElement | null
+        if (tip) {
+          // getBoundingClientRect учитывает все активные transform/анимации,
+          // поэтому линия корректно тянется за дёргающимся кончиком удилища.
+          const sceneRect = scene.getBoundingClientRect()
+          const tipRect = tip.getBoundingClientRect()
+          const bobberRect = bobberEl.getBoundingClientRect()
+
+          const x1 = tipRect.left + tipRect.width / 2 - sceneRect.left
+          const y1 = tipRect.top + tipRect.height / 2 - sceneRect.top
+          const x2 = bobberRect.left + bobberRect.width / 2 - sceneRect.left
+          const y2 = bobberRect.top + bobberRect.height / 2 - sceneRect.top
+
+          line.setAttribute('x1', x1.toFixed(2))
+          line.setAttribute('y1', y1.toFixed(2))
+          line.setAttribute('x2', x2.toFixed(2))
+          line.setAttribute('y2', y2.toFixed(2))
+        }
+      }
+
+      lineRafRef.current = requestAnimationFrame(update)
+    }
+
+    lineRafRef.current = requestAnimationFrame(update)
+
+    return () => {
+      active = false
+      if (lineRafRef.current !== null) cancelAnimationFrame(lineRafRef.current)
+      lineRafRef.current = null
+    }
+  }, [showFishingLine])
+
   return (
     <div className={`fishing-window fishing-window--${phase}`}>
       <div
+        ref={rodRef}
         className={`fishing-rod fishing-rod--${phase}`}
         style={{ '--rod-jerk': `${rodJerk}px` } as CSSProperties}
       >
         <img className="fishing-rod-image" src={rod} alt="" />
+        {/* Якорь на кончике удилища — двигается вместе с .fishing-rod */}
+        <span className="fishing-rod-tip" aria-hidden="true" />
       </div>
 
       <div
+        ref={sceneRef}
         className="fishing-scene"
         aria-label="Пляж и море"
         onPointerDown={handlePointerDown}
@@ -466,8 +535,25 @@ export function FishingGame({ onClose }: Props) {
         onPointerCancel={handlePointerCancel}
         onContextMenu={(event) => event.preventDefault()}
       >
+        {/* Леска: тянется от кончика удилища к поплавку */}
+        {showFishingLine && (
+          <svg className="fishing-line" aria-hidden="true">
+            <line ref={lineRef} x1="0" y1="0" x2="0" y2="0" />
+          </svg>
+        )}
+
         {(phase === 'waiting' || phase === 'bite' || phase === 'fight') && (
-          <div className="fishing-bobber" style={{ left: `${bobberX}%`, top: `${bobberTop}%` }}>
+          <div
+            ref={bobberRef}
+            className="fishing-bobber"
+            style={
+              {
+                left: `${bobberX}%`,
+                top: `${bobberTop}%`,
+                '--bobber-scale': bobberScale,
+              } as CSSProperties
+            }
+          >
             <img
               src={bobber}
               alt=""
