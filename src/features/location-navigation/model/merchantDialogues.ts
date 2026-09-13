@@ -150,6 +150,11 @@ function openMerchantOptions(onOpenQuiz: () => void) {
       label: 'Сыграть в квиз',
       onSelect: () => openQuizInvitation(onOpenQuiz),
     },
+    {
+      id: 'later',
+      label: 'Позже',
+      onSelect: () => {},
+    },
   ]
 
   openDialogue({

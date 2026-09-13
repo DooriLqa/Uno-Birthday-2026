@@ -85,7 +85,7 @@ export function GameFlow() {
       />
       <LocationNavigator
         active={!mapOpen && !activeGame && !radioOpen}
-        visible={(!activeGame || activeGame.id === 'beach-radio') && !radioOpen}
+        visible={!activeGame || activeGame.id === 'beach-radio'}
         onOpenMap={openMap}
         onOpenGame={openGame}
         onMerchant={() => talkToMerchant(() => openGame('beach-radio'))}

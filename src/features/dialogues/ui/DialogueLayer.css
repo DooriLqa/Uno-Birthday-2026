@@ -6,11 +6,13 @@
   align-items: flex-end;
   padding: clamp(20px, 5vw, 68px);
   background: linear-gradient(180deg, rgba(11, 35, 46, 0.05), rgba(8, 25, 34, 0.46));
-  cursor: pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .dialogue-layer--has-choices {
-  cursor: default;
+  --cursor-image: var(--app-cursor);
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .dialogue-layer__close {
@@ -27,7 +29,8 @@
   border-radius: 50%;
   background: rgba(91, 48, 23, 0.9);
   color: #fff8df;
-  cursor: pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
 }
 
 .dialogue-layer__entry {
@@ -174,7 +177,8 @@
   background: linear-gradient(180deg, #fff3bd, #f3cb78);
   box-shadow: 0 4px 0 #84501f;
   color: #593216;
-  cursor: pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 8, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
   font: inherit;
   font-size: clamp(0.9rem, 1.6vw, 1.1rem);
   font-weight: 850;
