@@ -97,10 +97,19 @@
   border-right: 1px solid rgba(255, 231, 155, 0.34);
 }
 
-.fruit-basket-game__hud > span:last-child { border-right: 0; }
-.fruit-basket-game__hearts { color: var(--danger); letter-spacing: 1px; }
-.fruit-basket-game__empty-hearts { color: rgba(255, 255, 255, 0.35); }
-.fruit-basket-game__bonus-active { color: var(--accent); }
+.fruit-basket-game__hud > span:last-child {
+  border-right: 0;
+}
+.fruit-basket-game__hearts {
+  color: var(--danger);
+  letter-spacing: 1px;
+}
+.fruit-basket-game__empty-hearts {
+  color: rgba(255, 255, 255, 0.35);
+}
+.fruit-basket-game__bonus-active {
+  color: var(--accent);
+}
 
 .fruit-basket-game__start-screen,
 .fruit-basket-game__result {
@@ -113,7 +122,9 @@
   border: 3px solid #ffe79b;
   border-radius: 8px;
   background: rgba(12, 27, 74, 0.95);
-  box-shadow: 7px 7px 0 rgba(5, 12, 38, 0.45), inset 0 0 0 2px #536cc3;
+  box-shadow:
+    7px 7px 0 rgba(5, 12, 38, 0.45),
+    inset 0 0 0 2px #536cc3;
   text-align: center;
   transform: translate(-50%, -50%);
 }
@@ -143,7 +154,8 @@
   background: var(--accent);
   color: #172452;
   font-weight: 900;
-  cursor: pointer;
+  --cursor-image: url('@/shared/assets/common/cursors/hand-point.png') 20 5, pointer;
+  cursor: var(--cursor-rendering, var(--cursor-image));
   box-shadow: 0 4px 0 #bd7b45;
 }
 
@@ -171,12 +183,22 @@
   font-size: 0.62rem;
   font-weight: 900;
   letter-spacing: 0.08em;
-  transition: background 0.18s ease, border-color 0.18s ease;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
 }
 
-.fruit-basket-game__drop-zone--left { left: 9px; }
-.fruit-basket-game__drop-zone--right { right: 9px; }
-.fruit-basket-game__drop-zone span { margin-top: 4px; font-size: 1.65rem; line-height: 1; }
+.fruit-basket-game__drop-zone--left {
+  left: 9px;
+}
+.fruit-basket-game__drop-zone--right {
+  right: 9px;
+}
+.fruit-basket-game__drop-zone span {
+  margin-top: 4px;
+  font-size: 1.65rem;
+  line-height: 1;
+}
 
 .fruit-basket-game__drop-zone i {
   position: absolute;
@@ -196,14 +218,35 @@
   color: #fff7cd;
 }
 
-.fruit-basket-game__drop-zone.is-charging strong::after { content: '...'; }
+.fruit-basket-game__drop-zone.is-charging strong::after {
+  content: '...';
+}
 
 .fruit-basket-game__sun,
-.fruit-basket-game__cloud { position: absolute; z-index: 2; pointer-events: none; }
-.fruit-basket-game__sun { top: 8%; right: 12%; color: #ffd35c; font-size: 3.5rem; }
-.fruit-basket-game__cloud { color: rgba(255, 255, 255, 0.5); font-size: 3.2rem; }
-.cloud-one { top: 17%; left: 12%; }
-.cloud-two { top: 30%; right: 30%; font-size: 2rem; }
+.fruit-basket-game__cloud {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+.fruit-basket-game__sun {
+  top: 8%;
+  right: 12%;
+  color: #ffd35c;
+  font-size: 3.5rem;
+}
+.fruit-basket-game__cloud {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 3.2rem;
+}
+.cloud-one {
+  top: 17%;
+  left: 12%;
+}
+.cloud-two {
+  top: 30%;
+  right: 30%;
+  font-size: 2rem;
+}
 
 .fruit-basket-game__item {
   position: absolute;
@@ -216,13 +259,33 @@
   transform: translateX(-50%);
 }
 
-.fruit-basket-game__item img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.fruit-basket-game__item--bad { filter: drop-shadow(0 4px 2px rgba(87, 20, 35, 0.5)); }
-.fruit-basket-game__item--bonus { z-index: 6; overflow: visible; }
-.fruit-basket-game__item--bonus img { filter: drop-shadow(0 0 7px rgba(255, 215, 0, 0.9)); transform: scale(1.05); }
-.fruit-basket-game__item--bonus-x2 img { animation: bonus-x2-pulse 0.8s ease-in-out infinite; }
-.fruit-basket-game__item--bonus-magnet img { animation: bonus-magnet-pulse 0.8s ease-in-out infinite; }
-.fruit-basket-game__item--magnetized img { filter: drop-shadow(0 0 5px rgba(100, 180, 255, 0.9)) drop-shadow(0 0 10px rgba(100, 180, 255, 0.5)); }
+.fruit-basket-game__item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.fruit-basket-game__item--bad {
+  filter: drop-shadow(0 4px 2px rgba(87, 20, 35, 0.5));
+}
+.fruit-basket-game__item--bonus {
+  z-index: 6;
+  overflow: visible;
+}
+.fruit-basket-game__item--bonus img {
+  filter: drop-shadow(0 0 7px rgba(255, 215, 0, 0.9));
+  transform: scale(1.05);
+}
+.fruit-basket-game__item--bonus-x2 img {
+  animation: bonus-x2-pulse 0.8s ease-in-out infinite;
+}
+.fruit-basket-game__item--bonus-magnet img {
+  animation: bonus-magnet-pulse 0.8s ease-in-out infinite;
+}
+.fruit-basket-game__item--magnetized img {
+  filter: drop-shadow(0 0 5px rgba(100, 180, 255, 0.9))
+    drop-shadow(0 0 10px rgba(100, 180, 255, 0.5));
+}
 
 .fruit-basket-game__basket {
   position: absolute;
@@ -237,21 +300,57 @@
   transform: translateX(-50%);
 }
 
-.fruit-basket-game__basket.is-full { filter: drop-shadow(0 0 9px rgba(217, 56, 56, 0.95)); }
-.fruit-basket-game__basket img { display: block; width: 100%; height: 112px; object-fit: contain; filter: drop-shadow(0 7px 2px rgba(7, 17, 47, 0.42)); }
-.fruit-basket-game__basket i { width: 70%; height: 8px; border-radius: 50%; background: rgba(4, 12, 36, 0.42); font-size: 0; }
-.fruit-basket-game__ground { display: none; }
-.fruit-basket-game__result-icon { font-size: 2.7rem; }
-.fruit-basket-game__result h2 { margin: 9px 0 6px; }
+.fruit-basket-game__basket.is-x2-active {
+  filter: drop-shadow(0 0 7px rgba(255, 214, 48, 1)) drop-shadow(0 0 13px rgba(255, 190, 25, 0.72));
+}
+.fruit-basket-game__basket.is-magnet-active {
+  filter: drop-shadow(0 0 7px rgba(80, 185, 255, 1)) drop-shadow(0 0 13px rgba(65, 145, 255, 0.72));
+}
+.fruit-basket-game__basket.is-full {
+  filter: drop-shadow(0 0 7px rgba(235, 55, 55, 1)) drop-shadow(0 0 13px rgba(217, 56, 56, 0.8));
+}
+.fruit-basket-game__basket img {
+  display: block;
+  width: 100%;
+  height: 112px;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 2px rgba(7, 17, 47, 0.42));
+}
+.fruit-basket-game__basket i {
+  width: 70%;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(4, 12, 36, 0.42);
+  font-size: 0;
+}
+.fruit-basket-game__ground {
+  display: none;
+}
+.fruit-basket-game__result-icon {
+  font-size: 2.7rem;
+}
+.fruit-basket-game__result h2 {
+  margin: 9px 0 6px;
+}
 
 @keyframes bonus-x2-pulse {
-  0%, 100% { transform: scale(1.05); }
-  50% { transform: scale(1.18); }
+  0%,
+  100% {
+    transform: scale(1.05);
+  }
+  50% {
+    transform: scale(1.18);
+  }
 }
 
 @keyframes bonus-magnet-pulse {
-  0%, 100% { transform: scale(1.05) rotate(0deg); }
-  50% { transform: scale(1.18) rotate(-8deg); }
+  0%,
+  100% {
+    transform: scale(1.05) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.18) rotate(-8deg);
+  }
 }
 
 .fruit-basket-game__start-screen button:disabled {

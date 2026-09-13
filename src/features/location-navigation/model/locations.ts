@@ -5,7 +5,6 @@ import library from '@/shared/assets/locations/tourist/library.png'
 import lounger from '@/shared/assets/locations/tourist/lounger.png'
 import beach from '@/shared/assets/locations/tourist/beach.png'
 import shop from '@/shared/assets/locations/tourist/shop.png'
-import arcades from '@/shared/assets/locations/tourist/arcades.png'
 import wildBeach from '@/shared/assets/locations/wild/overview-v3.png'
 import fisherHut from '@/shared/assets/locations/wild/fisher-hut.png'
 import pirateShore from '@/shared/assets/locations/wild/pirate-shore.png'
@@ -22,7 +21,6 @@ export type LocationId =
   | 'lounger'
   | 'tourist-beach'
   | 'shop'
-  | 'arcades'
   | 'wild-beach'
   | 'fisher-hut'
   | 'pirate-shore'
@@ -209,23 +207,8 @@ export const locations: Record<LocationId, LocationDefinition> = {
       },
       {
         id: 'machines',
-        label: 'Подойти к игровым автоматам',
-        area: area(51, 27, 37, 55),
-        cursor: 'magnify',
-        action: { type: 'location', locationId: 'arcades' },
-      },
-    ],
-  },
-  arcades: {
-    ...base,
-    id: 'arcades',
-    title: 'Игровые автоматы',
-    image: arcades,
-    hotspots: [
-      {
-        id: 'catch',
-        label: 'Ловля предметов',
-        area: area(40, 15, 19, 73),
+        label: 'Сыграть в «Корзинку удачи»',
+        area: area(56, 28, 17, 52),
         cursor: 'hand-point',
         action: { type: 'game', gameId: 'fruit-basket' },
       },
@@ -292,8 +275,8 @@ export const locations: Record<LocationId, LocationDefinition> = {
       {
         id: 'bottles',
         label: 'Разобрать записки из бутылок',
-        area: area(30, 28, 45, 55),
-        cursor: 'projected-forward',
+        area: area(32, 61, 64, 28),
+        cursor: 'hand-point',
         action: { type: 'game', gameId: 'robot-maze' },
       },
       {

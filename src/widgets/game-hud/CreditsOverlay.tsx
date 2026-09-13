@@ -24,7 +24,7 @@ const CREDIT_SECTIONS: { title: string; names: string[] }[] = [
       'AlfrenD',
     ],
   },
-  { title: 'Special thanks', names: ['ChatGPT'] },
+  /* { title: 'Special thanks', names: ['ChatGPT'] }, */
 ]
 
 type Props = {

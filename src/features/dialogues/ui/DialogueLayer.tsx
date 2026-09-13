@@ -19,6 +19,10 @@ export function DialogueLayer() {
 
   const message = dialogue?.messages[activeMessageIndex]
   const hasChoices = Boolean(message?.choices?.length)
+  const isShopMenu = activeDialogueId === 'tourist-merchant-options' ||
+    activeDialogueId === 'niche-stream-drink-menu' ||
+    activeDialogueId === 'niche-stream-coffee-menu' ||
+    activeDialogueId === 'niche-stream-bubble-tea-menu'
 
   useEffect(() => {
     if (!activeDialogueId) return
@@ -68,13 +72,13 @@ export function DialogueLayer() {
 
   return (
     <section
-      className={`dialogue-layer ${hasChoices ? 'dialogue-layer--has-choices' : ''}`}
+      className={`dialogue-layer ${hasChoices ? 'dialogue-layer--has-choices' : ''} ${isShopMenu ? 'dialogue-layer--shop-menu' : ''}`}
       role="dialog"
       aria-modal="true"
       aria-label={`Диалог: ${dialogue.id}`}
       onClick={() => { if (!hasChoices) nextMessage() }}
     >
-      <button
+      {!isShopMenu && <button
         type="button"
         className="dialogue-layer__close"
         aria-label="Закрыть диалог"
@@ -84,7 +88,7 @@ export function DialogueLayer() {
         }}
       >
         <X size={20} />
-      </button>
+      </button>}
       <div ref={historyRef} className="dialogue-layer__history" aria-live="polite">
         {visibleMessages.map((dialogueMessage, index) => {
           const isActiveMessage = index === activeMessageIndex
@@ -100,6 +104,19 @@ export function DialogueLayer() {
               }`}
             >
               <div className="dialogue-layer__bubble">
+                {isShopMenu && isActiveMessage && (
+                  <button
+                    type="button"
+                    className="dialogue-layer__close dialogue-layer__close--shop"
+                    aria-label="Закрыть диалог"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      closeDialogue()
+                    }}
+                  >
+                    <X size={21} aria-hidden="true" />
+                  </button>
+                )}
                 <strong>{dialogueMessage.speaker.name}</strong>
                 <p>{dialogueMessage.text}</p>
                 {isActiveMessage && dialogueMessage.choices?.length ? (
