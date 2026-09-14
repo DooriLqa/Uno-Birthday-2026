@@ -390,9 +390,9 @@ function createBricks(level: number): Brick[] {
 
         powerUp:
           stats.type !== 'indestructible' &&
-          stats.type !== 'barrel' &&
-          stats.type !== 'hard' &&
-          stats.type !== 'strong'
+            stats.type !== 'barrel' &&
+            stats.type !== 'hard' &&
+            stats.type !== 'strong'
             ? randomPowerUp()
             : undefined,
         destroyTimer: 0,
@@ -1763,9 +1763,17 @@ export function Arkanoid({ onComplete }: Props) {
 
       if (event.code === 'Space') {
         event.preventDefault()
-        if (!event.repeat) {
-          launchBall()
+        if (event.repeat) {
+          return
         }
+
+        const game = gameRef.current
+        if (game?.won && game.level < TOTAL_LEVELS) {
+          nextLevel()
+          return
+        }
+
+        launchBall()
       }
     }
 
@@ -1788,7 +1796,7 @@ export function Arkanoid({ onComplete }: Props) {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [launchBall])
+  }, [launchBall, nextLevel])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -1917,9 +1925,8 @@ export function Arkanoid({ onComplete }: Props) {
                             <button
                               key={key}
                               type="button"
-                              className={`arkanoid__difficulty-button${
-                                difficulty === key ? ' arkanoid__difficulty-button--active' : ''
-                              }`}
+                              className={`arkanoid__difficulty-button${difficulty === key ? ' arkanoid__difficulty-button--active' : ''
+                                }`}
                               onClick={() => selectDifficulty(key)}
                               disabled={!isDifficultyUnlocked(key, difficultyLosses)}
                             >
