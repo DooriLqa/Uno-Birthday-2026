@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
 const CREDIT_SECTIONS: { title: string; names: string[] }[] = [  
-  { title: 'Идея и Team Lead', names: ['DooriLqa'] },
+  { title: 'Автор идеи и Team Lead', names: ['DooriLqa'] },
 
   { title: 'Разработчики', names: ['DooriLqa', 'croppusha', 'RAMisExpensive', 'Derp', 'JustZoB'] },{ title: 'Тестирование', names: ['PogUbamBamBam'] },
   { title: 'Оформление', names: ['nobrainshiba', 'DooriLqa'] },
