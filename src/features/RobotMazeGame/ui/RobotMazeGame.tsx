@@ -9,6 +9,7 @@ import wall2 from '@/shared/assets/games/robot-maze/wall2.png'
 import wall3 from '@/shared/assets/games/robot-maze/wall3.png'
 import wall4 from '@/shared/assets/games/robot-maze/wall4.png'
 import wall5 from '@/shared/assets/games/robot-maze/wall5.png'
+import coin from '@/shared/assets/common/branding/coin.png'
 
 import corgiUp from '@/shared/assets/games/robot-maze/corgi-pirate-up.png'
 import corgiRight from '@/shared/assets/games/robot-maze/corgi-pirate-right.png'
@@ -901,8 +902,11 @@ export function RobotMazeGame({ onComplete }: Props) {
             Пройдено: {playedLevels.length} / {levels.length}
           </div>
 
-          <div className="RobotMaze__level">
-            Монеты: {collectedCoins} / {totalCoins} 💎
+          <div className="RobotMaze__level RobotMaze__coins">
+            <p>
+              Монеты: {collectedCoins} / {totalCoins}
+            </p>
+            <img className="robot-coin" src={coin} alt="" />
           </div>
         </aside>
 
@@ -1092,11 +1096,11 @@ export function RobotMazeGame({ onComplete }: Props) {
               onClick={removeLastCommand}
               disabled={isRunning || commands.length === 0}
             >
-              Удалить
+              Удалить команду
             </button>
 
             <button className="RobotMaze__button" onClick={resetLevel} disabled={isRunning}>
-              Сбросить уровень
+              Очистить ввод
             </button>
           </div>
 

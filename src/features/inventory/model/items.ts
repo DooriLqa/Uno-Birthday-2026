@@ -2,6 +2,7 @@ import type { InventoryItem } from './store'
 import collieRedKeychain from '@/shared/assets/features/inventory/arcade-keychains/collie-red-keychain.png'
 import shepherdGreenKeychain from '@/shared/assets/features/inventory/arcade-keychains/shepherd-green-keychain.png'
 import beagleBlueKeychain from '@/shared/assets/features/inventory/arcade-keychains/beagle-blue-keychain.png'
+import stupidBadgeArtwork from '@/shared/assets/features/inventory/arcade-keychains/stupid.png'
 import tropicalFieldJournalSpreadOne from '@/shared/assets/features/inventory/books/tropical-field-journal-spread-v3-1.png'
 import tropicalFieldJournalSpreadTwo from '@/shared/assets/features/inventory/books/tropical-field-journal-spread-v3-2.png'
 import sailorLogbookSpread from '@/shared/assets/features/inventory/books/sailor-logbook-spread-v3.png'
@@ -15,8 +16,10 @@ import islandMapIcon from '@/shared/assets/features/inventory/paper-icons/island
 import libraryPageIcon from '@/shared/assets/features/inventory/paper-icons/library-page.png'
 import libraryHintIcon from '@/shared/assets/features/inventory/paper-icons/library-hint.png'
 import libraryNoteIcon from '@/shared/assets/features/inventory/paper-icons/library-note.png'
+import oilLanternArtwork from '@/shared/assets/features/inventory/lantern/oil-lantern.png'
 import pataponArtwork from '@/shared/assets/features/inventory/patapon/patapon.png'
 import pataponIcon from '@/shared/assets/features/inventory/patapon/patapon-icon.png'
+import fishingRodGoldArtwork from '@/shared/assets/games/fishing/rod-gold.png'
 
 export type CafeDrinkId =
   | 'espresso'
@@ -95,6 +98,24 @@ export const BOOK_ITEMS: readonly InventoryItem[] = [
   },
 ]
 
+export const STUPID_BADGE: InventoryItem = {
+  id: 'stupid-badge',
+  name: `Значок «I'm sorry, I was born stupid»`,
+  icon: '🏷️',
+  rarity: 'rare',
+  inspectable: true,
+  description: `Значок с надписью «I'm sorry, I was born stupid».`,
+}
+
+export const FISHING_ROD: InventoryItem = {
+  id: 'fishing-rod-gold',
+  name: 'Золотая удочка',
+  icon: '🎣',
+  rarity: 'legendary',
+  inspectable: true,
+  description: 'Позолоченная удочка, которая увеличивает зелёную зону при борьбе с рыбой.',
+}
+
 export const ARCADE_REWARDS_BY_GAME_ID: Readonly<Record<string, InventoryItem>> = {
   'flappy-bird': {
     id: 'arcade-pin-dachshund-red',
@@ -139,6 +160,9 @@ const BOOK_PICKUP_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
 }
 
 const ITEM_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
+  'oil-lantern': oilLanternArtwork,
+  [STUPID_BADGE.id]: stupidBadgeArtwork,
+  [FISHING_ROD.id]: fishingRodGoldArtwork,
   patapon: pataponIcon,
   'shiba-treasure-map': islandMapIcon,
   'beach-library-page-0': libraryPageIcon,
@@ -160,12 +184,14 @@ const ITEM_ARTWORK_BY_ID: Readonly<Record<string, string>> = {
 }
 
 const ARCADE_REWARDS_BY_ITEM_ID = Object.fromEntries(
-  Object.values(ARCADE_REWARDS_BY_GAME_ID).map((item) => [item.id, item]),
+  Object.values(GAME_REWARDS_BY_GAME_ID).map((item) => [item.id, item]),
 ) as Readonly<Record<string, InventoryItem>>
 
 export const isArcadeKeychain = (itemId: string) => itemId in ARCADE_REWARDS_BY_ITEM_ID
 
 const ITEM_DEFINITIONS_BY_ID: Readonly<Record<string, InventoryItem>> = {
+  [STUPID_BADGE.id]: STUPID_BADGE,
+  [FISHING_ROD.id]: FISHING_ROD,
   ...Object.fromEntries(Object.values(GAME_REWARDS_BY_GAME_ID).map((item) => [item.id, item])),
   ...ARCADE_REWARDS_BY_ITEM_ID,
   ...Object.fromEntries(BOOK_ITEMS.map((item) => [item.id, item])),

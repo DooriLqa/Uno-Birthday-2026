@@ -35,7 +35,7 @@ const fishermanDialogue: Dialogue = {
       id: 'reward',
       speaker: fisherman,
       emotion: 'happy',
-      text: 'Приноси улов: за каждые три пойманные рыбы я дам одну монетку. Сорт и редкость не важны — считаются любые три.',
+      text: 'Приноси улов мне и я дам тебе монетки.',
     },
   ],
 }

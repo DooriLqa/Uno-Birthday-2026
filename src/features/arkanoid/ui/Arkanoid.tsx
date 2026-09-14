@@ -1727,9 +1727,17 @@ export function Arkanoid({ onComplete }: Props) {
 
       if (event.code === 'Space') {
         event.preventDefault()
-        if (!event.repeat) {
-          launchBall()
+        if (event.repeat) {
+          return
         }
+
+        const game = gameRef.current
+        if (game?.won && game.level < TOTAL_LEVELS) {
+          nextLevel()
+          return
+        }
+
+        launchBall()
       }
     }
 
@@ -1752,7 +1760,7 @@ export function Arkanoid({ onComplete }: Props) {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [launchBall])
+  }, [launchBall, nextLevel])
 
   useEffect(() => {
     const canvas = canvasRef.current
