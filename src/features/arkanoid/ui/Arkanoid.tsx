@@ -190,33 +190,7 @@ const MACHINE_HIT_SHAKE_DURATION = 320
 
 // Небольшой случайный разброс после каждого отскока.
 // Нужен, чтобы мяч не зацикливался между двумя параллельными поверхностями.
-const BOUNCE_RANDOM_MAX = 0.18
 const BOUNCE_PUSH = 1.5
-
-function addBounceRandom(ball: Ball) {
-  const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy)
-
-  if (speed <= 0) {
-    ball.vx = 0.18
-    ball.vy = -2.8
-    return
-  }
-
-  // Маленькое случайное изменение только угла, скорость сохраняем.
-  const angle = Math.atan2(ball.vy, ball.vx)
-  const randomAngle = (Math.random() * 2 - 1) * BOUNCE_RANDOM_MAX
-  const nextAngle = angle + randomAngle
-
-  ball.vx = Math.cos(nextAngle) * speed
-  ball.vy = Math.sin(nextAngle) * speed
-
-  // Не даём мячу стать идеально вертикальным.
-  if (Math.abs(ball.vx) < 0.12) {
-    ball.vx = ball.vx < 0 ? -0.12 : 0.12
-    const verticalSpeed = Math.sqrt(Math.max(0, speed * speed - ball.vx * ball.vx))
-    ball.vy = ball.vy < 0 ? -verticalSpeed : verticalSpeed
-  }
-}
 
 /*
  * =========================================================
@@ -390,9 +364,9 @@ function createBricks(level: number): Brick[] {
 
         powerUp:
           stats.type !== 'indestructible' &&
-            stats.type !== 'barrel' &&
-            stats.type !== 'hard' &&
-            stats.type !== 'strong'
+          stats.type !== 'barrel' &&
+          stats.type !== 'hard' &&
+          stats.type !== 'strong'
             ? randomPowerUp()
             : undefined,
         destroyTimer: 0,
@@ -1420,7 +1394,6 @@ export function Arkanoid({ onComplete }: Props) {
           ball.x = ball.radius + BOUNCE_PUSH
 
           ball.vx = Math.abs(ball.vx)
-          addBounceRandom(ball)
           ball.vx = Math.abs(ball.vx)
         }
 
@@ -1428,7 +1401,6 @@ export function Arkanoid({ onComplete }: Props) {
           ball.x = CANVAS_WIDTH - ball.radius - BOUNCE_PUSH
 
           ball.vx = -Math.abs(ball.vx)
-          addBounceRandom(ball)
           ball.vx = -Math.abs(ball.vx)
         }
 
@@ -1436,7 +1408,6 @@ export function Arkanoid({ onComplete }: Props) {
           ball.y = ball.radius + BOUNCE_PUSH
 
           ball.vy = Math.abs(ball.vy)
-          addBounceRandom(ball)
           ball.vy = Math.abs(ball.vy)
         }
 
@@ -1457,7 +1428,6 @@ export function Arkanoid({ onComplete }: Props) {
           ball.vy = -Math.max(getBallSpeed(game.level), Math.abs(ball.vy))
 
           ball.y = game.paddle.y - ball.radius - BOUNCE_PUSH
-          addBounceRandom(ball)
           ball.vy = -Math.abs(ball.vy)
         }
 
@@ -1495,7 +1465,6 @@ export function Arkanoid({ onComplete }: Props) {
               ball.x = brick.x - ball.radius - BOUNCE_PUSH
 
               ball.vx = -Math.abs(ball.vx)
-              addBounceRandom(ball)
               ball.vx = -Math.abs(ball.vx)
 
               break
@@ -1508,7 +1477,6 @@ export function Arkanoid({ onComplete }: Props) {
               ball.x = brick.x + brick.width + ball.radius + BOUNCE_PUSH
 
               ball.vx = Math.abs(ball.vx)
-              addBounceRandom(ball)
               ball.vx = Math.abs(ball.vx)
 
               break
@@ -1518,7 +1486,6 @@ export function Arkanoid({ onComplete }: Props) {
               ball.y = brick.y - ball.radius - BOUNCE_PUSH
 
               ball.vy = -Math.abs(ball.vy)
-              addBounceRandom(ball)
               ball.vy = -Math.abs(ball.vy)
 
               break
@@ -1531,7 +1498,6 @@ export function Arkanoid({ onComplete }: Props) {
               ball.y = brick.y + brick.height + ball.radius + BOUNCE_PUSH
 
               ball.vy = Math.abs(ball.vy)
-              addBounceRandom(ball)
               ball.vy = Math.abs(ball.vy)
 
               break
@@ -1571,7 +1537,6 @@ export function Arkanoid({ onComplete }: Props) {
               }
             }
 
-            addBounceRandom(ball)
             break
           }
 
@@ -1590,7 +1555,6 @@ export function Arkanoid({ onComplete }: Props) {
           // Выталкиваем мяч из кирпича и чуть случайно меняем угол.
           ball.x += Math.sign(ball.vx || 1) * BOUNCE_PUSH * 0.35
           ball.y += Math.sign(ball.vy || -1) * BOUNCE_PUSH
-          addBounceRandom(ball)
 
           break
         }
@@ -1925,8 +1889,9 @@ export function Arkanoid({ onComplete }: Props) {
                             <button
                               key={key}
                               type="button"
-                              className={`arkanoid__difficulty-button${difficulty === key ? ' arkanoid__difficulty-button--active' : ''
-                                }`}
+                              className={`arkanoid__difficulty-button${
+                                difficulty === key ? ' arkanoid__difficulty-button--active' : ''
+                              }`}
                               onClick={() => selectDifficulty(key)}
                               disabled={!isDifficultyUnlocked(key, difficultyLosses)}
                             >
