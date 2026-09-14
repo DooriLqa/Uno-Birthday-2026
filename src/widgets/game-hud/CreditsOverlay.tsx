@@ -24,6 +24,9 @@ const CREDIT_SECTIONS: { title: string; names: string[] }[] = [
       'AlfrenD',
     ],
   },
+  { title: 'Сборка сундука', names: ['Phleesty'] },
+  { title: 'Особое спасибо', names: ['Чатику за просмотр и понимание'] },
+  { title: 'С ДНЕМ РОЖДЕНИЯ, ЮНЯША!', names: ['Буп'] },
   /* { title: 'Special thanks', names: ['ChatGPT'] }, */
 ]
 
